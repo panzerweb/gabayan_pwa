@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test'
 
+// The seeded tasks are scheduled on 2026-09-23 (Asia/Manila), and Home asks for
+// the tasks of the browser's current day, so the clock is pinned to that day.
+test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-09-23T08:00:00+08:00'))
+})
+
 test('existing farmer completes feeding and reviews cultivation guidance', async ({ page }) => {
   await page.goto('/sign-in')
   await page.getByLabel('Email or mobile number').fill('juan@example.com')
