@@ -1,0 +1,1202 @@
+{
+  "users": [
+    {
+      "id": "usr_juan",
+      "fullName": "Juan Dela Cruz",
+      "email": "juan@example.com",
+      "mobileNumber": "+639171234567",
+      "avatar": null,
+      "emailVerified": true,
+      "mobileVerified": false,
+      "locale": "en-PH",
+      "timezone": "Asia/Manila",
+      "createdAt": "2026-08-06T00:00:00Z",
+      "updatedAt": "2026-09-21T00:00:00Z",
+      "version": 1,
+      "mockPassword": "Gabayan123!",
+      "mockHasCultivation": true
+    }
+  ],
+  "farms": [
+    {
+      "id": "farm_juan",
+      "ownerUserId": "usr_juan",
+      "name": "Dela Cruz Family Fish Farm",
+      "region": "CALABARZON",
+      "province": "Laguna",
+      "municipality": "San Pablo City",
+      "experienceLevel": "BEGINNER",
+      "notes": "Small-scale freshwater pond operation.",
+      "createdAt": "2026-08-06T00:00:00Z",
+      "updatedAt": "2026-09-21T00:00:00Z",
+      "version": 1
+    }
+  ],
+  "notificationSettings": [
+    {
+      "id": "notification_settings_juan",
+      "ownerUserId": "usr_juan",
+      "feedingReminders": true,
+      "waterMaintenance": true,
+      "growthSampling": true,
+      "harvestReminders": true,
+      "orderUpdates": true,
+      "educationalTips": true,
+      "morningFeedingTime": "08:00",
+      "afternoonFeedingTime": "16:30",
+      "timezone": "Asia/Manila",
+      "updatedAt": "2026-09-21T00:00:00Z",
+      "version": 1
+    }
+  ],
+  "species": [
+    {
+      "id": "sp_tilapia",
+      "commonName": "Tilapia",
+      "localName": "Tilapia",
+      "slug": "tilapia",
+      "shortDescription": "Beginner-friendly and adaptable to many freshwater culture systems.",
+      "beginnerFriendly": true,
+      "image": {
+        "url": "/mock-media/tilapia.svg",
+        "alt": "Tilapia swimming in clear water"
+      },
+      "estimatedCultureDays": { "minimum": 120, "maximum": 180 },
+      "active": true,
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "sp_milkfish",
+      "commonName": "Milkfish",
+      "localName": "Bangus",
+      "slug": "milkfish",
+      "shortDescription": "A popular Filipino aquaculture species raised in suitable ponds and cages.",
+      "beginnerFriendly": true,
+      "image": {
+        "url": "/mock-media/milkfish.svg",
+        "alt": "Milkfish swimming near the water surface"
+      },
+      "estimatedCultureDays": { "minimum": 120, "maximum": 210 },
+      "active": true,
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "sp_catfish",
+      "commonName": "Catfish",
+      "localName": "Hito",
+      "slug": "catfish",
+      "shortDescription": "A hardy freshwater fish suitable for certain pond and tank systems.",
+      "beginnerFriendly": true,
+      "image": {
+        "url": "/mock-media/catfish.svg",
+        "alt": "Catfish in a freshwater culture area"
+      },
+      "estimatedCultureDays": { "minimum": 90, "maximum": 150 },
+      "active": true,
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "sp_carp",
+      "commonName": "Carp",
+      "localName": "Carp",
+      "slug": "carp",
+      "shortDescription": "An adaptable freshwater fish used in pond-based culture.",
+      "beginnerFriendly": false,
+      "image": {
+        "url": "/mock-media/carp.svg",
+        "alt": "Carp in a freshwater pond"
+      },
+      "estimatedCultureDays": { "minimum": 150, "maximum": 240 },
+      "active": true,
+      "sourceStatus": "DEMO"
+    }
+  ],
+  "cultureEnvironments": [
+    {
+      "id": "env_pond",
+      "code": "POND",
+      "name": "Pond",
+      "shortDescription": "For traditional earthen, concrete, or lined pond setups.",
+      "image": { "url": "/mock-media/pond.svg", "alt": "A managed fish pond" },
+      "active": true,
+      "dimensionModel": "RECTANGULAR_VOLUME",
+      "guidanceSummary": "Plan using the pond surface area and estimated water volume.",
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "env_tank",
+      "code": "TANK",
+      "name": "Tank / Container",
+      "shortDescription": "For controlled backyard or small-scale tank systems.",
+      "image": { "url": "/mock-media/tank.svg", "alt": "A circular backyard fish tank" },
+      "active": true,
+      "dimensionModel": "RECTANGULAR_VOLUME",
+      "guidanceSummary": "Use actual internal dimensions when estimating usable water volume.",
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "env_cage",
+      "code": "FISH_CAGE",
+      "name": "Fish Cage",
+      "shortDescription": "For suitable cages installed in approved bodies of water.",
+      "image": { "url": "/mock-media/cage.svg", "alt": "A floating aquaculture fish cage" },
+      "active": true,
+      "dimensionModel": "RECTANGULAR_VOLUME",
+      "guidanceSummary": "Cage planning depends on site approval, flow, and local conditions.",
+      "sourceStatus": "DEMO"
+    }
+  ],
+  "compatibilityRules": [
+    {
+      "id": "compat_tilapia_pond",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Tilapia in a pond.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_tilapia_tank",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "Tilapia can be planned for a managed tank using this demo profile.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_tilapia_cage",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "status": "CAUTION",
+      "title": "Check the site before continuing",
+      "message": "Fish cages require suitable water flow, permits, and local site assessment.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_milkfish_pond",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Milkfish in a suitable pond.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_milkfish_tank",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_tank",
+      "status": "NOT_RECOMMENDED",
+      "title": "Choose another culture environment",
+      "message": "This prototype does not have a reviewed Milkfish tank profile.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_milkfish_cage",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "status": "CAUTION",
+      "title": "Check the site before continuing",
+      "message": "Milkfish cages require suitable water conditions, permits, and local guidance.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_catfish_pond",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Catfish in a managed pond.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_catfish_tank",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Catfish in a suitable tank.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_catfish_cage",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_cage",
+      "status": "NOT_RECOMMENDED",
+      "title": "Choose another culture environment",
+      "message": "This prototype does not have a reviewed Catfish cage profile.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_carp_pond",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Carp in a suitable freshwater pond.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_carp_tank",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "status": "CAUTION",
+      "title": "Review space and water management",
+      "message": "A Carp tank needs careful space and water-quality planning.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "compat_carp_cage",
+      "speciesId": "sp_carp",
+      "environmentId": "env_cage",
+      "status": "NOT_RECOMMENDED",
+      "title": "Choose another culture environment",
+      "message": "This prototype does not have a reviewed Carp cage profile.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    }
+  ],
+  "stockingRules": [
+    {
+      "id": "stock_tilapia_pond",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 15,
+      "maximumDensity": 18.3333,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_tilapia_tank",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 10,
+      "maximumDensity": 14,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_tilapia_cage",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 18,
+      "maximumDensity": 22,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_milkfish_pond",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 10,
+      "maximumDensity": 14,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_milkfish_cage",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 15,
+      "maximumDensity": 20,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_catfish_pond",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 12,
+      "maximumDensity": 18,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_catfish_tank",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 15,
+      "maximumDensity": 20,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_carp_pond",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 8,
+      "maximumDensity": 12,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "stock_carp_tank",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 6,
+      "maximumDensity": 10,
+      "densityUnit": "FISH_PER_M3",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    }
+  ],
+  "stockingEstimates": [],
+  "cultivations": [
+    {
+      "id": "cul_tilapia_001",
+      "ownerUserId": "usr_juan",
+      "name": "Tilapia Batch #001",
+      "species": {
+        "id": "sp_tilapia",
+        "commonName": "Tilapia",
+        "localName": "Tilapia",
+        "image": { "url": "/mock-media/tilapia.svg", "alt": "Tilapia swimming in clear water" }
+      },
+      "environment": { "id": "env_pond", "code": "POND", "name": "Pond" },
+      "status": "GROWING",
+      "dayNumber": 46,
+      "estimatedDurationDays": 150,
+      "progressPercent": 31,
+      "initialFingerlings": 500,
+      "estimatedLiveFish": 485,
+      "estimatedHarvestDate": "2027-01-04",
+      "nextTaskAt": "2026-09-23T08:00:00Z",
+      "stockingStatus": "RECOMMENDED",
+      "createdAt": "2026-08-07T00:00:00Z",
+      "updatedAt": "2026-09-22T00:00:00Z",
+      "version": 1,
+      "dimensions": { "lengthM": 5, "widthM": 4, "waterDepthM": 1.5 },
+      "surfaceAreaM2": 20,
+      "estimatedWaterVolumeM3": 30,
+      "stockedOn": "2026-08-07",
+      "recordedMortality": 15,
+      "latestGrowthMeasurement": {
+        "id": "grw_tilapia_003",
+        "cultivationId": "cul_tilapia_001",
+        "measuredOn": "2026-09-21",
+        "numberOfFishSampled": 20,
+        "averageWeight": { "value": 180, "unit": "G" },
+        "notes": "Fish were sampled from different areas of the pond.",
+        "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+        "createdAt": "2026-09-21T00:30:00Z",
+        "updatedAt": "2026-09-21T00:30:00Z",
+        "version": 1
+      },
+      "growthStage": { "code": "GROWING", "name": "Growing", "isEstimated": true },
+      "feedingSummary": {
+        "dailyFeed": { "value": 2.4, "unit": "KG" },
+        "feedingsPerDay": 2,
+        "nextFeedingAt": "2026-09-23T08:00:00Z",
+        "planId": "feed_plan_tilapia_001"
+      },
+      "harvestSummary": {
+        "targetWeight": { "value": 350, "unit": "G" },
+        "readinessStatus": "MONITOR",
+        "estimatedHarvestDate": "2027-01-04"
+      },
+      "stockingEstimateSnapshot": {
+        "estimateId": "est_demo_tilapia_pond_500",
+        "species": {
+          "id": "sp_tilapia",
+          "commonName": "Tilapia",
+          "localName": "Tilapia",
+          "slug": "tilapia",
+          "shortDescription": "Beginner-friendly and adaptable to many freshwater culture systems.",
+          "beginnerFriendly": true,
+          "image": { "url": "/mock-media/tilapia.svg", "alt": "Tilapia swimming in clear water" },
+          "estimatedCultureDays": { "minimum": 120, "maximum": 180 },
+          "active": true,
+          "sourceStatus": "DEMO"
+        },
+        "environment": {
+          "id": "env_pond",
+          "code": "POND",
+          "name": "Pond",
+          "shortDescription": "For traditional earthen, concrete, or lined pond setups.",
+          "image": { "url": "/mock-media/pond.svg", "alt": "A managed fish pond" },
+          "active": true,
+          "dimensionModel": "RECTANGULAR_VOLUME",
+          "guidanceSummary": "Plan using the pond surface area and estimated water volume.",
+          "sourceStatus": "DEMO"
+        },
+        "dimensions": { "lengthM": 5, "widthM": 4, "waterDepthM": 1.5 },
+        "surfaceAreaM2": 20,
+        "estimatedWaterVolumeM3": 30,
+        "plannedFingerlings": 500,
+        "recommendedMinimum": 450,
+        "recommendedMaximum": 550,
+        "status": "RECOMMENDED",
+        "differenceToRange": 0,
+        "suggestedFingerlings": 500,
+        "basis": {
+          "type": "WATER_VOLUME",
+          "densityMinimum": 15,
+          "densityMaximum": 18.3333,
+          "densityUnit": "FISH_PER_M3",
+          "inputAreaM2": 20,
+          "inputVolumeM3": 30,
+          "explanation": "Demo density range for this prototype profile."
+        },
+        "compatibility": {
+          "speciesId": "sp_tilapia",
+          "environmentId": "env_pond",
+          "status": "COMPATIBLE",
+          "title": "This setup can be planned",
+          "message": "This demo profile supports Tilapia in a pond.",
+          "alternatives": [],
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        },
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09",
+        "expiresAt": "2026-09-21T09:00:00Z",
+        "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on local conditions."
+      },
+      "recommendationDisclaimer": "Gabayan's recommendations are demo estimates and may vary based on local conditions.",
+      "notes": null
+    },
+    {
+      "id": "cul_tilapia_harvest",
+      "ownerUserId": "usr_juan",
+      "name": "Tilapia Harvest Demo",
+      "species": {
+        "id": "sp_tilapia",
+        "commonName": "Tilapia",
+        "localName": "Tilapia",
+        "image": { "url": "/mock-media/tilapia.svg", "alt": "Tilapia swimming in clear water" }
+      },
+      "environment": { "id": "env_pond", "code": "POND", "name": "Pond" },
+      "status": "PRE_HARVEST",
+      "dayNumber": 150,
+      "estimatedDurationDays": 155,
+      "progressPercent": 97,
+      "initialFingerlings": 500,
+      "estimatedLiveFish": 480,
+      "estimatedHarvestDate": "2026-09-30",
+      "nextTaskAt": null,
+      "stockingStatus": "RECOMMENDED",
+      "createdAt": "2026-04-27T00:00:00Z",
+      "updatedAt": "2026-09-22T00:00:00Z",
+      "version": 1,
+      "dimensions": { "lengthM": 5, "widthM": 4, "waterDepthM": 1.5 },
+      "surfaceAreaM2": 20,
+      "estimatedWaterVolumeM3": 30,
+      "stockedOn": "2026-04-27",
+      "recordedMortality": 20,
+      "latestGrowthMeasurement": {
+        "id": "grw_tilapia_harvest",
+        "cultivationId": "cul_tilapia_harvest",
+        "measuredOn": "2026-09-22",
+        "numberOfFishSampled": 30,
+        "averageWeight": { "value": 360, "unit": "G" },
+        "notes": "Demo harvest-readiness sample.",
+        "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+        "createdAt": "2026-09-22T01:00:00Z",
+        "updatedAt": "2026-09-22T01:00:00Z",
+        "version": 1
+      },
+      "growthStage": { "code": "PRE_HARVEST", "name": "Pre-harvest", "isEstimated": true },
+      "feedingSummary": {
+        "dailyFeed": { "value": 4.32, "unit": "KG" },
+        "feedingsPerDay": 2,
+        "nextFeedingAt": "2026-09-23T08:00:00Z",
+        "planId": "feed_plan_tilapia_harvest"
+      },
+      "harvestSummary": {
+        "targetWeight": { "value": 350, "unit": "G" },
+        "readinessStatus": "POTENTIALLY_READY",
+        "estimatedHarvestDate": "2026-09-30"
+      },
+      "stockingEstimateSnapshot": null,
+      "recommendationDisclaimer": "Gabayan's recommendations are demo estimates and may vary based on local conditions.",
+      "notes": "Near-harvest deterministic fixture for the readiness journey."
+    }
+  ],
+  "growthMeasurements": [
+    {
+      "id": "grw_tilapia_001",
+      "cultivationId": "cul_tilapia_001",
+      "measuredOn": "2026-08-21",
+      "numberOfFishSampled": 20,
+      "averageWeight": { "value": 42, "unit": "G" },
+      "notes": null,
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-08-21T00:30:00Z",
+      "updatedAt": "2026-08-21T00:30:00Z",
+      "version": 1
+    },
+    {
+      "id": "grw_tilapia_002",
+      "cultivationId": "cul_tilapia_001",
+      "measuredOn": "2026-09-06",
+      "numberOfFishSampled": 20,
+      "averageWeight": { "value": 105, "unit": "G" },
+      "notes": null,
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-09-06T00:30:00Z",
+      "updatedAt": "2026-09-06T00:30:00Z",
+      "version": 1
+    },
+    {
+      "id": "grw_tilapia_003",
+      "cultivationId": "cul_tilapia_001",
+      "measuredOn": "2026-09-21",
+      "numberOfFishSampled": 20,
+      "averageWeight": { "value": 180, "unit": "G" },
+      "notes": "Fish were sampled from different areas of the pond.",
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-09-21T00:30:00Z",
+      "updatedAt": "2026-09-21T00:30:00Z",
+      "version": 1
+    },
+    {
+      "id": "grw_tilapia_harvest",
+      "cultivationId": "cul_tilapia_harvest",
+      "measuredOn": "2026-09-22",
+      "numberOfFishSampled": 30,
+      "averageWeight": { "value": 360, "unit": "G" },
+      "notes": "Demo harvest-readiness sample.",
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-09-22T01:00:00Z",
+      "updatedAt": "2026-09-22T01:00:00Z",
+      "version": 1
+    }
+  ],
+  "mortalityRecords": [
+    {
+      "id": "mort_tilapia_001",
+      "cultivationId": "cul_tilapia_001",
+      "occurredOn": "2026-09-10",
+      "fishCount": 15,
+      "reason": "UNKNOWN",
+      "notes": "Recorded during the weekly count.",
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-09-10T02:00:00Z"
+    },
+    {
+      "id": "mort_tilapia_harvest",
+      "cultivationId": "cul_tilapia_harvest",
+      "occurredOn": "2026-08-30",
+      "fishCount": 20,
+      "reason": "UNKNOWN",
+      "notes": null,
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-08-30T02:00:00Z"
+    }
+  ],
+  "waterChecks": [
+    {
+      "id": "water_tilapia_001",
+      "cultivationId": "cul_tilapia_001",
+      "checkedAt": "2026-09-21T22:30:00Z",
+      "observation": {
+        "clarity": "Slightly green",
+        "odor": "No unusual odor",
+        "fishBehavior": "Active near feeding time",
+        "unusualChanges": false
+      },
+      "actionTaken": null,
+      "notes": null,
+      "guidance": [
+        {
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09",
+          "disclaimer": "This is conditional demo guidance and is not a site-specific water-quality assessment."
+        }
+      ],
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-09-21T22:30:00Z"
+    }
+  ],
+  "harvestRecords": [],
+  "tasks": [
+    {
+      "id": "task_feed_am",
+      "cultivationId": "cul_tilapia_001",
+      "type": "FEEDING",
+      "title": "Morning feeding",
+      "instruction": "Give the planned morning portion and observe feeding response.",
+      "scheduledAt": "2026-09-23T00:00:00Z",
+      "dueAt": "2026-09-23T01:00:00Z",
+      "status": "COMPLETED",
+      "recommendedAmount": { "value": 1.2, "unit": "KG" },
+      "completedAt": "2026-09-23T00:12:00Z",
+      "completionRecordType": "FEEDING_RECORD",
+      "completionRecordId": "feed_tilapia_001",
+      "deepLink": "/app/cultivations/cul_tilapia_001/tasks?taskId=task_feed_am",
+      "audit": {
+        "createdAt": "2026-09-21T08:00:00Z",
+        "updatedAt": "2026-09-23T00:12:00Z",
+        "version": 2
+      }
+    },
+    {
+      "id": "task_water_check",
+      "cultivationId": "cul_tilapia_001",
+      "type": "WATER_CHECK",
+      "title": "Check water condition",
+      "instruction": "Observe the water color, odor, and fish behavior. Record any concerns.",
+      "scheduledAt": "2026-09-23T02:00:00Z",
+      "dueAt": "2026-09-23T04:00:00Z",
+      "status": "DUE",
+      "recommendedAmount": null,
+      "completedAt": null,
+      "completionRecordType": null,
+      "completionRecordId": null,
+      "deepLink": "/app/cultivations/cul_tilapia_001/tasks?taskId=task_water_check",
+      "audit": {
+        "createdAt": "2026-09-21T08:00:00Z",
+        "updatedAt": "2026-09-21T08:00:00Z",
+        "version": 1
+      }
+    },
+    {
+      "id": "task_feed_pm",
+      "cultivationId": "cul_tilapia_001",
+      "type": "FEEDING",
+      "title": "Afternoon feeding",
+      "instruction": "Give the planned afternoon portion and stop if fish are not actively feeding.",
+      "scheduledAt": "2026-09-23T08:00:00Z",
+      "dueAt": "2026-09-23T09:00:00Z",
+      "status": "DUE",
+      "recommendedAmount": { "value": 1.2, "unit": "KG" },
+      "completedAt": null,
+      "completionRecordType": null,
+      "completionRecordId": null,
+      "deepLink": "/app/cultivations/cul_tilapia_001/tasks?taskId=task_feed_pm",
+      "audit": {
+        "createdAt": "2026-09-21T08:00:00Z",
+        "updatedAt": "2026-09-21T08:00:00Z",
+        "version": 1
+      }
+    }
+  ],
+  "feedingRecords": [
+    {
+      "id": "feed_tilapia_001",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": "task_feed_am",
+      "fedAt": "2026-09-23T00:12:00Z",
+      "amount": { "value": 1.2, "unit": "KG" },
+      "notes": "Fish responded normally.",
+      "recordedBy": { "id": "usr_juan", "fullName": "Juan Dela Cruz" },
+      "createdAt": "2026-09-23T00:12:00Z"
+    }
+  ],
+  "timelineEvents": [
+    {
+      "id": "timeline_stocked",
+      "cultivationId": "cul_tilapia_001",
+      "type": "STOCKING",
+      "label": "Fingerlings stocked",
+      "status": "COMPLETED",
+      "occurredOn": "2026-08-07",
+      "estimatedOn": null,
+      "detail": "500 Tilapia fingerlings recorded."
+    },
+    {
+      "id": "timeline_growing",
+      "cultivationId": "cul_tilapia_001",
+      "type": "GROWTH_STAGE",
+      "label": "Growing stage",
+      "status": "CURRENT",
+      "occurredOn": "2026-09-06",
+      "estimatedOn": null,
+      "detail": "Current stage is estimated from the configured demo profile and recent records."
+    },
+    {
+      "id": "timeline_harvest",
+      "cultivationId": "cul_tilapia_001",
+      "type": "HARVEST",
+      "label": "Estimated harvest window",
+      "status": "UPCOMING",
+      "occurredOn": null,
+      "estimatedOn": "2027-01-04",
+      "detail": "Readiness still requires current growth measurements and a harvest assessment."
+    }
+  ],
+  "educationalTips": [
+    {
+      "id": "tip_observation_001",
+      "title": "Observe before feeding",
+      "message": "Check fish behavior and water condition before each feeding. Pause and investigate if feeding response changes suddenly.",
+      "image": null,
+      "learnMoreUrl": null,
+      "sourceStatus": "DEMO",
+      "isDemo": true,
+      "ruleVersion": "demo-2026-09",
+      "disclaimer": "This is general demo guidance, not a site-specific prescription. Local conditions and fish health may require a different response."
+    }
+  ],
+  "notifications": [
+    {
+      "id": "ntf_feed_pm",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "FEEDING_DUE",
+      "title": "Afternoon feeding is due",
+      "message": "Tilapia Batch #001 has a planned feeding at 4:00 PM.",
+      "recommendedAmount": { "value": 1.2, "unit": "KG" },
+      "occurredAt": "2026-09-23T07:45:00Z",
+      "readAt": null,
+      "action": {
+        "label": "Review task",
+        "deepLink": "/app/cultivations/cul_tilapia_001/tasks?taskId=task_feed_pm"
+      },
+      "cultivationId": "cul_tilapia_001",
+      "orderId": null,
+      "taskId": "task_feed_pm"
+    },
+    {
+      "id": "ntf_water_check",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "WATER_CHECK_DUE",
+      "title": "Water observation reminder",
+      "message": "Check water color, odor, and fish behavior today.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-23T01:45:00Z",
+      "readAt": null,
+      "action": {
+        "label": "View daily tasks",
+        "deepLink": "/app/cultivations/cul_tilapia_001/tasks?taskId=task_water_check"
+      },
+      "cultivationId": "cul_tilapia_001",
+      "orderId": null,
+      "taskId": "task_water_check"
+    },
+    {
+      "id": "ntf_tip_observation",
+      "ownerUserId": "usr_juan",
+      "category": "EDUCATION",
+      "type": "EDUCATIONAL_TIP",
+      "title": "Look for changes in feeding response",
+      "message": "A sudden change can signal a water-quality or fish-health concern.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-21T06:00:00Z",
+      "readAt": "2026-09-21T07:00:00Z",
+      "action": null,
+      "cultivationId": "cul_tilapia_001",
+      "orderId": null,
+      "taskId": null
+    },
+    {
+      "id": "ntf_order_shipped",
+      "ownerUserId": "usr_juan",
+      "category": "ORDER",
+      "type": "ORDER_UPDATE",
+      "title": "Order GBY-10245 has shipped",
+      "message": "Your farm supplies are on the way with Bayanihan Express.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-20T03:30:00Z",
+      "readAt": null,
+      "action": { "label": "Track order", "deepLink": "/app/orders/ord_10245/tracking" },
+      "cultivationId": null,
+      "orderId": "ord_10245",
+      "taskId": null
+    }
+  ],
+  "productCategories": [
+    { "id": "cat_feeds", "code": "FEEDS", "name": "Feeds", "icon": "feed", "sortOrder": 1 },
+    {
+      "id": "cat_aeration",
+      "code": "AERATION",
+      "name": "Aeration",
+      "icon": "bubbles",
+      "sortOrder": 2
+    },
+    {
+      "id": "cat_pumps",
+      "code": "WATER_PUMPS",
+      "name": "Water Pumps",
+      "icon": "pump",
+      "sortOrder": 3
+    },
+    {
+      "id": "cat_testing",
+      "code": "TESTING",
+      "name": "Testing",
+      "icon": "testing",
+      "sortOrder": 4
+    },
+    { "id": "cat_nets", "code": "NETS", "name": "Nets", "icon": "net", "sortOrder": 5 },
+    { "id": "cat_tanks", "code": "TANKS", "name": "Tanks", "icon": "tank", "sortOrder": 6 },
+    { "id": "cat_filters", "code": "FILTERS", "name": "Filters", "icon": "filter", "sortOrder": 7 },
+    { "id": "cat_tools", "code": "TOOLS", "name": "Tools", "icon": "tools", "sortOrder": 8 }
+  ],
+  "products": [
+    {
+      "id": "prd_pond_aerator",
+      "sku": "GBY-AER-001",
+      "name": "Compact Pond Aerator",
+      "shortDescription": "A compact aerator for suitable small pond and tank setups.",
+      "primaryImage": { "url": "/mock-media/aerator.svg", "alt": "Compact pond aerator" },
+      "price": { "amountMinor": 129900, "currency": "PHP" },
+      "rating": 4.7,
+      "ratingCount": 84,
+      "soldCount": 210,
+      "availability": "AVAILABLE",
+      "stockQuantity": 24,
+      "categoryId": "cat_aeration",
+      "badges": ["Setup support"],
+      "images": [{ "url": "/icon.svg", "alt": "Compact pond aerator" }],
+      "description": "A compact electric aerator intended for suitable small pond and tank setups. Confirm electrical safety and actual oxygen needs before use.",
+      "specifications": [
+        { "label": "Rated power", "value": "45 W" },
+        { "label": "Cable length", "value": "5 m" },
+        { "label": "Warranty", "value": "6 months" }
+      ],
+      "suitableSpeciesIds": ["sp_tilapia", "sp_catfish", "sp_carp"],
+      "suitableEnvironmentIds": ["env_pond", "env_tank"],
+      "recommendation": {
+        "cultivationId": "cul_tilapia_001",
+        "why": "Aeration may support dissolved oxygen when appropriate for this pond setup."
+      },
+      "maximumOrderQuantity": 4
+    },
+    {
+      "id": "prd_grower_feed",
+      "sku": "GBY-FED-020",
+      "name": "Tilapia Grower Feed 20 kg",
+      "shortDescription": "Demo grower feed listing for planned supply shopping.",
+      "primaryImage": { "url": "/icon.svg", "alt": "Bag of Tilapia grower feed" },
+      "price": { "amountMinor": 118000, "currency": "PHP" },
+      "rating": 4.6,
+      "ratingCount": 126,
+      "soldCount": 540,
+      "availability": "AVAILABLE",
+      "stockQuantity": 36,
+      "categoryId": "cat_feeds",
+      "badges": ["Popular"],
+      "images": [{ "url": "/icon.svg", "alt": "Bag of Tilapia grower feed" }],
+      "description": "A sample marketplace feed product. Match feed type and pellet size to the current growth stage with local technical guidance.",
+      "specifications": [
+        { "label": "Net weight", "value": "20 kg" },
+        { "label": "Form", "value": "Floating pellets" }
+      ],
+      "suitableSpeciesIds": ["sp_tilapia"],
+      "suitableEnvironmentIds": ["env_pond", "env_tank", "env_cage"],
+      "recommendation": null,
+      "maximumOrderQuantity": 10
+    },
+    {
+      "id": "prd_water_test_kit",
+      "sku": "GBY-TST-004",
+      "name": "Freshwater Test Kit",
+      "shortDescription": "Color-comparison kit for common freshwater observations.",
+      "primaryImage": { "url": "/icon.svg", "alt": "Freshwater test kit" },
+      "price": { "amountMinor": 64900, "currency": "PHP" },
+      "rating": 4.5,
+      "ratingCount": 67,
+      "soldCount": 143,
+      "availability": "LOW_STOCK",
+      "stockQuantity": 6,
+      "categoryId": "cat_testing",
+      "badges": ["Low stock"],
+      "images": [{ "url": "/icon.svg", "alt": "Freshwater test kit" }],
+      "description": "A basic test kit for observational use. Follow the manufacturer instructions and seek qualified advice when readings are concerning.",
+      "specifications": [
+        { "label": "Tests", "value": "pH, ammonia, nitrite" },
+        { "label": "Approximate uses", "value": "40" }
+      ],
+      "suitableSpeciesIds": ["sp_tilapia", "sp_milkfish", "sp_catfish", "sp_carp"],
+      "suitableEnvironmentIds": ["env_pond", "env_tank"],
+      "recommendation": null,
+      "maximumOrderQuantity": 3
+    },
+    {
+      "id": "prd_water_pump",
+      "sku": "GBY-PMP-018",
+      "name": "Submersible Water Pump",
+      "shortDescription": "Compact pump for suitable transfer and circulation tasks.",
+      "primaryImage": { "url": "/icon.svg", "alt": "Submersible water pump" },
+      "price": { "amountMinor": 189900, "currency": "PHP" },
+      "rating": 4.4,
+      "ratingCount": 42,
+      "soldCount": 91,
+      "availability": "AVAILABLE",
+      "stockQuantity": 12,
+      "categoryId": "cat_pumps",
+      "badges": [],
+      "images": [{ "url": "/icon.svg", "alt": "Submersible water pump" }],
+      "description": "A portable pump for appropriate water-transfer jobs. It does not imply that full water replacement is recommended.",
+      "specifications": [
+        { "label": "Rated power", "value": "85 W" },
+        { "label": "Maximum lift", "value": "3 m" }
+      ],
+      "suitableSpeciesIds": ["sp_tilapia", "sp_catfish"],
+      "suitableEnvironmentIds": ["env_pond", "env_tank"],
+      "recommendation": null,
+      "maximumOrderQuantity": 2
+    },
+    {
+      "id": "prd_scoop_net",
+      "sku": "GBY-NET-012",
+      "name": "Soft Mesh Scoop Net",
+      "shortDescription": "Soft mesh net for careful handling during routine work.",
+      "primaryImage": { "url": "/icon.svg", "alt": "Soft mesh fish scoop net" },
+      "price": { "amountMinor": 34900, "currency": "PHP" },
+      "rating": 4.8,
+      "ratingCount": 103,
+      "soldCount": 276,
+      "availability": "AVAILABLE",
+      "stockQuantity": 41,
+      "categoryId": "cat_nets",
+      "badges": ["Gentle mesh"],
+      "images": [{ "url": "/icon.svg", "alt": "Soft mesh fish scoop net" }],
+      "description": "A soft mesh scoop net designed to reduce abrasion during careful fish handling.",
+      "specifications": [
+        { "label": "Opening", "value": "30 cm" },
+        { "label": "Handle", "value": "60 cm" }
+      ],
+      "suitableSpeciesIds": ["sp_tilapia", "sp_milkfish", "sp_catfish", "sp_carp"],
+      "suitableEnvironmentIds": ["env_pond", "env_tank", "env_cage"],
+      "recommendation": null,
+      "maximumOrderQuantity": 5
+    },
+    {
+      "id": "prd_pond_filter",
+      "sku": "GBY-FLT-009",
+      "name": "Washable Pond Filter Pad",
+      "shortDescription": "Reusable mechanical filter media for compatible systems.",
+      "primaryImage": { "url": "/icon.svg", "alt": "Washable pond filter pad" },
+      "price": { "amountMinor": 89900, "currency": "PHP" },
+      "rating": 4.2,
+      "ratingCount": 31,
+      "soldCount": 74,
+      "availability": "OUT_OF_STOCK",
+      "stockQuantity": 0,
+      "categoryId": "cat_filters",
+      "badges": ["Reusable"],
+      "images": [{ "url": "/icon.svg", "alt": "Washable pond filter pad" }],
+      "description": "Reusable filter material for systems designed to accept mechanical filtration.",
+      "specifications": [{ "label": "Size", "value": "50 × 50 cm" }],
+      "suitableSpeciesIds": ["sp_tilapia", "sp_catfish"],
+      "suitableEnvironmentIds": ["env_tank"],
+      "recommendation": null,
+      "maximumOrderQuantity": 6
+    }
+  ],
+  "favorites": [],
+  "addresses": [
+    {
+      "id": "addr_juan_home",
+      "ownerUserId": "usr_juan",
+      "label": "Farm address",
+      "recipientName": "Juan Dela Cruz",
+      "mobileNumber": "+639171234567",
+      "line1": "18 Mabini Street",
+      "line2": null,
+      "barangay": "San Roque",
+      "cityMunicipality": "San Pablo City",
+      "province": "Laguna",
+      "region": "CALABARZON",
+      "postalCode": "4000",
+      "countryCode": "PH",
+      "deliveryInstructions": "Call before entering the farm gate.",
+      "isDefault": true,
+      "createdAt": "2026-08-06T00:00:00Z",
+      "updatedAt": "2026-08-06T00:00:00Z",
+      "version": 1
+    }
+  ],
+  "carts": [
+    {
+      "id": "cart_juan",
+      "ownerUserId": "usr_juan",
+      "updatedAt": "2026-09-22T00:00:00Z",
+      "version": 1
+    }
+  ],
+  "cartItems": [],
+  "paymentOptions": [
+    {
+      "type": "CASH_ON_DELIVERY",
+      "label": "Cash on delivery",
+      "description": "Pay the courier when your order arrives.",
+      "enabled": true,
+      "disabledReason": null
+    },
+    {
+      "type": "GCASH",
+      "label": "GCash",
+      "description": "Demo option unavailable until payment integration is configured.",
+      "enabled": false,
+      "disabledReason": "Online payment is not available in this prototype."
+    },
+    {
+      "type": "CARD",
+      "label": "Debit or credit card",
+      "description": "Demo option unavailable until payment integration is configured.",
+      "enabled": false,
+      "disabledReason": "Online payment is not available in this prototype."
+    }
+  ],
+  "checkoutQuotes": [],
+  "orders": [
+    {
+      "id": "ord_10245",
+      "ownerUserId": "usr_juan",
+      "orderNumber": "GBY-10245",
+      "status": "SHIPPED",
+      "itemCount": 2,
+      "previewImages": [
+        { "url": "/icon.svg", "alt": "Compact pond aerator" },
+        { "url": "/icon.svg", "alt": "Freshwater test kit" }
+      ],
+      "total": { "amountMinor": 209800, "currency": "PHP" },
+      "placedAt": "2026-09-18T02:15:00Z",
+      "estimatedDeliveryDate": "2026-09-24",
+      "items": [
+        {
+          "id": "ord_item_10245_1",
+          "productId": "prd_pond_aerator",
+          "sku": "GBY-AER-001",
+          "name": "Compact Pond Aerator",
+          "image": { "url": "/icon.svg", "alt": "Compact pond aerator" },
+          "quantity": 1,
+          "unitPrice": { "amountMinor": 129900, "currency": "PHP" },
+          "lineTotal": { "amountMinor": 129900, "currency": "PHP" }
+        },
+        {
+          "id": "ord_item_10245_2",
+          "productId": "prd_water_test_kit",
+          "sku": "GBY-TST-004",
+          "name": "Freshwater Test Kit",
+          "image": { "url": "/icon.svg", "alt": "Freshwater test kit" },
+          "quantity": 1,
+          "unitPrice": { "amountMinor": 64900, "currency": "PHP" },
+          "lineTotal": { "amountMinor": 64900, "currency": "PHP" }
+        }
+      ],
+      "subtotal": { "amountMinor": 194800, "currency": "PHP" },
+      "deliveryFee": { "amountMinor": 15000, "currency": "PHP" },
+      "paymentMethod": "CASH_ON_DELIVERY",
+      "paymentStatus": "PENDING",
+      "deliveryAddress": {
+        "id": "addr_juan_home",
+        "label": "Farm address",
+        "recipientName": "Juan Dela Cruz",
+        "mobileNumber": "+639171234567",
+        "line1": "18 Mabini Street",
+        "line2": null,
+        "barangay": "San Roque",
+        "cityMunicipality": "San Pablo City",
+        "province": "Laguna",
+        "region": "CALABARZON",
+        "postalCode": "4000",
+        "countryCode": "PH",
+        "deliveryInstructions": "Call before entering the farm gate."
+      },
+      "contact": {
+        "fullName": "Juan Dela Cruz",
+        "mobileNumber": "+639171234567",
+        "email": "juan@example.com"
+      },
+      "courier": {
+        "name": "Bayanihan Express",
+        "trackingNumber": "BX-884120",
+        "contactUrl": null
+      },
+      "cancellation": null,
+      "updatedAt": "2026-09-20T03:30:00Z",
+      "version": 3
+    }
+  ],
+  "trackingEvents": [
+    {
+      "id": "trk_10245_1",
+      "orderId": "ord_10245",
+      "status": "PROCESSING",
+      "label": "Order placed",
+      "description": "We received your order.",
+      "occurredAt": "2026-09-18T02:15:00Z",
+      "completed": true,
+      "current": false
+    },
+    {
+      "id": "trk_10245_2",
+      "orderId": "ord_10245",
+      "status": "PROCESSING",
+      "label": "Payment confirmed",
+      "description": "Cash on delivery was selected.",
+      "occurredAt": "2026-09-18T02:16:00Z",
+      "completed": true,
+      "current": false
+    },
+    {
+      "id": "trk_10245_3",
+      "orderId": "ord_10245",
+      "status": "PROCESSING",
+      "label": "Preparing order",
+      "description": "Your farm supplies were packed.",
+      "occurredAt": "2026-09-19T01:00:00Z",
+      "completed": true,
+      "current": false
+    },
+    {
+      "id": "trk_10245_4",
+      "orderId": "ord_10245",
+      "status": "SHIPPED",
+      "label": "Shipped",
+      "description": "Bayanihan Express has your package.",
+      "occurredAt": "2026-09-20T03:30:00Z",
+      "completed": true,
+      "current": true
+    },
+    {
+      "id": "trk_10245_5",
+      "orderId": "ord_10245",
+      "status": "OUT_FOR_DELIVERY",
+      "label": "Out for delivery",
+      "description": "The courier will deliver to your farm address.",
+      "occurredAt": null,
+      "completed": false,
+      "current": false
+    },
+    {
+      "id": "trk_10245_6",
+      "orderId": "ord_10245",
+      "status": "DELIVERED",
+      "label": "Delivered",
+      "description": "Order delivered.",
+      "occurredAt": null,
+      "completed": false,
+      "current": false
+    }
+  ],
+  "idempotencyRecords": []
+}

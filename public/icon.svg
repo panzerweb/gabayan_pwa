@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Gabayan</title>
+  <desc id="desc">A fish above a guiding water path.</desc>
+  <rect width="512" height="512" rx="112" fill="#075985"/>
+  <path d="M96 332c58-58 126-78 202-59 47 12 82 4 118-27-23 67-67 108-132 120-67 13-130 2-188-34Z" fill="#2dd4bf"/>
+  <path d="M118 232c49-70 119-99 205-87 39 6 72 24 98 55-34 4-62 18-84 43-41 47-97 61-161 42-24-7-43-25-58-53Z" fill="#fff"/>
+  <path d="m351 198 65-42-8 75Z" fill="#a7f3d0"/>
+  <circle cx="173" cy="218" r="13" fill="#075985"/>
+  <path d="M162 273c43 14 83 11 122-10" fill="none" stroke="#075985" stroke-linecap="round" stroke-width="14"/>
+</svg>
