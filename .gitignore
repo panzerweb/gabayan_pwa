@@ -9,3 +9,9 @@ test-results/
 *.log
 .DS_Store
 Thumbs.db
+
+# Local working copy of mock-api/fixtures/seed.json, rewritten by the mock server and tests
+mock-api/db.json
+
+# The repository is managed with pnpm; an npm install must not add a second lockfile
+package-lock.json

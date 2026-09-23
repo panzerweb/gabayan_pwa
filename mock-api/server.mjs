@@ -1,3 +1,4 @@
+import { copyFileSync, existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -6,6 +7,7 @@ const require = createRequire(import.meta.url)
 const jsonServer = require('json-server')
 
 const defaultDatabasePath = resolve(process.cwd(), 'mock-api', 'db.json')
+const seedDatabasePath = resolve(process.cwd(), 'mock-api', 'fixtures', 'seed.json')
 const apiVersion = '0.6.0'
 const ruleDisclaimer =
   "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
@@ -197,6 +199,9 @@ function validateRegistration(body) {
 }
 
 export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = {}) {
+  // db.json is an untracked working copy of the seed; start from the seed when it is absent.
+  if (!existsSync(databasePath)) copyFileSync(seedDatabasePath, databasePath)
+
   const app = jsonServer.create()
   const router = jsonServer.router(databasePath)
   const resolvedDelay = delayMs ?? Number(process.env.MOCK_API_DELAY_MS ?? 250)
