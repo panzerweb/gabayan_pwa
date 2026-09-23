@@ -23,6 +23,31 @@ pnpm dev:all
 
 `VITE_API_BASE_URL` is the only frontend server-location setting. Keep it pointed at a server that implements [the v1 contract](docs/api_contract.md).
 
+## Build the Android app with Capacitor
+
+Do not package the normal `.env` value into an APK: inside Android, `localhost` refers to the
+Android device, not the computer running the mock API.
+
+For an Android Studio emulator:
+
+```powershell
+Copy-Item .env.android.example .env.android.local
+pnpm dev:mock
+pnpm android:sync
+pnpm android:open
+```
+
+The Android-mode example uses `http://10.0.2.2:3001/api/v1`, the emulator alias for the host
+computer. The debug manifest permits cleartext HTTP only for local development.
+
+For a physical Android phone, replace `10.0.2.2` in `.env.android.local` with the computer's LAN
+IPv4 address, keep both devices on the same network, and allow port 3001 through the development
+machine's firewall. A release APK must use the HTTPS URL of the deployed FastAPI service; release
+builds do not opt into cleartext traffic.
+
+Every API request has a bounded timeout. If the API cannot be reached during startup, Gabayan now
+continues to Welcome instead of remaining indefinitely on the web splash screen.
+
 ## Quality checks
 
 ```powershell

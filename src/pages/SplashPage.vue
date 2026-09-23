@@ -10,8 +10,11 @@ const router = useRouter()
 const session = useSessionStore()
 
 onMounted(async () => {
-  await session.restore()
-  await router.replace(session.isAuthenticated ? session.suggestedRoute : '/welcome')
+  try {
+    await session.restore()
+  } finally {
+    await router.replace(session.isAuthenticated ? session.suggestedRoute : '/welcome')
+  }
 })
 </script>
 

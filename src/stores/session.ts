@@ -50,7 +50,9 @@ export const useSessionStore = defineStore('session', () => {
         user.value = profile.data
         hasCultivation.value = cultivations.page.total > 0
       } catch (error) {
-        if (!(error instanceof ApiError) || error.status !== 401) throw error
+        if (!(error instanceof ApiError) || error.status !== 401) {
+          console.warn('Session restore skipped because the API is unavailable or invalid.', error)
+        }
         clear()
       } finally {
         initialized.value = true

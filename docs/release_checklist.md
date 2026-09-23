@@ -6,9 +6,9 @@ Last verified: 2026-09-23
 
 - [x] ESLint passes across application, mock API, and tests.
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 14 tests.
+- [x] Unit and component suite passes: 15 tests.
 - [x] Mock API contract suite passes: 10 tests.
-- [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Mobile Playwright suite passes: 14 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -53,9 +53,9 @@ Production build on 2026-09-23:
 
 | Asset                       |        Raw |      Gzip |
 | --------------------------- | ---------: | --------: |
-| Application JavaScript      |  391.61 kB | 118.69 kB |
+| Application JavaScript      |  400.31 kB | 121.96 kB |
 | Application CSS             |   76.65 kB |  12.14 kB |
-| Precached application shell | 463.43 KiB |       n/a |
+| Precached application shell | 472.04 KiB |       n/a |
 
 The current MVP stays in one application bundle. Route-level splitting is a post-MVP optimization if future profile, reporting, or marketplace features materially increase these figures.
 
@@ -65,4 +65,4 @@ The current MVP stays in one application bundle. Route-level splitting is a post
 - [x] Pages and components do not call JSON Server or raw collections directly.
 - [x] Request and response payloads are runtime-validated at the API boundary.
 - [x] Contract tests cover auth, onboarding, operations, commerce, harvest, and profile resources.
-- [ ] When FastAPI staging is available, set only `VITE_API_BASE_URL`, run the contract suite against staging, and execute the 13 critical browser journeys. This external deployment gate cannot be completed from the frontend/mock repository alone.
+- [ ] When FastAPI staging is available, set only `VITE_API_BASE_URL`, run the contract suite against staging, and execute the 14 critical browser journeys. This external deployment gate cannot be completed from the frontend/mock repository alone.

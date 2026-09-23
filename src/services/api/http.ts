@@ -1,6 +1,6 @@
 import type { ZodType } from 'zod'
 
-import { apiBaseUrl } from './config'
+import { apiBaseUrl, apiRequestTimeoutMs } from './config'
 
 export interface ResponseMeta {
   requestId: string
@@ -72,8 +72,23 @@ function isApiErrorPayload(value: unknown): value is ApiErrorPayload {
 }
 
 export async function apiRequest<T>(path: `/${string}`, options: ApiRequestOptions<T>): Promise<T> {
-  const { body, schema, accessToken, headers: optionHeaders, ...requestOptions } = options
+  const {
+    body,
+    schema,
+    accessToken,
+    headers: optionHeaders,
+    signal: optionSignal,
+    ...requestOptions
+  } = options
   const headers = new Headers(optionHeaders)
+  const controller = new AbortController()
+  let timedOut = false
+  const abortFromCaller = () => controller.abort(optionSignal?.reason)
+  optionSignal?.addEventListener('abort', abortFromCaller, { once: true })
+  const timeoutId = globalThis.setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, apiRequestTimeoutMs)
   headers.set('Accept', 'application/json')
 
   if (body !== undefined) {
@@ -84,12 +99,30 @@ export async function apiRequest<T>(path: `/${string}`, options: ApiRequestOptio
     headers.set('Authorization', `Bearer ${accessToken}`)
   }
 
-  const response = await fetch(`${apiBaseUrl}${path}`, {
-    ...requestOptions,
-    headers,
-    credentials: 'include',
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  })
+  let response: Response
+  try {
+    response = await fetch(`${apiBaseUrl}${path}`, {
+      ...requestOptions,
+      headers,
+      signal: controller.signal,
+      credentials: 'include',
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    })
+  } catch (error) {
+    if (optionSignal?.aborted) throw error
+    throw new ApiError(0, {
+      code: timedOut ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR',
+      message: timedOut
+        ? 'The server took too long to respond. Check your connection and try again.'
+        : 'The server could not be reached. Check your connection and API address.',
+      fields: null,
+      details: null,
+      requestId: 'client',
+    })
+  } finally {
+    globalThis.clearTimeout(timeoutId)
+    optionSignal?.removeEventListener('abort', abortFromCaller)
+  }
 
   if (response.status === 204) {
     return schema.parse(undefined)

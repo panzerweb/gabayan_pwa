@@ -57,4 +57,19 @@ describe('apiRequest', () => {
       requestId: 'req_test',
     } satisfies Partial<ApiError>)
   })
+
+  it('normalizes an unreachable server into a client network error', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+
+    const request = apiRequest('/auth/refresh', {
+      method: 'POST',
+      schema: exampleEnvelope,
+    })
+
+    await expect(request).rejects.toMatchObject({
+      status: 0,
+      code: 'NETWORK_ERROR',
+      requestId: 'client',
+    } satisfies Partial<ApiError>)
+  })
 })
