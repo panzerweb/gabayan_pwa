@@ -1,6 +1,6 @@
 # Gabayan PWA
 
-Gabayan is a mobile-first guide for beginner and small-scale fish farmers in the Philippines. The frontend is a Vue 3 progressive web app. Development uses a contract-faithful JSON Server API that can later be replaced by the separate FastAPI service through one environment variable.
+Gabayan is a mobile-first guide for beginner and small-scale fish farmers in the Philippines. The frontend is a Vue 3 progressive web app. It runs against a contract-faithful JSON Server mock or the separate FastAPI service in `aqua-lens-api`; switching between them is one environment variable.
 
 ## Prerequisites
 
@@ -22,6 +22,23 @@ pnpm dev:all
 - Health check: `http://localhost:3001/api/v1/health`
 
 `VITE_API_BASE_URL` is the only frontend server-location setting. Keep it pointed at a server that implements [the v1 contract](docs/api_contract.md).
+
+## Mock or FastAPI
+
+The two servers differ in that one value and nothing else; no code in `src/` asks which one
+answers:
+
+| API     | `VITE_API_BASE_URL`            | Open the app on         |
+| ------- | ------------------------------ | ----------------------- |
+| Mock    | `http://localhost:3001/api/v1` | `http://localhost:5173` |
+| FastAPI | `http://127.0.0.1:8000/api/v1` | `http://127.0.0.1:5173` |
+
+For FastAPI, start `aqua-lens-api` as its README ("Running the PWA against this API") describes,
+set the variable in `.env`, and run `pnpm dev --host 127.0.0.1`. The app is opened on the API's host
+because the refresh cookie is `SameSite=Lax`, and `localhost` and `127.0.0.1` are different sites: on
+the other host, signing in works but the session is lost on reload. On FastAPI the demo account
+exists only after its `seed-demo` command, with the same email and password; the Google demo button
+is a mock fixture that FastAPI answers as unavailable.
 
 ## Quality checks
 
@@ -46,7 +63,10 @@ Endpoint catalog coverage: 68 of 68 rows exercised against in-process mock.
 ```
 
 The development fixtures `demo-google-token` and `demo-reset-token` are asserted as accepted by the
-mock and refused by any other server.
+mock and refused by any other server. `tests/contract/pwa-client.contract.spec.mjs` then signs in
+through the app's own data layer - the `src/pages/*/data/*.api.ts` functions, their query strings and
+Zod schemas - and reads every resource the demo farmer has, so a schema stricter than the server
+fails there rather than on a screen.
 
 ## Running against another API
 
@@ -76,7 +96,9 @@ npx playwright test --reporter=line
 
 `CONTRACT_API_BASE_URL` and `VITE_API_BASE_URL` are the full API root, `/api/v1` included.
 Playwright starts and resets the mock API only when `VITE_API_BASE_URL` is unset or names the mock
-(a loopback host on `MOCK_API_PORT`, 3001 by default); any other server is left to you. Clear both
+(a loopback host on `MOCK_API_PORT`, 3001 by default); any other server is left to you. The
+journeys open the app on `127.0.0.1` when the API is on `127.0.0.1`, and on `localhost` otherwise
+(`tests/e2e/support/api-target.ts`). Clear both
 variables (`Remove-Item Env:CONTRACT_API_BASE_URL, Env:VITE_API_BASE_URL`) to return to the mock.
 
 ## Source layout
@@ -128,12 +150,12 @@ button are development fixtures only.
   prompt.
 - Unit, component, contract, and exact-target mobile end-to-end tests.
 
-Phases 0-6 are complete for the mock-backed frontend. The cultivation journey and supporting commerce experiences are API-backed.
+Phases 0-6 are complete, and on 2026-09-24 the same build passed the contract suite and all 13
+journeys against FastAPI with only `VITE_API_BASE_URL` changed. The cultivation journey and supporting commerce experiences are API-backed.
 Juan can follow daily guidance, record growth/mortality/water observations, review the feeding plan,
 complete a measured harvest with an auditable summary, browse cultivation-context supplies, place an
 idempotent mock order, follow its tracking timeline, and maintain farm/account preferences. Demo
 guidance and derived biological values remain visibly labeled as estimates. See the
-[release checklist](docs/release_checklist.md) for the remaining external staging and physical-device
-deployment gates.
+[release checklist](docs/release_checklist.md) for the remaining physical-device and public-release checks.
 
 Read [AGENTS.md](AGENTS.md) and [the implementation plan](docs/implementation_plan.md) before adding features.

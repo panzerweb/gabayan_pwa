@@ -2,11 +2,14 @@
 
 ## 1. Document Status
 
-- Status: active implementation baseline; Phases 0, 1, 2, 3, and 4 completed
+- Status: active implementation baseline; Phases 0-6 completed
 - Product input: the 59-page Gabayan product brief supplied by the product owner
 - Frontend: Vue 3 PWA
 - Development API: JSON Server with custom middleware/actions
-- Production API: separate FastAPI service
+- Production API: separate FastAPI service (`aqua-lens-api`)
+- Backend swap: done on 2026-09-24. With only `VITE_API_BASE_URL` changed to a local FastAPI
+  (`aqua-lens-api` commit `101702b`, seeded with `seed-demo --date 2026-09-23`), the contract suite
+  and all 13 browser journeys pass; `docs/release_checklist.md` records the counts
 - Primary locale/market: Philippines
 - Primary viewport: `390 x 844 px`
 
@@ -358,8 +361,9 @@ Exit: growth/mortality affect derived outputs, and completed cultivation appears
 Status: completed on 2026-09-23 for the mock-backed frontend. Personal/farm details, addresses,
 reminder preferences, explicit offline write protection, keyboard/reduced-motion behavior, bounded
 PWA caching, install/update metadata, and the cross-width regression suite are implemented. The
-external FastAPI staging swap remains a deployment gate until that service is available; see
-`docs/release_checklist.md`.
+FastAPI swap followed on 2026-09-24: setting only `VITE_API_BASE_URL` to the FastAPI service ran the
+contract suite and the 13 journeys with no feature code change (the journeys open the app on the
+API's host so the refresh cookie stays same-site); see `docs/release_checklist.md`.
 
 - Profile/farm info, addresses, notification settings and reminder times.
 - Complete loading/empty/error/offline states.

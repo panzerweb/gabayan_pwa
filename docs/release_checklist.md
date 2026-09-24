@@ -7,8 +7,8 @@ Last verified: 2026-09-24
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 499 tests.
-- [x] Mock API contract suite passes: 44 tests, and its coverage check exercises all 68 method-and-path rows of contract §5.
+- [x] Unit and component suite passes: 504 tests.
+- [x] Mock API contract suite passes: 49 tests, and its coverage check exercises all 68 method-and-path rows of contract §5.
 - [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
@@ -77,4 +77,6 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] The contract suite runs against any server: the in-process mock by default, another API when `CONTRACT_API_BASE_URL` names its root. It creates its own accounts, finds seeded records by name rather than id, and asserts the mock-only sign-in fixtures are refused anywhere but the mock (`tests/contract/support/client.mjs`).
 - [x] The mock serves every §5 row, `PATCH /cultivations/{cultivationId}` (409 `CONFLICT` with `details.currentVersion` on a stale `If-Match`), `POST /tasks/{taskId}/reopen` and `POST /cultivations/{id}/feeding-records` included, and the species, culture-environment, compatibility and product-category reads are marked Public in §5.
 - [x] The journeys assert no mock identifier, and Playwright starts and resets the mock API only when `VITE_API_BASE_URL` is unset or names it (README "Running against another API").
-- [ ] When FastAPI staging is available, set only `VITE_API_BASE_URL`, run the contract suite against staging, and execute the 13 critical browser journeys. This external deployment gate cannot be completed from the frontend/mock repository alone.
+- [x] The contract suite also drives the app's own data layer - every `src/pages/*/data/*.api.ts` read, with its query string and Zod schema - against the server it targets (`tests/contract/pwa-client.contract.spec.mjs`); unknown response fields are dropped and a missing required one fails (`tests/unit/auth/auth.model.spec.ts`).
+- [x] The journeys open the app on the API's loopback host (`127.0.0.1` for FastAPI), so the `SameSite=Lax` refresh cookie survives a reload (`tests/e2e/support/api-target.ts`).
+- [x] With only `VITE_API_BASE_URL` set to FastAPI, the contract suite and the 13 critical browser journeys pass. Verified 2026-09-24 against `aqua-lens-api` commit `101702b` run locally as its README §5 describes (fresh database, `seed-demo --date 2026-09-23`, uvicorn on port 8000): contract suite 49 of 49 with 68 of 68 catalog rows exercised, and 13 of 13 journeys.

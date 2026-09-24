@@ -1,8 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
-import { DEFAULT_MOCK_API_PORT, usesMockApi } from './tests/e2e/support/api-target.js'
+import { appOrigin, DEFAULT_MOCK_API_PORT, usesMockApi } from './tests/e2e/support/api-target.js'
 
 const mockApiPort = process.env.MOCK_API_PORT ?? DEFAULT_MOCK_API_PORT
+// The app opens on the API's loopback host so the refresh cookie survives a reload.
+const appUrl = appOrigin(process.env.VITE_API_BASE_URL)
 
 // The servers start from their binaries rather than package scripts, so a package manager's
 // pre-run dependency check can never block the journeys. The mock is started - from a fresh
@@ -21,7 +23,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: appUrl,
     channel: 'chrome',
     trace: 'on-first-retry',
   },
@@ -34,7 +36,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'npx vite --host 127.0.0.1',
-      url: 'http://localhost:5173',
+      url: appUrl,
       reuseExistingServer: !process.env.CI,
     },
     ...(usesMockApi(process.env.VITE_API_BASE_URL, mockApiPort) ? [mockApiServer] : []),
