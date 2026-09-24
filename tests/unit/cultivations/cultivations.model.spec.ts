@@ -16,6 +16,7 @@ import {
   timelineEventDisplay,
   canRecordHarvest,
   feedingPlanSchema,
+  feedingRecordSchema,
   growthFormErrors,
   growthMeasurementRequest,
   harvestCompletionSchema,
@@ -168,6 +169,21 @@ describe('cultivation records model', () => {
     expect(
       under(cultivationsKeys.harvestReadiness('cul_1'), QUERY_KEY_PREFIXES.harvestReadiness),
     ).toBe(true)
+  })
+
+  it('reads a feeding recorded without a task as having no task', () => {
+    const record = {
+      id: 'feed_1',
+      cultivationId: 'cul_1',
+      taskId: null,
+      fedAt: '2026-09-23T00:30:00Z',
+      amount: { value: 800, unit: 'G' },
+      notes: null,
+      recordedBy: { id: 'usr_1', fullName: 'Juan Dela Cruz' },
+      createdAt: '2026-09-23T00:31:00Z',
+    }
+
+    expect(feedingRecordSchema.parse(record).taskId).toBeNull()
   })
 
   it('parses the records and harvest payloads the mock returns', () => {

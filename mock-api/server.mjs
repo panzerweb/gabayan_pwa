@@ -173,6 +173,119 @@ function dateInManila(isoTimestamp) {
   }).format(new Date(isoTimestamp))
 }
 
+function addDays(isoDate, days) {
+  const date = new Date(`${isoDate}T00:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
+function daysBetween(fromIsoDate, toIsoDate) {
+  return Math.round(
+    (Date.parse(`${toIsoDate}T00:00:00Z`) - Date.parse(`${fromIsoDate}T00:00:00Z`)) / 86400000,
+  )
+}
+
+function isCalendarDate(value) {
+  return (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) &&
+    new Date(`${value}T00:00:00Z`).toISOString().startsWith(value)
+  )
+}
+
+// An RFC 3339 time must carry its zone; a bare local time is refused rather than guessed.
+function parseZonedTimestamp(value) {
+  if (typeof value !== 'string') return null
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/i.test(value)) {
+    return null
+  }
+  const moment = Date.parse(value)
+  return Number.isNaN(moment) ? null : new Date(moment).toISOString().replace('.000Z', 'Z')
+}
+
+// Reads `If-Match` as the bare version the contract writes, tolerating the quoted ETag
+// form. Undefined means an unconditional write; null means the header is malformed.
+function parseIfMatch(header) {
+  if (header === undefined || !String(header).trim()) return undefined
+  const text = String(header).trim().replace(/^W\//, '').replace(/^"|"$/g, '')
+  return /^\d+$/.test(text) && Number(text) >= 1 ? Number(text) : null
+}
+
+// Day number, progress and harvest date as FastAPI derives them from the stocking date.
+function stockingSchedule(stockedOn, durationDays, today) {
+  const dayNumber = daysBetween(stockedOn, today) + 1
+  const progressPercent = durationDays
+    ? Math.min(100, Math.max(0, Math.round((dayNumber / durationDays) * 100)))
+    : 0
+  return {
+    dayNumber,
+    progressPercent,
+    estimatedHarvestDate: durationDays ? addDays(stockedOn, durationDays) : null,
+  }
+}
+
+function validateCultivationPatch(body) {
+  const editable = ['name', 'stockedOn', 'notes']
+  const fields = {}
+  const changes = {}
+  for (const key of Object.keys(body)) {
+    if (!editable.includes(key)) fields[key] = ['Extra inputs are not permitted']
+  }
+  if (Object.hasOwn(body, 'name')) {
+    const name = body.name
+    if (name === null || (typeof name === 'string' && !name.trim())) {
+      fields.name = ['This field is required.']
+    } else if (typeof name !== 'string') fields.name = ['Enter text.']
+    else if (name.trim().length > 100) fields.name = ['Use at most 100 characters.']
+    else changes.name = name.trim()
+  }
+  if (Object.hasOwn(body, 'stockedOn')) {
+    if (body.stockedOn === null) fields.stockedOn = ['This field is required.']
+    else if (!isCalendarDate(body.stockedOn)) fields.stockedOn = ['Use a date as YYYY-MM-DD.']
+    else changes.stockedOn = body.stockedOn
+  }
+  if (Object.hasOwn(body, 'notes')) {
+    if (body.notes !== null && typeof body.notes !== 'string') fields.notes = ['Enter text.']
+    else if ((body.notes ?? '').trim().length > 1000) {
+      fields.notes = ['Use at most 1000 characters.']
+    } else changes.notes = (body.notes ?? '').trim() || null
+  }
+  return { fields, changes }
+}
+
+function validateFeedingRecord(body) {
+  const fields = {}
+  const fedAt = parseZonedTimestamp(body.fedAt)
+  if (!fedAt) {
+    fields.fedAt = ['Use an RFC 3339 time with a time zone, such as 2026-09-23T08:00:00Z.']
+  }
+  const amount = body.amount
+  const grams =
+    amount && Number.isFinite(amount.value) && ['G', 'KG'].includes(amount.unit)
+      ? amount.unit === 'KG'
+        ? amount.value * 1000
+        : amount.value
+      : null
+  if (grams === null || grams <= 0) {
+    fields.amount = ['Enter a feeding amount greater than 0 in g or kg.']
+  } else if (grams > 1000000) fields.amount = ['Enter a feeding amount of at most 1,000 kg.']
+  if (body.taskId !== undefined && body.taskId !== null && typeof body.taskId !== 'string') {
+    fields.taskId = ['Enter text.']
+  }
+  if (body.notes !== undefined && body.notes !== null && typeof body.notes !== 'string') {
+    fields.notes = ['Enter text.']
+  } else if (String(body.notes ?? '').trim().length > 1000) {
+    fields.notes = ['Use at most 1000 characters.']
+  }
+  return {
+    fields,
+    fedAt,
+    taskId: body.taskId ?? null,
+    notes: String(body.notes ?? '').trim() || null,
+  }
+}
+
 function validateRegistration(body) {
   const fields = {}
   const fullName = String(body.fullName ?? '').trim()
@@ -482,6 +595,66 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     }
   }
 
+  // Earliest scheduled task still ahead; a missed or cancelled task is not work to come.
+  function nextOpenTaskAt(cultivationId) {
+    const next = router.db
+      .get('tasks')
+      .filter(
+        (task) => task.cultivationId === cultivationId && ['UPCOMING', 'DUE'].includes(task.status),
+      )
+      .sortBy('scheduledAt')
+      .first()
+      .value()
+    return next?.scheduledAt ?? null
+  }
+
+  // Moves a task to COMPLETED with its linked record, bumps the cultivation's version and
+  // marks the task's reminders read, each stamped `changedAt` (now by default). Returns the
+  // stored task.
+  function markTaskCompleted(task, cultivation, { completedAt, record, changedAt }) {
+    const now = new Date().toISOString()
+    const completedTask = {
+      ...task,
+      status: 'COMPLETED',
+      completedAt,
+      completionRecordType: record?.type ?? null,
+      completionRecordId: record?.id ?? null,
+      audit: { ...task.audit, updatedAt: changedAt ?? now, version: task.audit.version + 1 },
+    }
+    router.db.get('tasks').find({ id: task.id }).assign(completedTask).write()
+    router.db
+      .get('cultivations')
+      .find({ id: cultivation.id })
+      .assign({
+        nextTaskAt: nextOpenTaskAt(cultivation.id),
+        updatedAt: changedAt ?? now,
+        version: cultivation.version + 1,
+      })
+      .write()
+    router.db
+      .get('notifications')
+      .filter({ ownerUserId: cultivation.ownerUserId, taskId: task.id })
+      .each((notification) => {
+        if (notification.readAt === null) notification.readAt = changedAt ?? now
+      })
+      .write()
+    return completedTask
+  }
+
+  function feedingKilogramsOn(cultivationId, day) {
+    const grams = router.db
+      .get('feedingRecords')
+      .filter((record) => record.cultivationId === cultivationId)
+      .value()
+      .filter((record) => dateInManila(record.fedAt) === day)
+      .reduce(
+        (total, record) =>
+          total + (record.amount.unit === 'KG' ? record.amount.value * 1000 : record.amount.value),
+        0,
+      )
+    return Number((grams / 1000).toFixed(3))
+  }
+
   app.disable('x-powered-by')
   app.use((request, response, next) => {
     const origin = request.get('origin')
@@ -492,7 +665,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     }
     response.set(
       'access-control-allow-headers',
-      'Authorization, Content-Type, Idempotency-Key, X-Request-Id',
+      'Authorization, Content-Type, Idempotency-Key, If-Match, X-Request-Id',
     )
     response.set('access-control-allow-methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
     if (request.method === 'OPTIONS') return response.sendStatus(204)
@@ -1232,6 +1405,82 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, publicCultivationDetail(cultivation))
   })
 
+  // Edits the name, stocking date or notes. Setting the stocking date on a planning
+  // cultivation makes it ACTIVE; a closed cultivation accepts no edits (BLOCKERS D-30).
+  app.patch('/api/v1/cultivations/:cultivationId', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const expectedVersion = parseIfMatch(request.get('if-match'))
+    if (expectedVersion === null) {
+      return sendError(
+        response,
+        400,
+        'BAD_REQUEST',
+        'If-Match must be the version number you last read.',
+      )
+    }
+    const { fields, changes } = validateCultivationPatch(request.body ?? {})
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', fields)
+    }
+    if (!Object.keys(changes).length) {
+      return sendError(
+        response,
+        422,
+        'VALIDATION_ERROR',
+        'Provide at least one cultivation change.',
+      )
+    }
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that cultivation.')
+    }
+    if (expectedVersion !== undefined && expectedVersion !== cultivation.version) {
+      return sendError(
+        response,
+        409,
+        'CONFLICT',
+        'Your cultivation was changed somewhere else. Reload it and try again.',
+        null,
+        { currentVersion: cultivation.version },
+      )
+    }
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation is closed and can no longer be edited.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    const today = dateInManila(new Date().toISOString())
+    if (changes.stockedOn && changes.stockedOn > today) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the stocking date.', {
+        stockedOn: ['The stocking date cannot be in the future.'],
+      })
+    }
+    const updates = { ...changes }
+    if (changes.stockedOn) {
+      const schedule = stockingSchedule(changes.stockedOn, cultivation.estimatedDurationDays, today)
+      Object.assign(updates, schedule, {
+        harvestSummary: {
+          ...cultivation.harvestSummary,
+          estimatedHarvestDate: schedule.estimatedHarvestDate,
+        },
+      })
+      if (cultivation.status === 'PLANNING') updates.status = 'ACTIVE'
+    }
+    updates.updatedAt = new Date().toISOString()
+    updates.version = cultivation.version + 1
+    router.db.get('cultivations').find({ id: cultivation.id }).assign(updates).write()
+    return sendData(response, publicCultivationDetail({ ...cultivation, ...updates }))
+  })
+
   app.get('/api/v1/cultivations/:cultivationId/growth-measurements', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
@@ -1468,6 +1717,122 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       .value()
       .sort((left, right) => right.fedAt.localeCompare(left.fedAt))
     return listCollection(request, response, records)
+  })
+
+  // Records a feeding. A `taskId` names a feeding task of the same cultivation, which the
+  // record completes; without one the record's `taskId` is null (BLOCKERS D-36).
+  app.post('/api/v1/cultivations/:cultivationId/feeding-records', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const idempotencyKey = request.get('idempotency-key')
+    if (!idempotencyKey)
+      return sendError(response, 400, 'BAD_REQUEST', 'An idempotency key is required.')
+    const recordKey = `${user.id}:POST:/cultivations/${request.params.cultivationId}/feeding-records:${idempotencyKey}`
+    const prior = router.db.get('idempotencyRecords').find({ key: recordKey }).value()
+    if (prior) return sendData(response, prior.response, 201)
+    const { fields, fedAt, taskId, notes } = validateFeedingRecord(request.body ?? {})
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', fields)
+    }
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that cultivation.')
+    }
+    let task = null
+    if (taskId !== null) {
+      task = router.db.get('tasks').find({ id: taskId, cultivationId: cultivation.id }).value()
+      if (!task) {
+        return sendError(response, 422, 'VALIDATION_ERROR', 'Review the feeding record.', {
+          taskId: ['Choose a task of this cultivation.'],
+        })
+      }
+      if (task.type !== 'FEEDING') {
+        return sendError(response, 422, 'VALIDATION_ERROR', 'Review the feeding record.', {
+          taskId: ['Only a feeding task can be completed by a feeding record.'],
+        })
+      }
+      if (task.status === 'COMPLETED') {
+        return sendError(response, 409, 'CONFLICT', 'This task is already complete.', null, {
+          status: task.status,
+          completionRecordType: task.completionRecordType,
+        })
+      }
+      if (task.status === 'CANCELLED') {
+        return sendError(
+          response,
+          409,
+          'INVALID_STATE_TRANSITION',
+          'This task was cancelled and can no longer be completed.',
+          null,
+          { status: task.status },
+        )
+      }
+    }
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation no longer accepts feeding records.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    if (!cultivation.stockedOn) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'Set the stocking date before adding feeding records.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    const fedOn = dateInManila(fedAt)
+    const today = dateInManila(new Date().toISOString())
+    const dateProblem =
+      fedOn > today
+        ? 'The date cannot be in the future.'
+        : fedOn < cultivation.stockedOn
+          ? 'The date cannot be before the stocking date.'
+          : null
+    if (dateProblem) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the feeding record.', {
+        fedAt: [dateProblem],
+      })
+    }
+    const now = new Date().toISOString()
+    const record = {
+      id: `feed_${String(router.db.get('feedingRecords').size().value() + 1).padStart(5, '0')}`,
+      cultivationId: cultivation.id,
+      taskId: task?.id ?? null,
+      fedAt,
+      amount: request.body.amount,
+      notes,
+      recordedBy: { id: user.id, fullName: user.fullName },
+      createdAt: now,
+    }
+    router.db.get('feedingRecords').push(record).write()
+    const completedTask = task
+      ? markTaskCompleted(task, cultivation, {
+          completedAt: fedAt,
+          record: { type: 'FEEDING_RECORD', id: record.id },
+          changedAt: now,
+        })
+      : null
+    const result = {
+      record,
+      completedTask,
+      dailyProgress: {
+        recorded: { value: feedingKilogramsOn(cultivation.id, fedOn), unit: 'KG' },
+        planned: feedingPlanFor(cultivation, fedOn).dailyTotal,
+      },
+    }
+    router.db.get('idempotencyRecords').push({ key: recordKey, response: result }).write()
+    return sendData(response, result, 201)
   })
 
   app.get('/api/v1/cultivations/:cultivationId/water-checks', (request, response) => {
@@ -1814,44 +2179,11 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       }
       router.db.get('feedingRecords').push(linkedRecord).write()
     }
-    const completedTask = {
-      ...task,
-      status: 'COMPLETED',
+    const completedTask = markTaskCompleted(task, cultivation, {
       completedAt,
-      completionRecordType: linkedRecord ? 'FEEDING_RECORD' : null,
-      completionRecordId: linkedRecord?.id ?? null,
-      audit: {
-        ...task.audit,
-        updatedAt: completedAt,
-        version: task.audit.version + 1,
-      },
-    }
-    router.db.get('tasks').find({ id: task.id }).assign(completedTask).write()
-    const nextTask = router.db
-      .get('tasks')
-      .filter(
-        (candidate) =>
-          candidate.cultivationId === cultivation.id && candidate.status !== 'COMPLETED',
-      )
-      .sortBy('scheduledAt')
-      .first()
-      .value()
-    router.db
-      .get('cultivations')
-      .find({ id: cultivation.id })
-      .assign({
-        nextTaskAt: nextTask?.scheduledAt ?? null,
-        updatedAt: completedAt,
-        version: cultivation.version + 1,
-      })
-      .write()
-    router.db
-      .get('notifications')
-      .filter({ ownerUserId: user.id, taskId: task.id })
-      .each((notification) => {
-        if (notification.readAt === null) notification.readAt = completedAt
-      })
-      .write()
+      record: linkedRecord ? { type: 'FEEDING_RECORD', id: linkedRecord.id } : null,
+      changedAt: completedAt,
+    })
     const refreshedCultivation = router.db.get('cultivations').find({ id: cultivation.id }).value()
     const result = {
       task: completedTask,
@@ -1860,6 +2192,91 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     }
     router.db.get('idempotencyRecords').push({ key: recordKey, response: result }).write()
     return sendData(response, result)
+  })
+
+  // Returns a completed task to DUE and keeps the reason as an audit entry. No record type is
+  // reversible yet, so a completion that created a farm record is refused (BLOCKERS D-21).
+  app.post('/api/v1/tasks/:taskId/reopen', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const reason = request.body?.reason
+    if (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 500) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', {
+        reason: [
+          typeof reason === 'string' && reason.trim().length > 500
+            ? 'Use at most 500 characters.'
+            : 'Say why the task is being reopened.',
+        ],
+      })
+    }
+    const task = router.db.get('tasks').find({ id: request.params.taskId }).value()
+    const cultivation = task
+      ? router.db.get('cultivations').find({ id: task.cultivationId, ownerUserId: user.id }).value()
+      : null
+    if (!task || !cultivation) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that task.')
+    }
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation is closed and its tasks can no longer change.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    if (task.status !== 'COMPLETED') {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'Only a completed task can be reopened.',
+        null,
+        { status: task.status },
+      )
+    }
+    if (task.completionRecordType !== null) {
+      return sendError(
+        response,
+        409,
+        'CONFLICT',
+        'This task created a farm record that cannot be reversed, so it cannot be reopened.',
+        null,
+        { status: task.status, completionRecordType: task.completionRecordType },
+      )
+    }
+    const now = new Date().toISOString()
+    router.db
+      .get('taskReopenings')
+      .push({
+        id: `reopen_${String(router.db.get('taskReopenings').size().value() + 1).padStart(5, '0')}`,
+        taskId: task.id,
+        reopenedBy: { id: user.id, fullName: user.fullName },
+        reason: reason.trim(),
+        previousCompletedAt: task.completedAt,
+        createdAt: now,
+      })
+      .write()
+    const reopened = {
+      ...task,
+      status: 'DUE',
+      completedAt: null,
+      completionRecordType: null,
+      completionRecordId: null,
+      audit: { ...task.audit, updatedAt: now, version: task.audit.version + 1 },
+    }
+    router.db.get('tasks').find({ id: task.id }).assign(reopened).write()
+    router.db
+      .get('cultivations')
+      .find({ id: cultivation.id })
+      .assign({
+        nextTaskAt: nextOpenTaskAt(cultivation.id),
+        updatedAt: now,
+        version: cultivation.version + 1,
+      })
+      .write()
+    return sendData(response, reopened)
   })
 
   app.get('/api/v1/notifications/unread-count', (request, response) => {

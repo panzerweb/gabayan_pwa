@@ -7,8 +7,8 @@ Last verified: 2026-09-24
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 495 tests.
-- [x] Mock API contract suite passes: 10 tests.
+- [x] Unit and component suite passes: 499 tests.
+- [x] Mock API contract suite passes: 44 tests, and its coverage check exercises all 68 method-and-path rows of contract §5.
 - [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
@@ -74,4 +74,7 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] Marking notifications read is optimistic, as contract §14 allows: every cached list shows the change at once, is restored with a message if the server refuses, and the lists and Home refresh afterwards; "Mark all read" on a filtered list marks only that category (`tests/component/notifications/NotificationsView.spec.ts`).
 - [x] Request and response payloads are runtime-validated at the API boundary.
 - [x] Contract tests cover auth, onboarding, operations, commerce, harvest, and profile resources.
+- [x] The contract suite runs against any server: the in-process mock by default, another API when `CONTRACT_API_BASE_URL` names its root. It creates its own accounts, finds seeded records by name rather than id, and asserts the mock-only sign-in fixtures are refused anywhere but the mock (`tests/contract/support/client.mjs`).
+- [x] The mock serves every §5 row, `PATCH /cultivations/{cultivationId}` (409 `CONFLICT` with `details.currentVersion` on a stale `If-Match`), `POST /tasks/{taskId}/reopen` and `POST /cultivations/{id}/feeding-records` included, and the species, culture-environment, compatibility and product-category reads are marked Public in §5.
+- [x] The journeys assert no mock identifier, and Playwright starts and resets the mock API only when `VITE_API_BASE_URL` is unset or names it (README "Running against another API").
 - [ ] When FastAPI staging is available, set only `VITE_API_BASE_URL`, run the contract suite against staging, and execute the 13 critical browser journeys. This external deployment gate cannot be completed from the frontend/mock repository alone.

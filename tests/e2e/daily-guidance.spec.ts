@@ -44,6 +44,7 @@ test('notification filters and task deep links stay connected to daily guidance'
   ).toBeVisible()
   await page.getByRole('button', { name: 'Cultivation' }).click()
   await page.getByRole('button', { name: 'View daily tasks' }).click()
-  await expect(page).toHaveURL(/\/app\/cultivations\/cul_tilapia_001\/tasks/)
+  // Cultivation ids are opaque and differ between servers; the route shape is what matters.
+  await expect(page).toHaveURL(/\/app\/cultivations\/[^/?]+\/tasks/)
   await expect(page.getByRole('heading', { name: 'Check water condition' })).toBeVisible()
 })
