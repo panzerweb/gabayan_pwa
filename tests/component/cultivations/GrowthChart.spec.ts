@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 
-import GrowthChart from '@/components/cultivations/GrowthChart.vue'
-import type { GrowthMeasurement } from '@/services/api'
+import GrowthChart from '@pages/cultivations/presentation/components/GrowthChart.vue'
+import type { GrowthMeasurement } from '@pages/cultivations/domain/cultivations.model'
 
 function measurement(id: string, measuredOn: string, value: number): GrowthMeasurement {
   return {

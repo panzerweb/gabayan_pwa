@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import type { AppIconName } from '@components/ui/AppIcon.vue'
-import { mediaAssetSchema } from '@core/http'
+import { mediaAssetSchema, sourceStatusSchema } from '@core/http'
+import { moneySchema } from '@pages/marketplace/domain/marketplace.model'
 import { dimensionsSchema, stockingEstimateSchema } from '@/services/api/onboarding'
 
 type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger'
@@ -52,7 +53,7 @@ export const cultivationSummarySchema = z.object({
   version: z.number().int().positive(),
 })
 
-const latestGrowthMeasurementSchema = z.object({
+export const growthMeasurementSchema = z.object({
   id: z.string(),
   cultivationId: z.string(),
   measuredOn: z.string(),
@@ -81,7 +82,7 @@ export const cultivationDetailSchema = cultivationSummarySchema.extend({
   estimatedWaterVolumeM3: z.number().positive(),
   stockedOn: z.string().nullable(),
   recordedMortality: z.number().int().nonnegative(),
-  latestGrowthMeasurement: latestGrowthMeasurementSchema.nullable(),
+  latestGrowthMeasurement: growthMeasurementSchema.nullable(),
   growthStage: growthStageSchema,
   feedingSummary: z
     .object({
@@ -147,7 +148,7 @@ export const farmTaskSchema = z.object({
   }),
 })
 
-const feedingRecordSchema = z.object({
+export const feedingRecordSchema = z.object({
   id: z.string(),
   cultivationId: z.string(),
   taskId: z.string(),
@@ -301,5 +302,418 @@ export function feedingCompletionRequest(
     completedAt,
     actualAmount: { value: amount, unit },
     notes: notes.trim() || null,
+  }
+}
+
+// --- Growth, mortality, feeding and water records -------------------------------------------
+
+export const feedingPlanSchema = z.object({
+  id: z.string(),
+  cultivationId: z.string(),
+  date: z.string(),
+  dailyTotal: quantitySchema,
+  feedings: z.array(
+    z.object({
+      label: z.string(),
+      scheduledAt: z.string(),
+      recommendedAmount: quantitySchema,
+    }),
+  ),
+  estimatedLiveFish: z.number().int().nonnegative(),
+  estimatedAverageWeight: quantitySchema,
+  growthStage: z.string(),
+  feedRatePercent: z.number().nonnegative(),
+  explanation: z.string(),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string(),
+  disclaimer: z.string(),
+})
+
+export const harvestReadinessSchema = z.object({
+  cultivationId: z.string(),
+  status: harvestReadinessStatusSchema,
+  estimatedAverageWeight: quantitySchema.nullable(),
+  targetWeightRange: z.object({ minimum: quantitySchema, maximum: quantitySchema }).nullable(),
+  estimatedLiveFish: z.number().int().nonnegative(),
+  estimatedBiomass: quantitySchema.nullable(),
+  estimatedHarvestDate: z.string().nullable(),
+  latestMeasurementOn: z.string().nullable(),
+  basis: z.array(z.string()),
+  message: z.string(),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string(),
+  disclaimer: z.string(),
+})
+
+export const growthMutationResultSchema = z.object({
+  record: growthMeasurementSchema,
+  previousAverageWeight: quantitySchema.nullable(),
+  change: quantitySchema.nullable(),
+  feedingPlan: feedingPlanSchema,
+  harvestReadiness: harvestReadinessSchema,
+})
+
+export const mortalityReasonSchema = z.enum([
+  'UNKNOWN',
+  'WATER_QUALITY',
+  'DISEASE',
+  'HANDLING',
+  'PREDATION',
+  'OTHER',
+])
+
+export const mortalityRecordSchema = z.object({
+  id: z.string(),
+  cultivationId: z.string(),
+  occurredOn: z.string(),
+  fishCount: z.number().int().positive(),
+  reason: mortalityReasonSchema,
+  notes: z.string().nullable(),
+  recordedBy: compactUserSchema,
+  createdAt: z.string(),
+})
+
+export const mortalityMutationResultSchema = z.object({
+  record: mortalityRecordSchema,
+  stock: z.object({
+    initialFingerlings: z.number().int().nonnegative(),
+    recordedMortality: z.number().int().nonnegative(),
+    estimatedLiveFish: z.number().int().nonnegative(),
+  }),
+  feedingPlan: feedingPlanSchema,
+})
+
+export const guidanceMessageSchema = z.object({
+  severity: z.enum(['INFO', 'CAUTION', 'ACTION']),
+  title: z.string(),
+  message: z.string(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string(),
+  disclaimer: z.string(),
+})
+
+export const waterObservationSchema = z.object({
+  temperatureC: z.number().optional(),
+  dissolvedOxygenMgL: z.number().optional(),
+  ph: z.number().optional(),
+  clarity: z.string().optional(),
+  odor: z.string().optional(),
+  fishBehavior: z.string().optional(),
+  unusualChanges: z.boolean(),
+})
+
+export const waterCheckSchema = z.object({
+  id: z.string(),
+  cultivationId: z.string(),
+  checkedAt: z.string(),
+  observation: waterObservationSchema,
+  actionTaken: z.string().nullable(),
+  notes: z.string().nullable(),
+  guidance: z.array(guidanceMessageSchema),
+  recordedBy: compactUserSchema,
+  createdAt: z.string(),
+})
+
+export const waterCheckMutationResultSchema = z.object({
+  record: waterCheckSchema,
+  generatedTasks: z.array(farmTaskSchema),
+  guidance: z.array(guidanceMessageSchema),
+})
+
+// --- Harvest -----------------------------------------------------------------------------------
+
+export const harvestRecordSchema = z.object({
+  id: z.string(),
+  cultivationId: z.string(),
+  harvestDate: z.string(),
+  numberHarvested: z.number().int().positive(),
+  totalHarvestWeight: quantitySchema,
+  averageFishWeight: quantitySchema,
+  sellingPricePerKg: moneySchema,
+  notes: z.string().nullable(),
+  estimatedRevenue: moneySchema,
+  createdAt: z.string(),
+  recordedBy: compactUserSchema,
+})
+
+export const cultivationCompletionSummarySchema = z.object({
+  cultureDurationDays: z.number().int().positive(),
+  fingerlingsStocked: z.number().int().positive(),
+  fishHarvested: z.number().int().positive(),
+  recordedMortality: z.number().int().nonnegative(),
+  survivalRatePercent: z.number().min(0).max(100),
+  totalHarvestWeight: quantitySchema,
+  estimatedFeedUsed: quantitySchema,
+  estimatedExpenses: moneySchema.nullable(),
+  estimatedRevenue: moneySchema,
+  isDemo: z.boolean(),
+})
+
+export const harvestCompletionSchema = z.object({
+  cultivation: cultivationDetailSchema,
+  harvest: harvestRecordSchema,
+  summary: cultivationCompletionSummarySchema,
+})
+
+export type GrowthMeasurement = z.infer<typeof growthMeasurementSchema>
+export type GrowthMutationResult = z.infer<typeof growthMutationResultSchema>
+export type FeedingPlan = z.infer<typeof feedingPlanSchema>
+export type FeedingRecord = z.infer<typeof feedingRecordSchema>
+export type MortalityReason = z.infer<typeof mortalityReasonSchema>
+export type MortalityRecord = z.infer<typeof mortalityRecordSchema>
+export type MortalityMutationResult = z.infer<typeof mortalityMutationResultSchema>
+export type GuidanceMessage = z.infer<typeof guidanceMessageSchema>
+export type WaterObservation = z.infer<typeof waterObservationSchema>
+export type WaterCheck = z.infer<typeof waterCheckSchema>
+export type WaterCheckMutationResult = z.infer<typeof waterCheckMutationResultSchema>
+export type HarvestReadiness = z.infer<typeof harvestReadinessSchema>
+export type HarvestRecord = z.infer<typeof harvestRecordSchema>
+export type CultivationCompletionSummary = z.infer<typeof cultivationCompletionSummarySchema>
+export type HarvestCompletion = z.infer<typeof harvestCompletionSchema>
+
+export interface CreateGrowthMeasurementRequest {
+  measuredOn: string
+  numberOfFishSampled: number
+  averageWeight: { value: number; unit: 'G' | 'KG' }
+  notes?: string | null
+}
+
+export interface CreateMortalityRequest {
+  occurredOn: string
+  fishCount: number
+  reason: MortalityReason
+  notes?: string | null
+}
+
+export interface CreateWaterCheckRequest {
+  checkedAt: string
+  observation: WaterObservation
+  actionTaken?: string | null
+  notes?: string | null
+}
+
+export interface CreateHarvestRequest {
+  harvestDate: string
+  numberHarvested: number
+  totalHarvestWeight: { value: number; unit: 'KG' }
+  averageFishWeight: { value: number; unit: 'G' | 'KG' }
+  sellingPricePerKg: { amountMinor: number; currency: 'PHP' }
+  notes?: string | null
+}
+
+// Record histories are short enough to read in one page.
+export const RECORD_LIST_LIMIT = 100
+
+// Field messages keyed by the contract's camelCase request field, so local checks and the
+// server's `fields` land on the same input.
+export type FormErrors = Partial<Record<string, string>>
+
+// Reads a count typed into a form. Blank or fractional input is refused, never read as 0.
+export function parseWholeNumber(input: string): number | null {
+  const trimmed = input.trim()
+  const value = Number(trimmed)
+  return trimmed !== '' && Number.isInteger(value) && value > 0 ? value : null
+}
+
+// Reads a measurement typed into a form. Blank input is refused, never read as 0.
+export function parsePositiveNumber(input: string): number | null {
+  const trimmed = input.trim()
+  const value = Number(trimmed)
+  return trimmed !== '' && Number.isFinite(value) && value > 0 ? value : null
+}
+
+// Converts a peso amount typed as text ("120", "120.5") to integer centavos without passing
+// through floating-point multiplication. More than two decimal places is refused.
+export function pesosToCentavos(input: string): number | null {
+  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(input.trim())
+  if (!match) return null
+  const pesos = match[1] ?? '0'
+  const centavos = (match[2] ?? '').padEnd(2, '0')
+  return Number(pesos) * 100 + Number(centavos)
+}
+
+function notesOrNull(notes: string) {
+  return notes.trim() || null
+}
+
+export interface GrowthForm {
+  measuredOn: string
+  numberOfFishSampled: string
+  averageWeight: string
+  notes: string
+}
+
+export function growthFormErrors(form: GrowthForm): FormErrors {
+  const errors: FormErrors = {}
+  if (!form.measuredOn) errors.measuredOn = 'Choose the measurement date.'
+  if (parseWholeNumber(form.numberOfFishSampled) === null)
+    errors.numberOfFishSampled = 'Enter a whole-number sample size greater than 0.'
+  if (parsePositiveNumber(form.averageWeight) === null)
+    errors.averageWeight = 'Enter an average weight greater than 0.'
+  return errors
+}
+
+// The growth form records the sampled average in grams.
+export function growthMeasurementRequest(form: GrowthForm): CreateGrowthMeasurementRequest {
+  return {
+    measuredOn: form.measuredOn,
+    numberOfFishSampled: Number(form.numberOfFishSampled),
+    averageWeight: { value: Number(form.averageWeight), unit: 'G' },
+    notes: notesOrNull(form.notes),
+  }
+}
+
+export interface MortalityForm {
+  occurredOn: string
+  fishCount: string
+  reason: MortalityReason
+  notes: string
+}
+
+export function mortalityFormErrors(form: MortalityForm): FormErrors {
+  const errors: FormErrors = {}
+  if (!form.occurredOn) errors.occurredOn = 'Choose the date the loss was observed.'
+  if (parseWholeNumber(form.fishCount) === null)
+    errors.fishCount = 'Enter a whole number greater than 0.'
+  return errors
+}
+
+export function mortalityRequest(form: MortalityForm): CreateMortalityRequest {
+  return {
+    occurredOn: form.occurredOn,
+    fishCount: Number(form.fishCount),
+    reason: form.reason,
+    notes: notesOrNull(form.notes),
+  }
+}
+
+export const MORTALITY_REASONS: ReadonlyArray<{ value: MortalityReason; label: string }> = [
+  { value: 'UNKNOWN', label: 'Unknown' },
+  { value: 'WATER_QUALITY', label: 'Water quality' },
+  { value: 'DISEASE', label: 'Disease' },
+  { value: 'HANDLING', label: 'Handling' },
+  { value: 'PREDATION', label: 'Predation' },
+  { value: 'OTHER', label: 'Other' },
+]
+
+export function mortalityReasonLabel(reason: MortalityReason): string {
+  return MORTALITY_REASONS.find(({ value }) => value === reason)?.label ?? 'Unknown'
+}
+
+export interface WaterCheckForm {
+  checkedOn: string
+  clarity: string
+  odor: string
+  fishBehavior: string
+  unusualChanges: boolean
+  actionTaken: string
+  notes: string
+}
+
+export function waterCheckFormErrors(form: WaterCheckForm): FormErrors {
+  const errors: FormErrors = {}
+  if (!form.checkedOn) errors.checkedAt = 'Choose the date of this check.'
+  if (!form.clarity.trim()) errors.clarity = 'Describe how clear the water looks.'
+  if (!form.odor.trim()) errors.odor = 'Describe how the water smells.'
+  if (!form.fishBehavior.trim()) errors.fishBehavior = 'Describe how the fish are behaving.'
+  return errors
+}
+
+// A check entered by date is recorded at 8:00 in the morning, Manila time.
+export function waterCheckRequest(form: WaterCheckForm): CreateWaterCheckRequest {
+  return {
+    checkedAt: new Date(`${form.checkedOn}T08:00:00+08:00`).toISOString(),
+    observation: {
+      clarity: form.clarity.trim(),
+      odor: form.odor.trim(),
+      fishBehavior: form.fishBehavior.trim(),
+      unusualChanges: form.unusualChanges,
+    },
+    actionTaken: notesOrNull(form.actionTaken),
+    notes: notesOrNull(form.notes),
+  }
+}
+
+const UNUSUAL_CHANGE: StatusDisplay = { label: 'Change noted', tone: 'warning', icon: 'warning' }
+const NO_UNUSUAL_CHANGE: StatusDisplay = {
+  label: 'No unusual change',
+  tone: 'success',
+  icon: 'check',
+}
+
+export function waterCheckDisplay(observation: Pick<WaterObservation, 'unusualChanges'>) {
+  return observation.unusualChanges ? UNUSUAL_CHANGE : NO_UNUSUAL_CHANGE
+}
+
+// The Feeding / Mortality / Water / Feed plan tab of the farm records, held in `?tab=`.
+export const RECORDS_TABS = ['feeding', 'mortality', 'water', 'plan'] as const
+export type RecordsTab = (typeof RECORDS_TABS)[number]
+
+export const RECORDS_TAB_LABELS: Record<RecordsTab, string> = {
+  feeding: 'Feeding',
+  mortality: 'Mortality',
+  water: 'Water',
+  plan: 'Feed plan',
+}
+
+export function recordsTabFrom(value: unknown): RecordsTab {
+  return RECORDS_TABS.find((tab) => tab === value) ?? 'feeding'
+}
+
+export const RECORD_OFFLINE_MESSAGES = {
+  growth: 'Reconnect before saving this growth record. It has not been queued.',
+  mortality: 'Reconnect before saving mortality. It has not been queued.',
+  waterCheck: 'Reconnect before saving this water check. It has not been queued.',
+  harvest: 'Reconnect before completing harvest. This high-impact record is not queued.',
+} as const
+
+// A harvest is recorded only once the server's estimate from a current sample says the fish
+// may be ready; elapsed days alone never open the form.
+export function canRecordHarvest(status: HarvestReadinessStatus) {
+  return status === 'READY_SOON' || status === 'POTENTIALLY_READY'
+}
+
+// The readiness status as words, shown on the chip above the server's plain-language message.
+export function readinessStatusWords(status: HarvestReadinessStatus) {
+  return status.replaceAll('_', ' ')
+}
+
+export interface HarvestForm {
+  harvestDate: string
+  numberHarvested: string
+  totalHarvestWeight: string
+  averageFishWeight: string
+  sellingPricePerKg: string
+  notes: string
+}
+
+export function harvestFormErrors(form: HarvestForm): FormErrors {
+  const errors: FormErrors = {}
+  if (!form.harvestDate) errors.harvestDate = 'Choose the harvest date.'
+  if (parseWholeNumber(form.numberHarvested) === null)
+    errors.numberHarvested = 'Enter the number of fish harvested as a whole number.'
+  if (parsePositiveNumber(form.totalHarvestWeight) === null)
+    errors.totalHarvestWeight = 'Enter the total harvest weight in kg.'
+  if (parsePositiveNumber(form.averageFishWeight) === null)
+    errors.averageFishWeight = 'Enter the average fish weight in g.'
+  if (pesosToCentavos(form.sellingPricePerKg) === null)
+    errors.sellingPricePerKg = 'Enter the selling price per kg in pesos, like 120 or 120.50.'
+  return errors
+}
+
+// Builds the harvest request from a form `harvestFormErrors` has passed.
+export function harvestRequest(form: HarvestForm): CreateHarvestRequest {
+  return {
+    harvestDate: form.harvestDate,
+    numberHarvested: Number(form.numberHarvested),
+    totalHarvestWeight: { value: Number(form.totalHarvestWeight), unit: 'KG' },
+    averageFishWeight: { value: Number(form.averageFishWeight), unit: 'G' },
+    sellingPricePerKg: {
+      amountMinor: pesosToCentavos(form.sellingPricePerKg) ?? 0,
+      currency: 'PHP',
+    },
+    notes: notesOrNull(form.notes),
   }
 }

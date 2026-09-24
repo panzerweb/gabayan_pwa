@@ -14,9 +14,39 @@ import {
   taskStatusTone,
   timelineEventDate,
   timelineEventDisplay,
+  canRecordHarvest,
+  feedingPlanSchema,
+  growthFormErrors,
+  growthMeasurementRequest,
+  harvestCompletionSchema,
+  harvestFormErrors,
+  harvestReadinessSchema,
+  harvestRequest,
+  mortalityFormErrors,
+  mortalityReasonLabel,
+  mortalityRequest,
+  parsePositiveNumber,
+  parseWholeNumber,
+  pesosToCentavos,
+  readinessStatusWords,
+  recordsTabFrom,
+  waterCheckDisplay,
+  waterCheckFormErrors,
+  waterCheckRequest,
+  waterCheckSchema,
 } from '@pages/cultivations/domain/cultivations.model'
 
-import { afternoonFeeding, batch001, batch001Detail, harvestedBatch, waterCheck } from './fixtures'
+import {
+  afternoonFeeding,
+  batch001,
+  batch001Detail,
+  calmWaterCheck,
+  feedingPlan,
+  harvestCompletion,
+  harvestedBatch,
+  readyReadiness,
+  waterCheck,
+} from './fixtures'
 
 describe('cultivations model', () => {
   it('parses the seeded cultivation detail, stocking snapshot included', () => {
@@ -102,5 +132,161 @@ describe('cultivations model', () => {
       true,
     )
     expect(under(cultivationsKeys.taskList('cul_1'), QUERY_KEY_PREFIXES.tasks)).toBe(true)
+  })
+})
+
+describe('cultivation records model', () => {
+  const growthForm = {
+    measuredOn: '2026-09-23',
+    numberOfFishSampled: '12',
+    averageWeight: '200',
+    notes: '  Representative net sample. ',
+  }
+
+  const harvestForm = {
+    harvestDate: '2026-09-23',
+    numberHarvested: '470',
+    totalHarvestWeight: '169.2',
+    averageFishWeight: '360',
+    sellingPricePerKg: '120.5',
+    notes: '',
+  }
+
+  it('keys every record query under the prefix its invalidation row names', () => {
+    const under = (key: readonly unknown[], prefix: readonly string[]) =>
+      prefix.every((part, index) => key[index] === part)
+
+    expect(under(cultivationsKeys.growth('cul_1'), QUERY_KEY_PREFIXES.growth)).toBe(true)
+    expect(under(cultivationsKeys.mortality('cul_1'), QUERY_KEY_PREFIXES.mortality)).toBe(true)
+    expect(
+      under(cultivationsKeys.feedingPlan('cul_1', '2026-09-23'), QUERY_KEY_PREFIXES.feedingPlan),
+    ).toBe(true)
+    expect(under(cultivationsKeys.feedingRecords('cul_1'), QUERY_KEY_PREFIXES.feedingRecords)).toBe(
+      true,
+    )
+    expect(under(cultivationsKeys.waterChecks('cul_1'), QUERY_KEY_PREFIXES.waterChecks)).toBe(true)
+    expect(
+      under(cultivationsKeys.harvestReadiness('cul_1'), QUERY_KEY_PREFIXES.harvestReadiness),
+    ).toBe(true)
+  })
+
+  it('parses the records and harvest payloads the mock returns', () => {
+    expect(feedingPlanSchema.parse(feedingPlan).feedings).toHaveLength(2)
+    expect(harvestReadinessSchema.parse(readyReadiness).basis).toHaveLength(3)
+    expect(waterCheckSchema.parse(calmWaterCheck).guidance[0]?.severity).toBe('INFO')
+    expect(harvestCompletionSchema.parse(harvestCompletion).summary.survivalRatePercent).toBe(94)
+  })
+
+  it('refuses blank, zero and fractional counts instead of reading them as 0', () => {
+    expect(parseWholeNumber('12')).toBe(12)
+    for (const input of ['', '  ', '0', '2.5', '-3', 'ten']) {
+      expect(parseWholeNumber(input)).toBeNull()
+    }
+    expect(parsePositiveNumber('0.5')).toBe(0.5)
+    expect(parsePositiveNumber('')).toBeNull()
+    expect(parsePositiveNumber('0')).toBeNull()
+  })
+
+  it('turns a typed peso price into centavos without floating-point drift', () => {
+    expect(pesosToCentavos('120')).toBe(12000)
+    expect(pesosToCentavos('120.5')).toBe(12050)
+    expect(pesosToCentavos('0.29')).toBe(29)
+    expect(pesosToCentavos('1.005')).toBeNull()
+    expect(pesosToCentavos('')).toBeNull()
+    expect(pesosToCentavos('-1')).toBeNull()
+  })
+
+  it('checks the growth form and builds its request in grams', () => {
+    expect(growthFormErrors(growthForm)).toEqual({})
+    expect(
+      growthFormErrors({ ...growthForm, numberOfFishSampled: '', averageWeight: '0' }),
+    ).toEqual({
+      numberOfFishSampled: 'Enter a whole-number sample size greater than 0.',
+      averageWeight: 'Enter an average weight greater than 0.',
+    })
+    expect(growthMeasurementRequest(growthForm)).toEqual({
+      measuredOn: '2026-09-23',
+      numberOfFishSampled: 12,
+      averageWeight: { value: 200, unit: 'G' },
+      notes: 'Representative net sample.',
+    })
+  })
+
+  it('checks the mortality form and words each reason plainly', () => {
+    const form = { occurredOn: '2026-09-23', fishCount: '5', reason: 'UNKNOWN' as const, notes: '' }
+    expect(mortalityFormErrors(form)).toEqual({})
+    expect(mortalityFormErrors({ ...form, fishCount: '1.5' })).toEqual({
+      fishCount: 'Enter a whole number greater than 0.',
+    })
+    expect(mortalityRequest(form)).toEqual({
+      occurredOn: '2026-09-23',
+      fishCount: 5,
+      reason: 'UNKNOWN',
+      notes: null,
+    })
+    expect(mortalityReasonLabel('WATER_QUALITY')).toBe('Water quality')
+  })
+
+  it('asks for every qualitative water observation and dates the check in Manila', () => {
+    const form = {
+      checkedOn: '2026-09-23',
+      clarity: 'Cloudier than usual',
+      odor: 'Normal',
+      fishBehavior: ' Slower near one corner ',
+      unusualChanges: true,
+      actionTaken: '',
+      notes: '',
+    }
+    expect(waterCheckFormErrors({ ...form, clarity: ' ', odor: '', fishBehavior: '' })).toEqual({
+      clarity: 'Describe how clear the water looks.',
+      odor: 'Describe how the water smells.',
+      fishBehavior: 'Describe how the fish are behaving.',
+    })
+    expect(waterCheckRequest(form)).toEqual({
+      checkedAt: '2026-09-23T00:00:00.000Z',
+      observation: {
+        clarity: 'Cloudier than usual',
+        odor: 'Normal',
+        fishBehavior: 'Slower near one corner',
+        unusualChanges: true,
+      },
+      actionTaken: null,
+      notes: null,
+    })
+    expect(waterCheckDisplay({ unusualChanges: true })).toMatchObject({ label: 'Change noted' })
+  })
+
+  it('reads the records tab from the route query, falling back to feeding', () => {
+    expect(recordsTabFrom('water')).toBe('water')
+    expect(recordsTabFrom('plan')).toBe('plan')
+    expect(recordsTabFrom('harvest')).toBe('feeding')
+    expect(recordsTabFrom(undefined)).toBe('feeding')
+  })
+
+  it('opens the harvest form only on the server’s ready estimates', () => {
+    expect(canRecordHarvest('POTENTIALLY_READY')).toBe(true)
+    expect(canRecordHarvest('READY_SOON')).toBe(true)
+    for (const status of ['NOT_READY', 'MONITOR', 'INSUFFICIENT_DATA'] as const) {
+      expect(canRecordHarvest(status)).toBe(false)
+    }
+    expect(readinessStatusWords('POTENTIALLY_READY')).toBe('POTENTIALLY READY')
+  })
+
+  it('checks the harvest form and sends the price in centavos', () => {
+    expect(harvestFormErrors(harvestForm)).toEqual({})
+    expect(
+      harvestFormErrors({ ...harvestForm, numberHarvested: '0', sellingPricePerKg: '12.345' }),
+    ).toEqual({
+      numberHarvested: 'Enter the number of fish harvested as a whole number.',
+      sellingPricePerKg: 'Enter the selling price per kg in pesos, like 120 or 120.50.',
+    })
+    expect(harvestRequest(harvestForm)).toEqual({
+      harvestDate: '2026-09-23',
+      numberHarvested: 470,
+      totalHarvestWeight: { value: 169.2, unit: 'KG' },
+      averageFishWeight: { value: 360, unit: 'G' },
+      sellingPricePerKg: { amountMinor: 12050, currency: 'PHP' },
+      notes: null,
+    })
   })
 })

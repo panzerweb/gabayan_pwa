@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { GrowthMeasurement } from '@/services/api'
 import { formatManilaDate, formatQuantity } from '@core/utils/format'
 
+import type { GrowthMeasurement } from '../../domain/cultivations.model'
+
+// Sampled average weights plotted oldest to newest, with the same samples listed newest
+// first so the values are readable without the chart.
 const props = defineProps<{ measurements: GrowthMeasurement[] }>()
 
 function grams(record: GrowthMeasurement) {

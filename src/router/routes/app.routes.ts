@@ -37,19 +37,21 @@ export const appRoutes: RouteRecordRaw[] = [
       {
         path: 'cultivations/:cultivationId/growth',
         name: ROUTE_NAMES.cultivationGrowth,
-        component: () => import('@pages/app/CultivationGrowthPage.vue'),
+        component: () => import('@pages/cultivations/presentation/views/CultivationGrowthView.vue'),
         meta: { title: 'Growth records' },
       },
       {
         path: 'cultivations/:cultivationId/records',
         name: ROUTE_NAMES.cultivationRecords,
-        component: () => import('@pages/app/CultivationRecordsPage.vue'),
+        component: () =>
+          import('@pages/cultivations/presentation/views/CultivationRecordsView.vue'),
         meta: { title: 'Farm records' },
       },
       {
         path: 'cultivations/:cultivationId/harvest',
         name: ROUTE_NAMES.cultivationHarvest,
-        component: () => import('@pages/app/CultivationHarvestPage.vue'),
+        component: () =>
+          import('@pages/cultivations/presentation/views/CultivationHarvestView.vue'),
         meta: { title: 'Harvest readiness' },
       },
       {
