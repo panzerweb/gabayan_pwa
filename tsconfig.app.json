@@ -12,7 +12,13 @@
     "noUnusedParameters": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@core/*": ["./src/core/*"],
+      "@components/*": ["./src/components/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@layouts/*": ["./src/layouts/*"],
+      "@router/*": ["./src/router/*"],
+      "@pages/*": ["./src/pages/*"]
     },
     "types": ["vite/client", "vitest/globals"]
   }

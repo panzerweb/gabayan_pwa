@@ -1,8 +1,14 @@
 import { z } from 'zod'
 
-import { apiRequest } from './http'
+import {
+  apiRequest,
+  envelopeSchema,
+  mediaAssetSchema,
+  pageSchema,
+  sourceStatusSchema,
+} from '@core/http'
+
 import { cultivationSummarySchema, dimensionsSchema, stockingEstimateSchema } from './onboarding'
-import { envelopeSchema, mediaAssetSchema, pageSchema, sourceStatusSchema } from './schemas'
 
 export const quantitySchema = z.object({
   value: z.number().finite(),

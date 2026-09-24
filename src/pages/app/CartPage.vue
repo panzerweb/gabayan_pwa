@@ -17,8 +17,8 @@ import {
   updateCartItem,
 } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { useToastStore } from '@/stores/toast'
-import { formatPhp } from '@/utils/format'
+import { useToastStore } from '@stores/toast.store'
+import { formatPhp } from '@core/utils/format'
 
 const session = useSessionStore()
 const toast = useToastStore()

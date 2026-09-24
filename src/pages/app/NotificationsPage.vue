@@ -18,7 +18,7 @@ import {
   type Notification,
 } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { formatManilaDate, formatManilaTime, formatQuantity } from '@/utils/format'
+import { formatManilaDate, formatManilaTime, formatQuantity } from '@core/utils/format'
 
 type Filter = 'ALL' | Notification['category']
 const filters: { label: string; value: Filter }[] = [

@@ -6,7 +6,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import type { FarmTask } from '@/services/api'
-import { formatManilaTime, formatQuantity } from '@/utils/format'
+import { formatManilaTime, formatQuantity } from '@core/utils/format'
 
 const props = defineProps<{ task: FarmTask; actionable?: boolean }>()
 const emit = defineEmits<{ select: [task: FarmTask] }>()

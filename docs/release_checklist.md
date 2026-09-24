@@ -1,12 +1,13 @@
 # Gabayan MVP Release Checklist
 
-Last verified: 2026-09-23
+Last verified: 2026-09-24
 
 ## Automated release gate
 
 - [x] ESLint passes across application, mock API, and tests.
+- [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in `src/pages/*/presentation/**/*.vue` (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 14 tests.
+- [x] Unit and component suite passes: 134 tests.
 - [x] Mock API contract suite passes: 10 tests.
 - [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
@@ -49,19 +50,21 @@ pnpm mock:reset
 
 ## Performance snapshot
 
-Production build on 2026-09-23:
+Production build on 2026-09-24 (raw and gzip summed over every emitted file):
 
 | Asset                       |        Raw |      Gzip |
 | --------------------------- | ---------: | --------: |
-| Application JavaScript      |  391.61 kB | 118.69 kB |
-| Application CSS             |   76.65 kB |  12.14 kB |
-| Precached application shell | 463.43 KiB |       n/a |
+| Application JavaScript      |  428.06 kB | 158.99 kB |
+| Application CSS             |   76.70 kB |  25.14 kB |
+| Entry chunk (`index-*.js`)  |  189.15 kB |  58.71 kB |
+| Precached application shell | 493.73 KiB |       n/a |
 
-The current MVP stays in one application bundle. Route-level splitting is a post-MVP optimization if future profile, reporting, or marketplace features materially increase these figures.
+Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); the service worker precaches all chunks, so offline navigation is unchanged. The per-file gzip total is higher than a single bundle would compress to, while the entry chunk a first visit downloads is less than half the former bundle.
 
 ## Backend replacement gate
 
 - [x] Frontend HTTP calls use `VITE_API_BASE_URL` exclusively.
+- [x] Every contract §5 path is declared once in `ENDPOINTS` (`src/core/url_paths.ts`), checked against the catalog by `tests/unit/core/url-paths.spec.ts`.
 - [x] Pages and components do not call JSON Server or raw collections directly.
 - [x] Request and response payloads are runtime-validated at the API boundary.
 - [x] Contract tests cover auth, onboarding, operations, commerce, harvest, and profile resources.

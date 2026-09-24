@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { ApiError, apiRequest } from '@/services/api/http'
-import { envelopeSchema } from '@/services/api/schemas'
+import { ApiError, apiRequest, envelopeSchema } from '@core/http'
 
 const exampleEnvelope = envelopeSchema(z.object({ name: z.string() }))
 

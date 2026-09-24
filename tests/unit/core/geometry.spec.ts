@@ -1,4 +1,4 @@
-import { calculateRectangularArea, calculateRectangularVolume } from '@/utils/geometry'
+import { calculateRectangularArea, calculateRectangularVolume } from '@core/utils/geometry'
 
 describe('rectangular culture-area calculations', () => {
   it('calculates area and water volume without formatting strings', () => {

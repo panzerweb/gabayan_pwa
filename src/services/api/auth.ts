@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { apiRequest } from './http'
-import { envelopeSchema, mediaAssetSchema } from './schemas'
+import { apiRequest, envelopeSchema, mediaAssetSchema } from '@core/http'
 
 export const userProfileSchema = z.object({
   id: z.string().min(1),

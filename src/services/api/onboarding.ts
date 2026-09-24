@@ -1,7 +1,13 @@
 import { z } from 'zod'
 
-import { apiRequest } from './http'
-import { envelopeSchema, mediaAssetSchema, pageSchema, sourceStatusSchema } from './schemas'
+import {
+  apiRequest,
+  envelopeSchema,
+  mediaAssetSchema,
+  pageSchema,
+  sourceStatusSchema,
+} from '@core/http'
+
 import { speciesSummarySchema } from './species'
 
 export const cultureEnvironmentSchema = z.object({

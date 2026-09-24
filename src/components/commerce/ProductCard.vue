@@ -3,7 +3,7 @@ import AppIcon from '@/components/ui/AppIcon.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import type { ProductSummary } from '@/services/api'
-import { formatPhp } from '@/utils/format'
+import { formatPhp } from '@core/utils/format'
 
 defineProps<{ product: ProductSummary }>()
 </script>

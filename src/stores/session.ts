@@ -10,7 +10,7 @@ import {
   type AuthSession,
   type UserProfile,
 } from '@/services/api'
-import { queryClient } from '@/app/queryClient'
+import { queryClient } from '@core/query'
 
 export const useSessionStore = defineStore('session', () => {
   const accessToken = ref<string | null>(null)

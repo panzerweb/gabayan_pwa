@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { apiRequest } from './http'
-import { envelopeSchema } from './schemas'
+import { apiRequest, envelopeSchema } from '@core/http'
 
 const healthSchema = z.object({
   status: z.enum(['ok', 'degraded']),

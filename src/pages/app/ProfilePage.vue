@@ -12,7 +12,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
-import { useOnlineStatus } from '@/composables/useOnlineStatus'
+import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import {
   ApiError,
   createProfileAddress,
@@ -30,7 +30,7 @@ import {
   type NotificationSettings,
 } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { useToastStore } from '@/stores/toast'
+import { useToastStore } from '@stores/toast.store'
 
 type ProfileModal = 'personal' | 'farm' | 'address' | null
 type ReminderForm = Omit<

@@ -11,7 +11,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import { getEquipmentRecommendations } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
 import { useSetupStore } from '@/stores/setup'
-import { formatPhp } from '@/utils/format'
+import { formatPhp } from '@core/utils/format'
 
 const route = useRoute()
 const session = useSessionStore()

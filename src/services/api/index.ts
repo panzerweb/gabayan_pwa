@@ -1,4 +1,4 @@
-export { ApiError, apiRequest } from './http'
+export { ApiError, apiRequest } from '@core/http'
 export {
   forgotPassword,
   getCurrentUser,
@@ -74,7 +74,7 @@ export {
   updateProfileAddress,
   upsertFarmProfile,
 } from './profile'
-export type { Envelope, Page, PageInfo, ResponseMeta } from './http'
+export type { Envelope, Page, PageInfo, ResponseMeta } from '@core/http'
 export type { AuthSession, LoginRequest, RegisterRequest, UserProfile } from './auth'
 export type {
   CompatibilityResult,

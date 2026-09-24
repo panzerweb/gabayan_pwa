@@ -13,7 +13,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { getHomeDashboard, operationalQueryKeys, type FarmTask } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { formatQuantity, manilaDateToday } from '@/utils/format'
+import { formatQuantity, manilaDateToday } from '@core/utils/format'
 
 const session = useSessionStore()
 const today = manilaDateToday()

@@ -11,7 +11,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { listCultivations, operationalQueryKeys } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { formatManilaTime } from '@/utils/format'
+import { formatManilaTime } from '@core/utils/format'
 
 const session = useSessionStore()
 const route = useRoute()

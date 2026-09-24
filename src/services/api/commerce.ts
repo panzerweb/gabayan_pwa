@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { apiRequest } from './http'
-import { envelopeSchema, mediaAssetSchema, pageSchema } from './schemas'
+import { apiRequest, envelopeSchema, mediaAssetSchema, pageSchema } from '@core/http'
 
 export const moneySchema = z.object({
   amountMinor: z.number().int().nonnegative(),

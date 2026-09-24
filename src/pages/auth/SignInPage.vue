@@ -8,7 +8,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { ApiError, login, loginWithGoogle } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { zodFieldErrors } from '@/utils/validation'
+import { zodFieldErrors } from '@core/utils/validation'
 
 const schema = z.object({
   identifier: z.string().trim().min(1, 'Enter your email or mobile number.'),

@@ -11,7 +11,7 @@ import BaseModal from '@/components/overlays/BaseModal.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import { useOnlineStatus } from '@/composables/useOnlineStatus'
+import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import {
   ApiError,
   createGrowthMeasurement,
@@ -19,8 +19,8 @@ import {
   recordsQueryKeys,
 } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { useToastStore } from '@/stores/toast'
-import { manilaDateToday } from '@/utils/format'
+import { useToastStore } from '@stores/toast.store'
+import { manilaDateToday } from '@core/utils/format'
 
 const route = useRoute()
 const session = useSessionStore()

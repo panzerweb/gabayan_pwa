@@ -8,7 +8,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { ApiError, registerAccount } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { zodFieldErrors } from '@/utils/validation'
+import { zodFieldErrors } from '@core/utils/validation'
 
 const termsVersion = '2026-09'
 const schema = z

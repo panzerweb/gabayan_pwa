@@ -10,7 +10,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { commerceQueryKeys, getOrderTracking } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { formatManilaDate, formatManilaTime } from '@/utils/format'
+import { formatManilaDate, formatManilaTime } from '@core/utils/format'
 
 const route = useRoute()
 const session = useSessionStore()

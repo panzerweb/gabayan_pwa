@@ -6,8 +6,8 @@ import { z } from 'zod'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { useSetupStore } from '@/stores/setup'
-import { calculateRectangularArea, calculateRectangularVolume } from '@/utils/geometry'
-import { zodFieldErrors } from '@/utils/validation'
+import { calculateRectangularArea, calculateRectangularVolume } from '@core/utils/geometry'
+import { zodFieldErrors } from '@core/utils/validation'
 
 const dimensionSchema = z.object({
   lengthM: z.number().positive('Enter a length greater than 0.').max(10000),

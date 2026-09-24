@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 import type { GrowthMeasurement } from '@/services/api'
-import { formatManilaDate, formatQuantity } from '@/utils/format'
+import { formatManilaDate, formatQuantity } from '@core/utils/format'
 
 const props = defineProps<{ measurements: GrowthMeasurement[] }>()
 

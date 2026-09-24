@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { apiRequest } from './http'
-import { mediaAssetSchema, pageSchema, sourceStatusSchema } from './schemas'
+import { apiRequest, mediaAssetSchema, pageSchema, sourceStatusSchema } from '@core/http'
 
 export const speciesSummarySchema = z.object({
   id: z.string().min(1),

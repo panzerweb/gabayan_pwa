@@ -5,10 +5,10 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import BaseModal from '@/components/overlays/BaseModal.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import { useOnlineStatus } from '@/composables/useOnlineStatus'
+import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import { ApiError, completeTask, operationalQueryKeys, type FarmTask } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { useToastStore } from '@/stores/toast'
+import { useToastStore } from '@stores/toast.store'
 
 const props = defineProps<{ task: FarmTask | null; open: boolean }>()
 const emit = defineEmits<{ close: []; completed: [] }>()

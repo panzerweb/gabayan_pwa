@@ -12,7 +12,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { commerceQueryKeys, getOrder } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { formatManilaDate, formatPhp } from '@/utils/format'
+import { formatManilaDate, formatPhp } from '@core/utils/format'
 
 const route = useRoute()
 const session = useSessionStore()

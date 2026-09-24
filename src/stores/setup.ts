@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 
 import type { Dimensions, StockingEstimate } from '@/services/api'
 
-interface SetupDraft {
+export interface SetupDraft {
   speciesId: string | null
   environmentId: string | null
   dimensions: Dimensions | null

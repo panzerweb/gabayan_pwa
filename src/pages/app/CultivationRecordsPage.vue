@@ -12,7 +12,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
-import { useOnlineStatus } from '@/composables/useOnlineStatus'
+import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import {
   ApiError,
   createMortalityRecord,
@@ -25,8 +25,8 @@ import {
   type MortalityRecord,
 } from '@/services/api'
 import { useSessionStore } from '@/stores/session'
-import { useToastStore } from '@/stores/toast'
-import { formatManilaDate, formatManilaTime, formatQuantity, manilaDateToday } from '@/utils/format'
+import { useToastStore } from '@stores/toast.store'
+import { formatManilaDate, formatManilaTime, formatQuantity, manilaDateToday } from '@core/utils/format'
 
 type RecordsTab = 'feeding' | 'mortality' | 'water' | 'plan'
 

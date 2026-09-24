@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
+import { apiRequest, envelopeSchema, pageSchema } from '@core/http'
+
 import { userProfileSchema } from './auth'
 import { addressSchema } from './commerce'
-import { apiRequest } from './http'
-import { envelopeSchema, pageSchema } from './schemas'
 
 export const farmProfileSchema = z.object({
   id: z.string(),
