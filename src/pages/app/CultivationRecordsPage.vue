@@ -24,9 +24,14 @@ import {
   recordsQueryKeys,
   type MortalityRecord,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
-import { formatManilaDate, formatManilaTime, formatQuantity, manilaDateToday } from '@core/utils/format'
+import {
+  formatManilaDate,
+  formatManilaTime,
+  formatQuantity,
+  manilaDateToday,
+} from '@core/utils/format'
 
 type RecordsTab = 'feeding' | 'mortality' | 'water' | 'plan'
 

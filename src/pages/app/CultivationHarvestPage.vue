@@ -18,7 +18,7 @@ import {
   recordsQueryKeys,
   type HarvestCompletion,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 import { formatManilaDate, formatPhp, formatQuantity, manilaDateToday } from '@core/utils/format'
 

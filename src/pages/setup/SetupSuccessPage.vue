@@ -9,7 +9,7 @@ import AppIcon from '@/components/ui/AppIcon.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import { getEquipmentRecommendations } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useSetupStore } from '@/stores/setup'
 import { formatPhp } from '@core/utils/format'
 

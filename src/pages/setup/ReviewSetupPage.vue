@@ -8,7 +8,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import { ApiError, createCultivation } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useSetupStore } from '@/stores/setup'
 
 const setup = useSetupStore()

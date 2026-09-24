@@ -16,7 +16,7 @@ import {
   listProducts,
   type ProductFilters,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 
 const route = useRoute()
 const router = useRouter()

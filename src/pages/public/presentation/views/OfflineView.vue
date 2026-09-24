@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import ErrorState from '@/components/feedback/ErrorState.vue'
-import AppBrand from '@/components/brand/AppBrand.vue'
+import AppBrand from '@components/brand/AppBrand.vue'
+import ErrorState from '@components/feedback/ErrorState.vue'
 
+// A full reload lets the service worker and the network decide again which page to show.
 function retry() {
   window.location.reload()
 }

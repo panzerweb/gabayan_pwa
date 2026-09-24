@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/vue-query'
 
 import AppIcon from '@/components/ui/AppIcon.vue'
 import { commerceQueryKeys, getCart } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 
 const session = useSessionStore()
 const query = useQuery({

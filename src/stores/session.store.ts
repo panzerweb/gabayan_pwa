@@ -1,16 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-import {
-  ApiError,
-  getCurrentUser,
-  listCultivations,
-  logout as logoutRequest,
-  refreshAccessToken,
-  type AuthSession,
-  type UserProfile,
-} from '@/services/api'
+import { ApiError } from '@core/http'
 import { queryClient } from '@core/query'
+import { authRepository } from '@pages/auth/data/auth.repository'
+import type { AuthSession, UserProfile } from '@pages/auth/domain/auth.model'
+import { ROUTE_NAMES } from '@router/route-names'
+import { listCultivations } from '@/services/api'
 
 export const useSessionStore = defineStore('session', () => {
   const accessToken = ref<string | null>(null)
@@ -20,6 +16,11 @@ export const useSessionStore = defineStore('session', () => {
   let restorePromise: Promise<void> | null = null
 
   const isAuthenticated = computed(() => Boolean(accessToken.value && user.value))
+  // Where a signed-in farmer belongs: Home once a cultivation exists, otherwise setup.
+  const suggestedRouteName = computed(() =>
+    hasCultivation.value ? ROUTE_NAMES.home : ROUTE_NAMES.setupIntro,
+  )
+  // The same destination as a path, which the guest-only guard returns as its redirect.
   const suggestedRoute = computed(() => (hasCultivation.value ? '/app/home' : '/setup'))
 
   function acceptSession(session: AuthSession) {
@@ -35,16 +36,18 @@ export const useSessionStore = defineStore('session', () => {
     hasCultivation.value = false
   }
 
+  // Exchanges the refresh cookie for an access token once per page load. A 401 means
+  // there is no session to restore; any other failure is left to the caller.
   async function restore() {
     if (initialized.value) return
     if (restorePromise) return restorePromise
 
     restorePromise = (async () => {
       try {
-        const refreshed = await refreshAccessToken()
+        const refreshed = await authRepository.refreshAccessToken()
         accessToken.value = refreshed.data.accessToken
         const [profile, cultivations] = await Promise.all([
-          getCurrentUser(refreshed.data.accessToken),
+          authRepository.getCurrentUser(refreshed.data.accessToken),
           listCultivations(refreshed.data.accessToken, 1),
         ])
         user.value = profile.data
@@ -64,7 +67,7 @@ export const useSessionStore = defineStore('session', () => {
   async function signOut() {
     const token = accessToken.value
     try {
-      if (token) await logoutRequest(token)
+      if (token) await authRepository.logout(token)
     } catch {
       // Local session state must still be cleared if the server is unavailable.
     } finally {
@@ -84,6 +87,7 @@ export const useSessionStore = defineStore('session', () => {
     hasCultivation,
     initialized,
     isAuthenticated,
+    suggestedRouteName,
     suggestedRoute,
     acceptSession,
     restore,

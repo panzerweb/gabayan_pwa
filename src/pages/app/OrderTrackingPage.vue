@@ -9,7 +9,7 @@ import AppHeader from '@/components/navigation/AppHeader.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { commerceQueryKeys, getOrderTracking } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { formatManilaDate, formatManilaTime } from '@core/utils/format'
 
 const route = useRoute()

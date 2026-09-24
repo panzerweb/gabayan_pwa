@@ -7,8 +7,9 @@ import { ROUTE_NAMES, type RouteName } from '@router/route-names'
 import { appRoutes } from '@router/routes/app.routes'
 import { publicRoutes } from '@router/routes/public.routes'
 import { setupRoutes } from '@router/routes/setup.routes'
-import type { Dimensions, StockingEstimate, UserProfile } from '@/services/api'
-import { useSessionStore } from '@stores/session'
+import type { Dimensions, StockingEstimate } from '@/services/api'
+import type { UserProfile } from '@pages/auth/domain/auth.model'
+import { useSessionStore } from '@stores/session.store'
 import { useSetupStore } from '@stores/setup'
 
 // Resolves against the real route records so parent meta (`requiresAuth`, `guestOnly`)

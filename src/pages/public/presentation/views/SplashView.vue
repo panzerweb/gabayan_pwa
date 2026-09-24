@@ -1,18 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import AppBrand from '@components/brand/AppBrand.vue'
+import LoadingState from '@components/feedback/LoadingState.vue'
 
-import AppBrand from '@/components/brand/AppBrand.vue'
-import LoadingState from '@/components/feedback/LoadingState.vue'
-import { useSessionStore } from '@/stores/session'
+import { useSplashRedirect } from '../composables/useSplashRedirect'
 
-const router = useRouter()
-const session = useSessionStore()
-
-onMounted(async () => {
-  await session.restore()
-  await router.replace(session.isAuthenticated ? session.suggestedRoute : '/welcome')
-})
+useSplashRedirect()
 </script>
 
 <template>

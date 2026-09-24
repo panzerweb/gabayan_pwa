@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import AppBrand from '@/components/brand/AppBrand.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import AppBrand from '@components/brand/AppBrand.vue'
+import BaseButton from '@components/ui/BaseButton.vue'
+import { ROUTE_NAMES } from '@router/route-names'
 </script>
 
 <template>
@@ -11,7 +12,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
       <h1>This page swam away</h1>
       <p>Let's guide you back to a familiar place.</p>
     </div>
-    <BaseButton to="/welcome">Return to welcome</BaseButton>
+    <BaseButton :to="{ name: ROUTE_NAMES.welcome }">Return to welcome</BaseButton>
   </main>
 </template>
 

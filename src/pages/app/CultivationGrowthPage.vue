@@ -18,7 +18,7 @@ import {
   listGrowthMeasurements,
   recordsQueryKeys,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 import { manilaDateToday } from '@core/utils/format'
 

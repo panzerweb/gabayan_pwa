@@ -21,7 +21,7 @@ import {
   listPaymentOptions,
   type PaymentOption,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { formatPhp } from '@core/utils/format'
 
 const session = useSessionStore()

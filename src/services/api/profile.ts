@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 import { apiRequest, envelopeSchema, pageSchema } from '@core/http'
+import { userProfileSchema } from '@pages/auth/domain/auth.model'
 
-import { userProfileSchema } from './auth'
 import { addressSchema } from './commerce'
 
 export const farmProfileSchema = z.object({

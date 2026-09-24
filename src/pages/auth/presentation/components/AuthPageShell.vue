@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import AppBrand from '@/components/brand/AppBrand.vue'
+import AppBrand from '@components/brand/AppBrand.vue'
 
+// The frame every sign-in screen shares: brand, an introduction, the form and an optional footer.
 defineProps<{ eyebrow: string; title: string; message: string }>()
 </script>
 

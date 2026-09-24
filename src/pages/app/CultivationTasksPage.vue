@@ -10,7 +10,7 @@ import ErrorState from '@/components/feedback/ErrorState.vue'
 import LoadingState from '@/components/feedback/LoadingState.vue'
 import AppHeader from '@/components/navigation/AppHeader.vue'
 import { listTasks, operationalQueryKeys, type FarmTask } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 
 const route = useRoute()
 const session = useSessionStore()

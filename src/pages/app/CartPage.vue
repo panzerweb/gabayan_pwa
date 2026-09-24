@@ -16,7 +16,7 @@ import {
   removeCartItem,
   updateCartItem,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 import { formatPhp } from '@core/utils/format'
 

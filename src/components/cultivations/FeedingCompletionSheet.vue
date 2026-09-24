@@ -7,7 +7,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import { ApiError, completeTask, operationalQueryKeys, type FarmTask } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
 const props = defineProps<{ task: FarmTask | null; open: boolean }>()

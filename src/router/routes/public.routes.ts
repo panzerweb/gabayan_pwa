@@ -9,7 +9,7 @@ export const publicRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     name: ROUTE_NAMES.splash,
-    component: () => import('@pages/SplashPage.vue'),
+    component: () => import('@pages/public/presentation/views/SplashView.vue'),
     meta: { title: 'Gabayan' },
   },
   {
@@ -20,7 +20,7 @@ export const publicRoutes: RouteRecordRaw[] = [
       {
         path: 'welcome',
         name: ROUTE_NAMES.welcome,
-        component: () => import('@pages/WelcomePage.vue'),
+        component: () => import('@pages/public/presentation/views/WelcomeView.vue'),
         meta: { title: 'Welcome' },
       },
       ...authRoutes,
@@ -29,13 +29,13 @@ export const publicRoutes: RouteRecordRaw[] = [
   {
     path: '/offline',
     name: ROUTE_NAMES.offline,
-    component: () => import('@pages/OfflinePage.vue'),
+    component: () => import('@pages/public/presentation/views/OfflineView.vue'),
     meta: { title: 'Offline' },
   },
   {
     path: '/:pathMatch(.*)*',
     name: ROUTE_NAMES.notFound,
-    component: () => import('@pages/NotFoundPage.vue'),
+    component: () => import('@pages/public/presentation/views/NotFoundView.vue'),
     meta: { title: 'Page not found' },
   },
 ]

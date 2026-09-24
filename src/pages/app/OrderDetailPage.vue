@@ -11,7 +11,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { commerceQueryKeys, getOrder } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { formatManilaDate, formatPhp } from '@core/utils/format'
 
 const route = useRoute()

@@ -7,7 +7,7 @@ Last verified: 2026-09-24
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in `src/pages/*/presentation/**/*.vue` (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 134 tests.
+- [x] Unit and component suite passes: 177 tests.
 - [x] Mock API contract suite passes: 10 tests.
 - [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
@@ -54,10 +54,10 @@ Production build on 2026-09-24 (raw and gzip summed over every emitted file):
 
 | Asset                       |        Raw |      Gzip |
 | --------------------------- | ---------: | --------: |
-| Application JavaScript      |  428.06 kB | 158.99 kB |
-| Application CSS             |   76.70 kB |  25.14 kB |
-| Entry chunk (`index-*.js`)  |  189.15 kB |  58.71 kB |
-| Precached application shell | 493.73 KiB |       n/a |
+| Application JavaScript      |  435.90 kB | 162.57 kB |
+| Application CSS             |   76.75 kB |  25.24 kB |
+| Entry chunk (`index-*.js`)  |  111.34 kB |  37.15 kB |
+| Precached application shell | 501.52 KiB |       n/a |
 
 Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); the service worker precaches all chunks, so offline navigation is unchanged. The per-file gzip total is higher than a single bundle would compress to, while the entry chunk a first visit downloads is less than half the former bundle.
 
@@ -66,6 +66,7 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] Frontend HTTP calls use `VITE_API_BASE_URL` exclusively.
 - [x] Every contract §5 path is declared once in `ENDPOINTS` (`src/core/url_paths.ts`), checked against the catalog by `tests/unit/core/url-paths.spec.ts`.
 - [x] Pages and components do not call JSON Server or raw collections directly.
+- [x] The public and sign-in screens reach the API only through their feature repositories (`src/pages/{public,auth}/data/`), on `ENDPOINTS`, and navigate by route name.
 - [x] Request and response payloads are runtime-validated at the API boundary.
 - [x] Contract tests cover auth, onboarding, operations, commerce, harvest, and profile resources.
 - [ ] When FastAPI staging is available, set only `VITE_API_BASE_URL`, run the contract suite against staging, and execute the 13 critical browser journeys. This external deployment gate cannot be completed from the frontend/mock repository alone.

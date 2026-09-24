@@ -17,7 +17,7 @@ import {
   operationalQueryKeys,
   type Notification,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { formatManilaDate, formatManilaTime, formatQuantity } from '@core/utils/format'
 
 type Filter = 'ALL' | Notification['category']

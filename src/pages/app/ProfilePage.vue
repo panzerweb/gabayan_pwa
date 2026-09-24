@@ -29,7 +29,7 @@ import {
   type FarmProfile,
   type NotificationSettings,
 } from '@/services/api'
-import { useSessionStore } from '@/stores/session'
+import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
 type ProfileModal = 'personal' | 'farm' | 'address' | null

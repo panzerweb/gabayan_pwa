@@ -1,15 +1,5 @@
 export { ApiError, apiRequest } from '@core/http'
 export {
-  forgotPassword,
-  getCurrentUser,
-  login,
-  loginWithGoogle,
-  logout,
-  refreshAccessToken,
-  registerAccount,
-  resetPassword,
-} from './auth'
-export {
   createCultivation,
   createStockingEstimate,
   getCompatibility,
@@ -17,7 +7,6 @@ export {
   listCultivations,
   listCultureEnvironments,
 } from './onboarding'
-export { getHealth } from './system'
 export { listSpecies, speciesSummarySchema } from './species'
 export {
   completeTask,
@@ -75,7 +64,6 @@ export {
   upsertFarmProfile,
 } from './profile'
 export type { Envelope, Page, PageInfo, ResponseMeta } from '@core/http'
-export type { AuthSession, LoginRequest, RegisterRequest, UserProfile } from './auth'
 export type {
   CompatibilityResult,
   CreateCultivationRequest,
@@ -85,7 +73,6 @@ export type {
   EquipmentRecommendations,
   StockingEstimate,
 } from './onboarding'
-export type { Health } from './system'
 export type { ListSpeciesParams, SpeciesSummary } from './species'
 export type {
   CultivationDetail,

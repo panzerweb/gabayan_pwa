@@ -1,6 +1,6 @@
 import type { NavigationGuardReturn, RouteLocationNormalized } from 'vue-router'
 
-import { useSessionStore } from '@stores/session'
+import { useSessionStore } from '@stores/session.store'
 
 import { ROUTE_NAMES } from '../route-names'
 
