@@ -17,7 +17,10 @@ import { ROUTE_NAMES } from '@router/route-names'
     </div>
     <BaseCard class="setup-intro__steps" padding="lg">
       <ol>
-        <li><strong>Choose a species</strong><span>Tell us which fish you plan to raise.</span></li>
+        <li>
+          <strong>Choose a species</strong
+          ><span>Tell us which fish or shrimp you plan to raise.</span>
+        </li>
         <li>
           <strong>Select an environment</strong
           ><span>We’ll check the demo compatibility profile.</span>

@@ -3,10 +3,9 @@ import EmptyState from '@components/feedback/EmptyState.vue'
 import ErrorState from '@components/feedback/ErrorState.vue'
 import LoadingState from '@components/feedback/LoadingState.vue'
 import BaseButton from '@components/ui/BaseButton.vue'
-import SelectableCard from '@components/ui/SelectableCard.vue'
 import { ROUTE_NAMES } from '@router/route-names'
 
-import { speciesNote, speciesTitle } from '../../domain/setup.model'
+import SpeciesCard from '../components/SpeciesCard.vue'
 import { useSetupOptions } from '../composables/useSetupOptions'
 
 const {
@@ -23,26 +22,27 @@ const {
   <section class="setup-flow-page">
     <div class="setup-flow-intro">
       <h2>What species will you raise?</h2>
-      <p>Your answer helps tailor compatibility checks and the stocking estimate.</p>
+      <p>
+        Choose the fish or shrimp you plan to stock. Your answer tailors the compatibility check and
+        the stocking estimate.
+      </p>
     </div>
-    <LoadingState v-if="speciesLoading" label="Loading fish profiles…" />
+    <LoadingState v-if="speciesLoading" label="Loading species profiles…" />
     <ErrorState
       v-else-if="speciesLoadFailed"
-      message="We couldn’t load the fish profiles. Check your connection and try again."
+      message="We couldn’t load the species profiles. Check your connection and try again."
       @retry="refetchSpecies()"
     />
     <EmptyState
       v-else-if="!species.length"
-      title="No fish profiles yet"
-      message="Fish profiles are being prepared. Please check back soon."
+      title="No species profiles yet"
+      message="Species profiles are being prepared. Please check back soon."
     />
-    <div v-else class="setup-flow-list" role="radiogroup" aria-label="Fish species">
-      <SelectableCard
+    <div v-else class="setup-flow-list" role="radiogroup" aria-label="Species">
+      <SpeciesCard
         v-for="item in species"
         :key="item.id"
-        :title="speciesTitle(item)"
-        :description="item.shortDescription"
-        :meta="speciesNote(item)"
+        :species="item"
         :selected="selectedSpeciesId === item.id"
         @select="selectSpecies(item.id)"
       />

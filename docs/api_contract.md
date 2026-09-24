@@ -523,7 +523,7 @@ A request stays `PENDING` until an operator changes the tier; it never charges t
 
 `{ id, commonName, localName, slug, shortDescription, beginnerFriendly, image, estimatedCultureDays: { minimum, maximum }, active, sourceStatus }`.
 
-Initial mock species: Tilapia, Milkfish/Bangus, Catfish/Hito, and Carp.
+Initial species: Tilapia, Milkfish/Bangus, Catfish/Hito, Grouper/Lapu-lapu, Shrimp/Hipon, and Carp, in that order. Every species is `sourceStatus` `DEMO`. Tilapia, Bangus, Hito, Lapu-lapu, and Shrimp carry the figures cited in the product brief (dissolved oxygen critical below about 2.0-3.0 mg/L, water depth of at least 1.0-1.2 m, about one square metre of pond per bangus) under rule version `demo-2026-09-gabayan`; figures the brief does not give (feeding bands, harvest target, the Lapu-lapu and Shrimp densities) are placeholders whose `basis` says so. Carp keeps the prototype profile (`demo-2026-09`).
 
 ### SpeciesProfile
 
@@ -552,7 +552,7 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 - `GrowthStageRule`: `{ id, name, minimumDay, maximumDay, expectedWeightRange: { minimum: Quantity, maximum: Quantity }, sourceStatus }`.
 - `StockingRule`: `{ id, speciesId, environmentId, basis: "SURFACE_AREA" | "WATER_VOLUME", minimumDensity, maximumDensity, densityUnit: "FISH_PER_M2" | "FISH_PER_M3", sourceStatus, ruleVersion }`.
 - `FeedingRule`: `{ id, speciesId, growthStage, feedRatePercentRange, feedingsPerDay, sourceStatus, ruleVersion }`.
-- `GuidanceRule`: `{ id, title, message, trigger, sourceStatus, ruleVersion }`.
+- `GuidanceRule`: `{ id, title, message, trigger, sourceStatus, ruleVersion }`. Seeded triggers: `ROUTINE_OBSERVATION` and `UNUSUAL_CHANGE` (answered by a water check), and `LOW_DISSOLVED_OXYGEN` and `WATER_DEPTH` (reference guidance shown with the profile).
 - `RuleSource`: `{ title, organization, url: string | null, reviewedAt: string | null, reviewedBy: string | null }`.
 
 ### CompatibilityResult
@@ -594,7 +594,7 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 | `expiresAt`              | timestamp              | Prevent stale plan creation                     |
 | `disclaimer`             | string                 | Required                                        |
 
-`EstimateBasis` is `{ type, densityMinimum, densityMaximum, densityUnit, inputAreaM2, inputVolumeM3, explanation }`.
+`EstimateBasis` is `{ type, densityMinimum, densityMaximum, densityUnit, inputAreaM2, inputVolumeM3, explanation }`. `explanation` is the stocking rule's own plain-language basis, including its citation or the fact that it is a placeholder.
 
 Representative response:
 

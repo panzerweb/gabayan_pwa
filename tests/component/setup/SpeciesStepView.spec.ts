@@ -4,7 +4,7 @@ import SpeciesStepView from '@pages/setup/presentation/views/SpeciesStepView.vue
 import { ROUTE_NAMES } from '@router/route-names'
 
 import { page } from '../../unit/marketplace/fixtures'
-import { milkfish, pond, tilapia } from '../../unit/setup/fixtures'
+import { milkfish, pond, shrimp, tilapia } from '../../unit/setup/fixtures'
 import { mountInApp } from '../support/app'
 import { storedDraft } from './support'
 
@@ -42,6 +42,25 @@ describe('SpeciesStepView', () => {
     expect(options[1]).toContain('Milkfish (Bangus)')
   })
 
+  it('shows shrimp beside the fish, each with its image and provenance', async () => {
+    repositories.setup.listSpecies = vi.fn().mockResolvedValue(page([tilapia, milkfish, shrimp]))
+    const { wrapper } = await mountSpecies()
+
+    expect(wrapper.text()).toContain('Choose the fish or shrimp you plan to stock.')
+    expect(wrapper.get('[role="radiogroup"]').attributes('aria-label')).toBe('Species')
+    const cards = wrapper.findAll('[role="radio"]')
+    expect(cards).toHaveLength(3)
+    expect(cards[2]?.text()).toContain('Shrimp (Hipon)')
+    expect(cards.map((card) => card.get('img').attributes('src'))).toEqual([
+      tilapia.image.url,
+      milkfish.image.url,
+      '/mock-media/shrimp.svg',
+    ])
+    for (const card of cards) {
+      expect(card.get('.status-chip').text()).toBe('Demo figures, not yet reviewed')
+    }
+  })
+
   it('keeps Continue closed until a species is chosen, then saves the choice', async () => {
     const { wrapper } = await mountSpecies()
 
@@ -53,14 +72,14 @@ describe('SpeciesStepView', () => {
     expect(storedDraft().speciesId).toBe('sp_milkfish')
   })
 
-  it('offers a retry when the fish profiles fail to load', async () => {
+  it('offers a retry when the species profiles fail to load', async () => {
     repositories.setup.listSpecies = vi
       .fn()
       .mockRejectedValueOnce(new TypeError('Failed to fetch'))
       .mockResolvedValueOnce(page([tilapia]))
     const { wrapper } = await mountSpecies()
 
-    expect(wrapper.text()).toContain('We couldn’t load the fish profiles.')
+    expect(wrapper.text()).toContain('We couldn’t load the species profiles.')
 
     await wrapper.get('[role="alert"] button').trigger('click')
     await flushPromises()
@@ -68,10 +87,10 @@ describe('SpeciesStepView', () => {
     expect(wrapper.findAll('[role="radio"]')).toHaveLength(1)
   })
 
-  it('says so when no fish profile is available', async () => {
+  it('says so when no species profile is available', async () => {
     repositories.setup.listSpecies = vi.fn().mockResolvedValue(page([]))
     const { wrapper } = await mountSpecies()
 
-    expect(wrapper.text()).toContain('No fish profiles yet')
+    expect(wrapper.text()).toContain('No species profiles yet')
   })
 })

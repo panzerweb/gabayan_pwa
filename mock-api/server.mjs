@@ -540,6 +540,59 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return result
   }
 
+  // Contract §7 SpeciesProfile: the summary row with the species' seeded rule rows. Only an
+  // explicit COMPATIBLE rule lists an environment; a CAUTION pairing is answered by
+  // `GET /compatibility`. Internal seed fields (weights, severity, basis) stay out.
+  function speciesProfile(species) {
+    const rules = router.db.get('speciesProfiles').find({ speciesId: species.id }).value()
+    const activeEnvironmentIds = new Set(
+      router.db
+        .get('cultureEnvironments')
+        .filter({ active: true })
+        .map((environment) => environment.id)
+        .value(),
+    )
+    const compatibleEnvironmentIds = router.db
+      .get('compatibilityRules')
+      .filter({ speciesId: species.id, status: 'COMPATIBLE' })
+      .map((rule) => rule.environmentId)
+      .value()
+      .filter((environmentId) => activeEnvironmentIds.has(environmentId))
+    const stockingRules = router.db
+      .get('stockingRules')
+      .filter({ speciesId: species.id })
+      .map((rule) => omitKeys(rule, ['explanation']))
+      .value()
+    const target = rules?.harvestTarget ?? null
+    return {
+      ...species,
+      compatibleEnvironmentIds,
+      growthStages: rules?.growthStages ?? [],
+      stockingRules,
+      feedingRules: (rules?.feedingRules ?? []).map((rule) => ({
+        id: rule.id,
+        speciesId: species.id,
+        growthStage: rule.growthStage,
+        feedRatePercentRange: rule.feedRatePercentRange,
+        feedingsPerDay: rule.feedingsPerDay,
+        sourceStatus: rule.sourceStatus,
+        ruleVersion: rule.ruleVersion,
+      })),
+      waterGuidance: (rules?.waterGuidance ?? []).map((rule) => ({
+        id: rule.id,
+        title: rule.title,
+        message: rule.message,
+        trigger: rule.trigger,
+        sourceStatus: rule.sourceStatus,
+        ruleVersion: rule.ruleVersion,
+      })),
+      targetHarvestWeight: target ? { value: target.targetMinimumG, unit: 'G' } : null,
+      sources: rules?.sources ?? [],
+      ruleVersion: rules?.ruleVersion ?? 'demo-2026-09',
+      disclaimer: ruleDisclaimer,
+    }
+  }
+
   function averageWeightInGrams(cultivation) {
     const weight = cultivation.latestGrowthMeasurement?.averageWeight
     if (!weight) return null
@@ -1112,7 +1165,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const species = router.db.get('species').find({ id: request.params.speciesId }).value()
     if (!species)
       return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish profile.')
-    return sendData(response, species)
+    return sendData(response, speciesProfile(species))
   })
 
   app.get('/api/v1/culture-environments', (request, response) => {
@@ -1256,7 +1309,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         densityUnit: rule.densityUnit,
         inputAreaM2: surfaceAreaM2,
         inputVolumeM3: estimatedWaterVolumeM3,
-        explanation: 'Demo density range for this prototype profile.',
+        explanation: rule.explanation ?? 'Demo density range for this prototype profile.',
       },
       compatibility,
       isDemo: true,
