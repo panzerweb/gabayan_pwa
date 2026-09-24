@@ -2,7 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 
 import { ROUTE_NAMES } from '../route-names'
 
-const SETUP_STEPS = 4
+const SETUP_STEPS = 5
 
 // The plan step a new account passes through, then the cultivation setup wizard. The
 // setup-step guard keeps a wizard step closed until the draft holds what it needs.
@@ -47,9 +47,9 @@ export const setupRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'dimensions',
-        name: ROUTE_NAMES.setupDimensions,
-        component: () => import('@pages/setup/presentation/views/DimensionsStepView.vue'),
+        path: 'water-ranges',
+        name: ROUTE_NAMES.setupWaterRanges,
+        component: () => import('@pages/setup/presentation/views/WaterRangesStepView.vue'),
         meta: {
           title: 'New cultivation',
           setupStep: 3,
@@ -58,12 +58,23 @@ export const setupRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'dimensions',
+        name: ROUTE_NAMES.setupDimensions,
+        component: () => import('@pages/setup/presentation/views/DimensionsStepView.vue'),
+        meta: {
+          title: 'New cultivation',
+          setupStep: 4,
+          setupTotal: SETUP_STEPS,
+          backTo: ROUTE_NAMES.setupWaterRanges,
+        },
+      },
+      {
         path: 'fingerlings',
         name: ROUTE_NAMES.setupFingerlings,
         component: () => import('@pages/setup/presentation/views/FingerlingsStepView.vue'),
         meta: {
           title: 'New cultivation',
-          setupStep: 4,
+          setupStep: 5,
           setupTotal: SETUP_STEPS,
           backTo: ROUTE_NAMES.setupDimensions,
         },
@@ -74,7 +85,7 @@ export const setupRoutes: RouteRecordRaw[] = [
         component: () => import('@pages/setup/presentation/views/StockingResultView.vue'),
         meta: {
           title: 'Stocking estimate',
-          setupStep: 4,
+          setupStep: 5,
           setupTotal: SETUP_STEPS,
           backTo: ROUTE_NAMES.setupFingerlings,
         },
@@ -85,7 +96,7 @@ export const setupRoutes: RouteRecordRaw[] = [
         component: () => import('@pages/setup/presentation/views/ReviewSetupView.vue'),
         meta: {
           title: 'Review cultivation',
-          setupStep: 4,
+          setupStep: 5,
           setupTotal: SETUP_STEPS,
           backTo: ROUTE_NAMES.setupStockingResult,
         },

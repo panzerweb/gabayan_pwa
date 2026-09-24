@@ -20,6 +20,8 @@ async function planTilapiaPond(page: Page) {
   await page.getByRole('link', { name: 'Continue' }).click()
   await page.getByRole('radio', { name: /Pond/ }).click()
   await page.getByRole('link', { name: 'Continue' }).click()
+  await expect(page.getByRole('heading', { name: 'Good water for your stock' })).toBeVisible()
+  await page.getByRole('link', { name: 'Continue' }).click()
   await page.getByLabel('Length').fill('5')
   await page.getByLabel('Width').fill('4')
   await page.getByLabel('Average water depth').fill('1.5')

@@ -145,6 +145,17 @@ describe('setup-step guard', () => {
     }
   })
 
+  it('opens the water ranges step only once a culture system is chosen', () => {
+    const setup = useSetupStore()
+    setup.$patch({ draft: { speciesId: 'sp_tilapia' } })
+    expect(setupStepGuard(locationOf(ROUTE_NAMES.setupWaterRanges))).toEqual({
+      name: ROUTE_NAMES.setupEnvironment,
+    })
+
+    setup.$patch({ draft: { environmentId: 'env_pond' } })
+    expect(setupStepGuard(locationOf(ROUTE_NAMES.setupWaterRanges))).toBe(true)
+  })
+
   it('always opens the intro and the species step', () => {
     expect(setupStepGuard(locationOf(ROUTE_NAMES.setupIntro))).toBe(true)
     expect(setupStepGuard(locationOf(ROUTE_NAMES.setupSpecies))).toBe(true)

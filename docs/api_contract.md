@@ -192,6 +192,9 @@ erDiagram
 | `TierCode`               | `FREE`, `PRO`, `ORGANIZATION`                                                                                                                                        |
 | `TierEntitlement`        | `CULTIVATION_GUIDANCE`, `STOCKING_CALCULATOR`, `MARKETPLACE`, `WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`, `WATER_PARAMETER_LOGS`, `FEED_CONVERSION_TRACKING` |
 | `UpgradeRequestStatus`   | `PENDING`, `APPROVED`, `DECLINED`                                                                                                                                    |
+| `WaterParameter`         | `SALINITY`, `PH`, `AMMONIA`, `NITRITE`, `NITRATE`, `DISSOLVED_OXYGEN`, `WATER_TEMPERATURE`                                                                           |
+| `WaterParameterUnit`     | `PPT`, `PH`, `MG_PER_L`, `CELSIUS`                                                                                                                                   |
+| `WaterReadingStatus`     | `BELOW_RANGE`, `WITHIN_RANGE`, `ABOVE_RANGE`                                                                                                                         |
 
 ## 5. Endpoint Catalog
 
@@ -255,6 +258,15 @@ Every account starts on `FREE`. There is no in-app purchase in v1: a farmer reco
 | `POST /stocking-estimates`                  |    yes | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
 
 The reference reads are Public: they hold shared profile data and no account's records, and the setup wizard reads them before the farmer signs up.
+
+### Water quality
+
+| Method and path             | Query/body                            | Success response                  |
+| --------------------------- | ------------------------------------- | --------------------------------- |
+| `GET /water-thresholds`     | required `speciesId`, `environmentId` | `200 Envelope<WaterThresholdSet>` |
+| `POST /water-safety-checks` | `WaterSafetyCheckRequest`             | `200 Envelope<WaterSafetyCheck>`  |
+
+Both are signed in and part of every plan (`WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`). A safety check is a one-off evaluation: it stores nothing, needs no `Idempotency-Key`, and answers `200`. Saved water-parameter logs with history are the Pro entitlement `WATER_PARAMETER_LOGS` and are not part of the check.
 
 ### Dashboard and cultivations
 
@@ -642,6 +654,65 @@ Representative response:
 }
 ```
 
+### Water-quality thresholds and safety check
+
+The suggested range of each water parameter is a row of the species and culture-system profile, served with its provenance. Every threshold is demo data under rule version `demo-2026-09-gabayan`: dissolved oxygen carries the product brief's figure (critical below about 2.0-3.0 mg/L, IFAS FA002 and Fondriest); every other range is a placeholder whose `basis` says so. A pairing whose compatibility is `NOT_RECOMMENDED` has no thresholds.
+
+The seven parameters, always in this order, with the `WaterReadings` field that carries each reading and the values a reading may take:
+
+| `parameter`         | `unit`     | Reading field        | Accepted reading |
+| ------------------- | ---------- | -------------------- | ---------------- |
+| `SALINITY`          | `PPT`      | `salinityPpt`        | 0-80             |
+| `PH`                | `PH`       | `ph`                 | 0-14             |
+| `AMMONIA`           | `MG_PER_L` | `ammoniaMgL`         | 0-50             |
+| `NITRITE`           | `MG_PER_L` | `nitriteMgL`         | 0-50             |
+| `NITRATE`           | `MG_PER_L` | `nitrateMgL`         | 0-1000           |
+| `DISSOLVED_OXYGEN`  | `MG_PER_L` | `dissolvedOxygenMgL` | 0-30             |
+| `WATER_TEMPERATURE` | `CELSIUS`  | `temperatureC`       | 0-45             |
+
+#### WaterThreshold
+
+| Field          | Type                 | Notes                                                             |
+| -------------- | -------------------- | ----------------------------------------------------------------- |
+| `parameter`    | `WaterParameter`     |                                                                   |
+| `name`         | string               | Display name, e.g. `Ammonia`                                      |
+| `unit`         | `WaterParameterUnit` | Unit of `minimum`, `maximum` and the reading                      |
+| `minimum`      | number or null       | Lowest suggested value; `null` when the range has no lower bound  |
+| `maximum`      | number or null       | Highest suggested value; `null` when the range has no upper bound |
+| `explanation`  | string               | One plain sentence on what the parameter is and why it matters    |
+| `basis`        | string               | Where the figure comes from, or that it is a placeholder          |
+| `sourceStatus` | `SourceStatus`       |                                                                   |
+| `ruleVersion`  | string               |                                                                   |
+
+At least one of `minimum` and `maximum` is set. A reading equal to a bound is within the range.
+
+#### WaterThresholdSet
+
+`{ speciesId, environmentId, thresholds: WaterThreshold[], guidance: string, sources: RuleSource[], isDemo, sourceStatus, ruleVersion, disclaimer }`. `thresholds` holds the seven parameters in the order above; `guidance` is one environment-aware sentence on acting on the ranges (the water in a fish cage cannot be changed).
+
+| Case                                              | Answer                                        |
+| ------------------------------------------------- | --------------------------------------------- |
+| `speciesId` or `environmentId` missing            | `400 BAD_REQUEST`                             |
+| Unknown or inactive species or environment        | `404 NOT_FOUND`                               |
+| Compatibility of the pairing is `NOT_RECOMMENDED` | `400 INCOMPATIBLE_SELECTION` with its message |
+
+#### WaterSafetyCheckRequest
+
+`{ speciesId, environmentId, readings: WaterReadings }`. `WaterReadings` is `{ salinityPpt?, ph?, ammoniaMgL?, nitriteMgL?, nitrateMgL?, dissolvedOxygenMgL?, temperatureC? }`, each a number or `null`; an omitted or `null` field is a parameter the farmer did not measure.
+
+| Case                                                           | Answer                                                                       |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `speciesId` or `environmentId` missing or unknown              | `422 VALIDATION_ERROR` with `fields.speciesId` or `fields.environmentId`     |
+| No reading entered                                             | `422 VALIDATION_ERROR` with `fields.readings`                                |
+| A reading that is not a number, or outside its accepted values | `422 VALIDATION_ERROR` with `fields["readings.<field>"]`, e.g. `readings.ph` |
+| Compatibility of the pairing is `NOT_RECOMMENDED`              | `400 INCOMPATIBLE_SELECTION` with its message                                |
+
+#### WaterSafetyCheck
+
+`{ speciesId, environmentId, checkedAt: timestamp, results: WaterReadingResult[], notChecked: WaterParameter[], isDemo, sourceStatus, ruleVersion, disclaimer }`. `results` holds one entry per entered reading and `notChecked` the parameters passed over, both in parameter order. Nothing is stored.
+
+`WaterReadingResult`: `{ parameter, name, unit, value, minimum, maximum, status: WaterReadingStatus, explanation, guidance: GuidanceMessage }`. `status` is `BELOW_RANGE` when `value < minimum`, `ABOVE_RANGE` when `value > maximum`, and otherwise `WITHIN_RANGE`. `guidance` is chosen by parameter, status and culture environment; it uses conditional language and never tells the farmer to replace all the water.
+
 ## 8. Cultivation Schemas
 
 ### CreateCultivationRequest
@@ -1021,6 +1092,7 @@ Mock tracking advancement may be fixture-driven; the frontend must not manufactu
 | Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications             |
 | Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness, account tier     |
 | Upgrade request    | pending request                                      | Account tier                                 |
+| Water safety check | per-reading result; stores nothing                   | nothing                                      |
 
 Client-side optimistic updates are acceptable for notification read state and favorites. Use pessimistic updates for biological records, checkout, order placement, and harvest completion.
 

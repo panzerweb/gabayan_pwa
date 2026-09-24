@@ -46,12 +46,12 @@ function continueLink(wrapper: Awaited<ReturnType<typeof choose>>['wrapper']) {
 }
 
 describe('EnvironmentStepView', () => {
-  it('checks the chosen pairing and opens the dimensions step when it can be planned', async () => {
+  it('checks the chosen pairing and opens the water ranges step when it can be planned', async () => {
     const { wrapper } = await choose('Pond')
 
     expect(repositories.setup.getCompatibility).toHaveBeenCalledWith('sp_tilapia', 'env_pond')
     expect(wrapper.get('[role="status"]').text()).toContain('This setup can be planned')
-    expect(continueLink(wrapper)?.attributes('href')).toBe('/setup/dimensions')
+    expect(continueLink(wrapper)?.attributes('href')).toBe('/setup/water-ranges')
   })
 
   it('keeps the step closed for a pairing the profile advises against, naming alternatives', async () => {

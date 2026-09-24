@@ -14,6 +14,9 @@ export function formatQuantity(value: number, unit: string) {
     CELSIUS: '°C',
     COUNT: '',
     PERCENT: '%',
+    PPT: 'ppt',
+    MG_PER_L: 'mg/L',
+    PH: 'pH',
   }
   return `${new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(value)}${unit === 'PERCENT' ? '' : ' '}${label[unit] ?? unit}`.trim()
 }

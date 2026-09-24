@@ -48,6 +48,12 @@ export const ENDPOINTS = {
   stockingEstimates: {
     root: '/stocking-estimates',
   },
+  waterThresholds: {
+    root: '/water-thresholds',
+  },
+  waterSafetyChecks: {
+    root: '/water-safety-checks',
+  },
   dashboard: {
     home: '/dashboard/home',
   },

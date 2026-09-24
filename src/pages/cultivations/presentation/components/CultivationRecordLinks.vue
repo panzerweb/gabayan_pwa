@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ROUTE_NAMES } from '@router/route-names'
 
-// Entry points to the cultivation's growth, farm records and harvest screens.
+// Entry points to the cultivation's growth, farm records, water safety check and harvest
+// screens.
 const props = defineProps<{ cultivationId: string }>()
 
 const links = [
@@ -10,6 +11,11 @@ const links = [
     name: ROUTE_NAMES.cultivationRecords,
     label: 'Farm records',
     detail: 'Feeding, mortality, and water',
+  },
+  {
+    name: ROUTE_NAMES.cultivationWaterSafety,
+    label: 'Water safety check',
+    detail: 'Compare readings with suggested ranges',
   },
   { name: ROUTE_NAMES.cultivationHarvest, label: 'Harvest', detail: 'Readiness and completion' },
 ]
