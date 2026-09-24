@@ -22,7 +22,12 @@ export const setupRoutes: RouteRecordRaw[] = [
         path: 'species',
         name: ROUTE_NAMES.setupSpecies,
         component: () => import('@pages/setup/presentation/views/SpeciesStepView.vue'),
-        meta: { title: 'New cultivation', setupStep: 1, setupTotal: SETUP_STEPS, backTo: '/setup' },
+        meta: {
+          title: 'New cultivation',
+          setupStep: 1,
+          setupTotal: SETUP_STEPS,
+          backTo: ROUTE_NAMES.setupIntro,
+        },
       },
       {
         path: 'environment',
@@ -32,7 +37,7 @@ export const setupRoutes: RouteRecordRaw[] = [
           title: 'New cultivation',
           setupStep: 2,
           setupTotal: SETUP_STEPS,
-          backTo: '/setup/species',
+          backTo: ROUTE_NAMES.setupSpecies,
         },
       },
       {
@@ -43,7 +48,7 @@ export const setupRoutes: RouteRecordRaw[] = [
           title: 'New cultivation',
           setupStep: 3,
           setupTotal: SETUP_STEPS,
-          backTo: '/setup/environment',
+          backTo: ROUTE_NAMES.setupEnvironment,
         },
       },
       {
@@ -54,7 +59,7 @@ export const setupRoutes: RouteRecordRaw[] = [
           title: 'New cultivation',
           setupStep: 4,
           setupTotal: SETUP_STEPS,
-          backTo: '/setup/dimensions',
+          backTo: ROUTE_NAMES.setupDimensions,
         },
       },
       {
@@ -65,7 +70,7 @@ export const setupRoutes: RouteRecordRaw[] = [
           title: 'Stocking estimate',
           setupStep: 4,
           setupTotal: SETUP_STEPS,
-          backTo: '/setup/fingerlings',
+          backTo: ROUTE_NAMES.setupFingerlings,
         },
       },
       {
@@ -76,7 +81,7 @@ export const setupRoutes: RouteRecordRaw[] = [
           title: 'Review cultivation',
           setupStep: 4,
           setupTotal: SETUP_STEPS,
-          backTo: '/setup/stocking-result',
+          backTo: ROUTE_NAMES.setupStockingResult,
         },
       },
       {

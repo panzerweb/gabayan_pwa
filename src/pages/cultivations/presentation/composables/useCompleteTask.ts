@@ -7,7 +7,6 @@ import { invalidateAfter } from '@core/query'
 import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
-import { LEGACY_HOME_KEY } from '../../data/cultivations.keys'
 import { cultivationsRepository } from '../../data/cultivations.repository'
 import {
   TASK_COMPLETION_OFFLINE_MESSAGE,
@@ -87,10 +86,7 @@ export function useCompleteTask(repository: CultivationsRepository = cultivation
       else formError.value = describeError(error, SAVE_FAILED)
       return false
     }
-    await Promise.all([
-      invalidateAfter(queryClient, 'taskComplete'),
-      queryClient.invalidateQueries({ queryKey: LEGACY_HOME_KEY }),
-    ])
+    await invalidateAfter(queryClient, 'taskComplete')
     toast.show('Feeding record saved.', 'success')
     return true
   }

@@ -6,7 +6,6 @@ import { formatQuantity, manilaDateToday } from '@core/utils/format'
 import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
-import { LEGACY_HOME_KEY } from '../../data/cultivations.keys'
 import { cultivationsRepository } from '../../data/cultivations.repository'
 import {
   RECORD_OFFLINE_MESSAGES,
@@ -56,10 +55,7 @@ export function useRecordMortality(
     if (Object.keys(write.fieldErrors.value).length) return false
     const result = await write.submit(mortalityRequest(form))
     if (!result) return false
-    await Promise.all([
-      invalidateAfter(queryClient, 'mortalityCreate'),
-      queryClient.invalidateQueries({ queryKey: LEGACY_HOME_KEY }),
-    ])
+    await invalidateAfter(queryClient, 'mortalityCreate')
     const liveFish = formatQuantity(result.data.stock.estimatedLiveFish, 'COUNT')
     toast.show(`Mortality saved. Estimated live fish: ${liveFish}.`, 'success')
     return true

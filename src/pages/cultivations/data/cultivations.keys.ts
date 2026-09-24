@@ -18,8 +18,3 @@ export const cultivationsKeys = {
   harvestReadiness: (cultivationId: string) =>
     ['cultivations', 'harvest-readiness', cultivationId] as const,
 }
-
-// Home still keys its dashboard as `home-dashboard` rather than under the `home` prefix of
-// `@core/query` until it moves onto the feature layout, so cultivation writes refresh it by
-// this name as well.
-export const LEGACY_HOME_KEY = ['home-dashboard'] as const

@@ -49,6 +49,15 @@ describe('.vue import boundary', () => {
   })
 
   it.each([
+    'src/components/navigation/AppHeader.vue',
+    'src/layouts/AuthenticatedLayout.vue',
+    'src/App.vue',
+  ])('reports %s outside the feature folders as well', async (filePath) => {
+    expect(await restrictedImports('@tanstack/vue-query', filePath)).toHaveLength(1)
+    expect(await restrictedImports('@pages/cart/data/cart.repository', filePath)).toHaveLength(1)
+  })
+
+  it.each([
     '../composables/useCultivation',
     '../../domain/cultivations.model',
     '@core/utils/format',

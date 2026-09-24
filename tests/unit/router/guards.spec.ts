@@ -86,13 +86,15 @@ describe('session guard', () => {
   it('sends a signed-in farmer with a cultivation from a guest page to Home', async () => {
     signIn({ hasCultivation: true })
 
-    expect(await sessionGuard(locationOf(ROUTE_NAMES.signIn))).toBe('/app/home')
+    expect(await sessionGuard(locationOf(ROUTE_NAMES.signIn))).toEqual({ name: ROUTE_NAMES.home })
   })
 
   it('sends a signed-in farmer without a cultivation from a guest page to setup', async () => {
     signIn({ hasCultivation: false })
 
-    expect(await sessionGuard(locationOf(ROUTE_NAMES.createAccount))).toBe('/setup')
+    expect(await sessionGuard(locationOf(ROUTE_NAMES.createAccount))).toEqual({
+      name: ROUTE_NAMES.setupIntro,
+    })
   })
 
   it('lets a signed-in farmer open signed-in pages', async () => {

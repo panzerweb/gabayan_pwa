@@ -6,7 +6,6 @@ import { manilaDateToday } from '@core/utils/format'
 import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
-import { LEGACY_HOME_KEY } from '../../data/cultivations.keys'
 import { cultivationsRepository } from '../../data/cultivations.repository'
 import {
   RECORD_OFFLINE_MESSAGES,
@@ -50,10 +49,7 @@ export function useCompleteHarvest(
     if (Object.keys(write.fieldErrors.value).length) return null
     const result = await write.submit(harvestRequest(form))
     if (!result) return null
-    await Promise.all([
-      invalidateAfter(queryClient, 'harvestCreate'),
-      queryClient.invalidateQueries({ queryKey: LEGACY_HOME_KEY }),
-    ])
+    await invalidateAfter(queryClient, 'harvestCreate')
     toast.show('Harvest recorded. Cultivation moved to Completed.', 'success')
     return result.data
   }

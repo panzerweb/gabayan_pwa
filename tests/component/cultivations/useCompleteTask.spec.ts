@@ -66,7 +66,6 @@ describe('useCompleteTask', () => {
       ['cultivations', 'detail'],
       ['cultivations', 'timeline'],
       ['notifications'],
-      ['home-dashboard'],
     ]) {
       expect(invalidate).toHaveBeenCalledWith({ queryKey })
     }

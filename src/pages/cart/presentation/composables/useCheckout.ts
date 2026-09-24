@@ -33,10 +33,6 @@ const PLACE_FAILED = 'We couldn’t place this order. Please try again.'
 const QUOTE_CHANGED = 'Prices or your cart changed since the total was prepared. Review it again.'
 const NO_ADDRESS = 'Add a delivery address on your profile before checking out.'
 
-// Home still keys its dashboard as `home-dashboard` rather than under the `home` prefix of
-// `@core/query` until it moves onto the feature layout, so it is refreshed by name here.
-const LEGACY_HOME_KEY = ['home-dashboard'] as const
-
 // One placement attempt: the quote it places and the key the server deduplicates on.
 type PlacementAttempt = { quoteId: string; idempotencyKey: string }
 
@@ -167,10 +163,7 @@ export function useCheckout(repository: CartRepository = cartRepository) {
       formError.value = describeError(error, PLACE_FAILED)
       return
     }
-    await Promise.all([
-      invalidateAfter(queryClient, 'orderCreate'),
-      queryClient.invalidateQueries({ queryKey: LEGACY_HOME_KEY }),
-    ])
+    await invalidateAfter(queryClient, 'orderCreate')
     await router.replace({
       name: ROUTE_NAMES.orderDetail,
       params: { orderId },
