@@ -25,6 +25,12 @@ async function restrictedImports(specifier: string, filePath = VIEW_PATH) {
 }
 
 describe('.vue import boundary', () => {
+  // The first lint loads the flat config, the Vue and TypeScript parsers and
+  // every plugin; on a busy machine that alone can exceed the per-test timeout.
+  beforeAll(async () => {
+    await restrictedImports('@core/utils/format')
+  }, 60_000)
+
   it.each([
     '@tanstack/vue-query',
     '@core/http',
