@@ -61,9 +61,18 @@ export function registerSystemAndAuthContract(client) {
     it('answers a password-reset request the same way whatever the email', async () => {
       const response = await client
         .post('/auth/password/forgot')
-        .send({ email: uniqueEmail('nobody') })
+        .send({ identifier: uniqueEmail('nobody') })
 
       expect(expectEnvelope(response, 202).message).toEqual(expect.any(String))
+    })
+
+    it('refuses a password-reset request that names no identifier', async () => {
+      const response = await client
+        .post('/auth/password/forgot')
+        .send({ email: uniqueEmail('nobody') })
+
+      const error = expectError(response, 422, 'VALIDATION_ERROR')
+      expect(Object.keys(error.fields)).toContain('identifier')
     })
 
     it('accepts the development Google and reset fixtures only on the mock', async () => {

@@ -1,18 +1,21 @@
 import { defineConfig, devices } from '@playwright/test'
 
-import { DEFAULT_MOCK_API_PORT, usesMockApi } from './tests/e2e/support/api-target.js'
+import { journeyServers } from './tests/e2e/support/api-target.js'
 
-const mockApiPort = process.env.MOCK_API_PORT ?? DEFAULT_MOCK_API_PORT
+const servers = journeyServers(process.env)
 
 // The servers start from their binaries rather than package scripts, so a package manager's
-// pre-run dependency check can never block the journeys. The mock is started - from a fresh
-// copy of its seed - only when the app talks to it; another server named by
-// VITE_API_BASE_URL is started and seeded beforehand (README "Running against another API").
-const mockApiServer = {
+// pre-run dependency check can never block the journeys. Neither is ever reused: a server
+// already listening was built against an unknown API or holds another run's data, so a busy
+// port fails the run instead. The mock is started - from a fresh copy of its seed - only when
+// the app talks to it; another server named by VITE_API_BASE_URL is started and seeded
+// beforehand (README "Running against another API").
+const mockApiServer = (port: string) => ({
   command: 'node mock-api/reset.mjs && node mock-api/server.mjs',
-  url: `http://localhost:${mockApiPort}/api/v1/health`,
-  reuseExistingServer: !process.env.CI,
-}
+  url: `http://localhost:${port}/api/v1/health`,
+  env: { MOCK_API_PORT: port },
+  reuseExistingServer: false,
+})
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -21,7 +24,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: servers.appUrl,
     channel: 'chrome',
     trace: 'on-first-retry',
   },
@@ -33,10 +36,11 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'npx vite --host 127.0.0.1',
-      url: 'http://localhost:5173',
-      reuseExistingServer: !process.env.CI,
+      command: `npx vite --host 127.0.0.1 --port ${servers.appPort} --strictPort`,
+      url: servers.appUrl,
+      env: { VITE_API_BASE_URL: servers.apiBaseUrl },
+      reuseExistingServer: false,
     },
-    ...(usesMockApi(process.env.VITE_API_BASE_URL, mockApiPort) ? [mockApiServer] : []),
+    ...(servers.mockApiPort ? [mockApiServer(servers.mockApiPort)] : []),
   ],
 })

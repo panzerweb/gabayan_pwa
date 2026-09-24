@@ -67,3 +67,18 @@ export function createContractClient({ baseUrl = process.env.CONTRACT_API_BASE_U
   for (const method of methods) client[method] = (path) => send(method, path)
   return client
 }
+
+/**
+ * Starts the mock on a fresh copy of the seed on a free loopback port, for tests that talk to
+ * it over real HTTP (the PWA's own `fetch` client). Returns the API root and a `close()`.
+ */
+export async function listenOnFreshMock() {
+  const { target, root } = inProcessMock()
+  const server = await new Promise((resolve) => {
+    const listening = target.listen(0, '127.0.0.1', () => resolve(listening))
+  })
+  return {
+    baseUrl: `http://127.0.0.1:${server.address().port}${root}`,
+    close: () => new Promise((resolve) => server.close(resolve)),
+  }
+}

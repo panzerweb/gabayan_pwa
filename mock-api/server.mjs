@@ -780,7 +780,14 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, issueSession(response, user))
   })
 
-  app.post('/api/v1/auth/password/forgot', (_request, response) => {
+  app.post('/api/v1/auth/password/forgot', (request, response) => {
+    // The answer never says whether an account matched; only a missing identifier is refused.
+    const identifier = request.body?.identifier
+    if (typeof identifier !== 'string' || !identifier.trim()) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', {
+        identifier: ['Enter your email or mobile number.'],
+      })
+    }
     return sendData(
       response,
       { message: 'If an account matches, password reset instructions are ready.' },
