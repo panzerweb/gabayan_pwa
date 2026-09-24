@@ -7,7 +7,7 @@ Last verified: 2026-09-24
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in `src/pages/*/presentation/**/*.vue` (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 177 tests.
+- [x] Unit and component suite passes: 222 tests.
 - [x] Mock API contract suite passes: 10 tests.
 - [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
@@ -54,10 +54,10 @@ Production build on 2026-09-24 (raw and gzip summed over every emitted file):
 
 | Asset                       |        Raw |      Gzip |
 | --------------------------- | ---------: | --------: |
-| Application JavaScript      |  435.90 kB | 162.57 kB |
-| Application CSS             |   76.75 kB |  25.24 kB |
-| Entry chunk (`index-*.js`)  |  111.34 kB |  37.15 kB |
-| Precached application shell | 501.52 KiB |       n/a |
+| Application JavaScript      |  444.11 kB | 166.17 kB |
+| Application CSS             |   77.80 kB |  25.22 kB |
+| Entry chunk (`index-*.js`)  |  111.37 kB |  37.62 kB |
+| Precached application shell | 511.03 KiB |       n/a |
 
 Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); the service worker precaches all chunks, so offline navigation is unchanged. The per-file gzip total is higher than a single bundle would compress to, while the entry chunk a first visit downloads is less than half the former bundle.
 

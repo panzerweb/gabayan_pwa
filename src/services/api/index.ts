@@ -51,18 +51,6 @@ export {
   listWaterChecks,
   recordsQueryKeys,
 } from './records'
-export {
-  createProfileAddress,
-  deleteProfileAddress,
-  getFarmProfile,
-  getNotificationSettings,
-  getProfileAddresses,
-  profileQueryKeys,
-  updateCurrentUser,
-  updateNotificationSettings,
-  updateProfileAddress,
-  upsertFarmProfile,
-} from './profile'
 export type { Envelope, Page, PageInfo, ResponseMeta } from '@core/http'
 export type {
   CompatibilityResult,
@@ -112,10 +100,3 @@ export type {
   MortalityRecord,
   WaterCheck,
 } from './records'
-export type {
-  AddressWrite,
-  FarmProfile,
-  FarmWrite,
-  NotificationSettings,
-  NotificationSettingsPatch,
-} from './profile'

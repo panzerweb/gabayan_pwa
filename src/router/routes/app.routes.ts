@@ -97,7 +97,7 @@ export const appRoutes: RouteRecordRaw[] = [
       {
         path: 'profile',
         name: ROUTE_NAMES.profile,
-        component: () => import('@pages/app/ProfilePage.vue'),
+        component: () => import('@pages/profile/presentation/views/ProfileView.vue'),
         meta: { title: 'Profile' },
       },
       {
