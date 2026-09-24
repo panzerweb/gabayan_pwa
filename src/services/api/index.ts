@@ -4,18 +4,13 @@ export {
   createStockingEstimate,
   getCompatibility,
   getEquipmentRecommendations,
-  listCultivations,
   listCultureEnvironments,
 } from './onboarding'
 export { listSpecies, speciesSummarySchema } from './species'
 export {
-  completeTask,
-  getCultivation,
-  getCultivationTimeline,
   getHomeDashboard,
   getUnreadNotificationCount,
   listNotifications,
-  listTasks,
   markAllNotificationsRead,
   markNotificationRead,
   operationalQueryKeys,

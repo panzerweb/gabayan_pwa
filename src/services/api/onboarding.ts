@@ -184,14 +184,6 @@ export function createStockingEstimate(
   })
 }
 
-export function listCultivations(accessToken: string, limit = 20) {
-  return apiRequest(`/cultivations?limit=${limit}`, {
-    method: 'GET',
-    accessToken,
-    schema: pageSchema(cultivationSummarySchema),
-  })
-}
-
 export interface CreateCultivationRequest {
   name?: string
   estimateId: string

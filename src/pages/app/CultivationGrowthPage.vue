@@ -12,6 +12,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
+import { cultivationsKeys } from '@pages/cultivations/data/cultivations.keys'
 import {
   ApiError,
   createGrowthMeasurement,
@@ -87,7 +88,7 @@ async function submit() {
     await mutation.mutateAsync()
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: recordsQueryKeys.growth(cultivationId.value) }),
-      queryClient.invalidateQueries({ queryKey: ['cultivation', cultivationId.value] }),
+      queryClient.invalidateQueries({ queryKey: cultivationsKeys.detail(cultivationId.value) }),
       queryClient.invalidateQueries({
         queryKey: recordsQueryKeys.feedingPlan(cultivationId.value),
       }),

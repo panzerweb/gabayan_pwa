@@ -13,6 +13,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
+import { cultivationsKeys } from '@pages/cultivations/data/cultivations.keys'
 import {
   ApiError,
   createMortalityRecord,
@@ -135,7 +136,7 @@ function startRecord(type: 'mortality' | 'water') {
 
 async function invalidateRecords() {
   await Promise.all([
-    queryClient.invalidateQueries({ queryKey: ['cultivation', cultivationId.value] }),
+    queryClient.invalidateQueries({ queryKey: cultivationsKeys.detail(cultivationId.value) }),
     queryClient.invalidateQueries({ queryKey: recordsQueryKeys.feedingPlan(cultivationId.value) }),
     queryClient.invalidateQueries({ queryKey: recordsQueryKeys.readiness(cultivationId.value) }),
     queryClient.invalidateQueries({ queryKey: ['home-dashboard'] }),
@@ -185,7 +186,7 @@ async function submitWater() {
       queryClient.invalidateQueries({
         queryKey: recordsQueryKeys.waterChecks(cultivationId.value),
       }),
-      queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+      queryClient.invalidateQueries({ queryKey: cultivationsKeys.tasks() }),
     ])
     toast.show(result.data.guidance[0]?.title ?? 'Water check saved.', 'success')
     modal.value = null
