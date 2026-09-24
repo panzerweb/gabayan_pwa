@@ -8,7 +8,7 @@ const jsonServer = require('json-server')
 
 const defaultDatabasePath = resolve(process.cwd(), 'mock-api', 'db.json')
 const seedDatabasePath = resolve(process.cwd(), 'mock-api', 'fixtures', 'seed.json')
-const apiVersion = '0.6.0'
+const apiVersion = '0.7.0'
 const ruleDisclaimer =
   "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
 
@@ -367,6 +367,47 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
 
   function money(amountMinor) {
     return { amountMinor, currency: 'PHP' }
+  }
+
+  // An account without a tier row is on FREE; only an operator moves it (BLOCKERS D-7).
+  function accountTierCode(userId) {
+    return router.db.get('accountTiers').find({ ownerUserId: userId }).value()?.tierCode ?? 'FREE'
+  }
+
+  function tierPlan(code) {
+    return router.db.get('tierPlans').find({ code }).value()
+  }
+
+  // One active culture system is one cultivation not yet COMPLETED or CANCELLED (D-8).
+  function activeCultureSystems(userId) {
+    return router.db
+      .get('cultivations')
+      .filter(
+        (cultivation) =>
+          cultivation.ownerUserId === userId &&
+          !['COMPLETED', 'CANCELLED'].includes(cultivation.status),
+      )
+      .size()
+      .value()
+  }
+
+  function publicUpgradeRequest(upgradeRequest) {
+    return omitKeys(upgradeRequest, ['ownerUserId'])
+  }
+
+  function accountTier(userId) {
+    const plan = tierPlan(accountTierCode(userId))
+    const active = activeCultureSystems(userId)
+    const pending = router.db
+      .get('upgradeRequests')
+      .find({ ownerUserId: userId, status: 'PENDING' })
+      .value()
+    return {
+      plan,
+      activeCultureSystems: active,
+      remainingCultureSystems: Math.max(0, plan.cultureSystemLimit - active),
+      pendingUpgradeRequest: pending ? publicUpgradeRequest(pending) : null,
+    }
   }
 
   function productSummary(product, userId) {
@@ -1002,6 +1043,67 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, omitKeys({ ...existing, ...updated }, ['id', 'ownerUserId']))
   })
 
+  app.get('/api/v1/tiers', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    return listCollection(request, response, router.db.get('tierPlans').value())
+  })
+
+  app.get('/api/v1/users/me/tier', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    return sendData(response, accountTier(user.id))
+  })
+
+  app.post('/api/v1/users/me/tier/upgrade-requests', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const body = request.body ?? {}
+    const plans = router.db.get('tierPlans').value()
+    const currentTier = accountTierCode(user.id)
+    const rankOf = (code) => plans.findIndex((plan) => plan.code === code)
+    const fields = {}
+    if (rankOf(body.requestedTier) === -1) {
+      fields.requestedTier = ['Choose Pro or Organization.']
+    } else if (rankOf(body.requestedTier) <= rankOf(currentTier)) {
+      fields.requestedTier = ['Choose a plan above the one you are on.']
+    }
+    const note = body.note == null ? null : String(body.note).trim() || null
+    if (body.note != null && typeof body.note !== 'string') {
+      fields.note = ['Write the note as text.']
+    } else if (note && note.length > 500) {
+      fields.note = ['Keep the note to 500 characters or fewer.']
+    }
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Choose the plan you would like.', fields)
+    }
+    const pending = router.db
+      .get('upgradeRequests')
+      .find({ ownerUserId: user.id, status: 'PENDING' })
+      .value()
+    if (pending) {
+      return sendError(
+        response,
+        409,
+        'CONFLICT',
+        'Your plan request is still being reviewed. We will let you know once it is settled.',
+        null,
+        { pendingRequestId: pending.id, requestedTier: pending.requestedTier },
+      )
+    }
+    const upgradeRequest = {
+      id: `upg_${String(router.db.get('upgradeRequests').size().value() + 1).padStart(4, '0')}`,
+      ownerUserId: user.id,
+      currentTier,
+      requestedTier: body.requestedTier,
+      status: 'PENDING',
+      note,
+      createdAt: new Date().toISOString(),
+    }
+    router.db.get('upgradeRequests').push(upgradeRequest).write()
+    return sendData(response, publicUpgradeRequest(upgradeRequest), 201)
+  })
+
   app.get('/api/v1/species', (request, response) => {
     return listCollection(request, response, router.db.get('species').value())
   })
@@ -1195,6 +1297,24 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const recordKey = `${user.id}:POST:/cultivations:${idempotencyKey}`
     const prior = router.db.get('idempotencyRecords').find({ key: recordKey }).value()
     if (prior) return sendData(response, prior.response, 201)
+
+    const tier = accountTier(user.id)
+    if (tier.remainingCultureSystems === 0) {
+      const { plan, activeCultureSystems: active } = tier
+      const systems = plan.cultureSystemLimit === 1 ? 'culture system' : 'culture systems'
+      return sendError(
+        response,
+        403,
+        'TIER_LIMIT_REACHED',
+        `Your ${plan.name} plan covers ${plan.cultureSystemLimit} active ${systems}. Harvest or close one, or ask for a bigger plan.`,
+        null,
+        {
+          tier: plan.code,
+          cultureSystemLimit: plan.cultureSystemLimit,
+          activeCultureSystems: active,
+        },
+      )
+    }
 
     const body = request.body ?? {}
     const estimate = router.db

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import BaseButton from '@components/ui/BaseButton.vue'
 import BaseInput from '@components/ui/BaseInput.vue'
+import TierLimitNotice from '@pages/tiers/presentation/components/TierLimitNotice.vue'
 
 import SetupReviewList from '../components/SetupReviewList.vue'
 import { useCreateCultivation } from '../composables/useCreateCultivation'
 
-const { estimate, form, fieldErrors, formError, isOnline, creating, submit } =
+const { estimate, form, fieldErrors, formError, limitReached, isOnline, creating, submit } =
   useCreateCultivation()
 </script>
 
@@ -45,6 +46,7 @@ const { estimate, form, fieldErrors, formError, isOnline, creating, submit } =
     <p v-if="!isOnline" class="form-error" role="status">
       You’re offline. Reconnect before creating this cultivation. It will not be queued.
     </p>
+    <TierLimitNotice v-else-if="limitReached" :message="formError" />
     <p v-else-if="formError" class="form-error" role="alert">{{ formError }}</p>
     <div class="setup-flow-actions">
       <BaseButton :loading="creating" :disabled="!isOnline" @click="submit()">

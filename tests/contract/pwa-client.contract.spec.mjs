@@ -33,6 +33,7 @@ async function loadDataLayer() {
     import('@pages/cart/data/cart.api'),
     import('@pages/notifications/data/notifications.api'),
     import('@pages/orders/data/orders.api'),
+    import('@pages/tiers/data/tiers.api'),
   ])
   return Object.assign({}, ...modules)
 }
@@ -125,5 +126,13 @@ describe('the PWA data layer against the contract server', () => {
     const order = byName(orders, 'orderNumber', DEMO_ORDER_NUMBER)
     expect((await api.getOrderApi(order.id, accessToken)).data.orderNumber).toBe(DEMO_ORDER_NUMBER)
     expect((await api.getOrderTrackingApi(order.id, accessToken)).data).toBeDefined()
+  })
+
+  it("reads the plans and the demo farmer's own tier", async () => {
+    const plans = (await api.listPlansApi(accessToken)).data
+    expect(plans.map((plan) => plan.code)).toEqual(['FREE', 'PRO', 'ORGANIZATION'])
+    const tier = (await api.getAccountTierApi(accessToken)).data
+    expect(tier.plan.code).toBe('PRO')
+    expect(tier.activeCultureSystems).toBeLessThanOrEqual(tier.plan.cultureSystemLimit)
   })
 })

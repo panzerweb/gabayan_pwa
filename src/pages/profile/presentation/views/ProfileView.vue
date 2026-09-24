@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppHeader from '@components/navigation/AppHeader.vue'
 import BaseButton from '@components/ui/BaseButton.vue'
+import AccountPlanSection from '@pages/tiers/presentation/components/AccountPlanSection.vue'
 import { useSessionStore } from '@stores/session.store'
 
 import AddressBook from '../components/AddressBook.vue'
@@ -19,6 +20,7 @@ const { signingOut, signOut } = useSignOut()
     <AppHeader title="Profile" subtitle="Account and farm preferences" />
     <main class="profile-page__content">
       <ProfileSummary :full-name="session.user?.fullName" :email="session.user?.email" />
+      <AccountPlanSection />
       <PersonalDetailsSection />
       <FarmDetailsSection />
       <AddressBook />

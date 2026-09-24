@@ -1,5 +1,7 @@
 import 'vue-router'
 
+import type { TierCode } from '@pages/tiers/domain/tiers.model'
+
 import type { RouteName } from './route-names'
 
 export {}
@@ -14,5 +16,7 @@ declare module 'vue-router' {
     backTo?: RouteName
     requiresAuth?: boolean
     guestOnly?: boolean
+    // The least plan a screen needs; the tier guard sends a farmer below it to the plans.
+    tier?: TierCode
   }
 }

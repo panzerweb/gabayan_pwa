@@ -15,6 +15,7 @@ const blank = { template: '<div />' }
 
 // The routes a signed-in screen links to, each rendering nothing.
 const appRoutes = [
+  ['/setup/plan', ROUTE_NAMES.setupPlan],
   ['/setup', ROUTE_NAMES.setupIntro],
   ['/setup/species', ROUTE_NAMES.setupSpecies],
   ['/setup/environment', ROUTE_NAMES.setupEnvironment],
@@ -38,6 +39,7 @@ const appRoutes = [
   ['/app/orders/:orderId', ROUTE_NAMES.orderDetail],
   ['/app/orders/:orderId/tracking', ROUTE_NAMES.orderTracking],
   ['/app/profile', ROUTE_NAMES.profile],
+  ['/app/plans', ROUTE_NAMES.plans],
   ['/app/notifications', ROUTE_NAMES.notifications],
 ] as const
 

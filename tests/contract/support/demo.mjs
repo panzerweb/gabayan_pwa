@@ -61,7 +61,19 @@ export async function listSeedDayTasks(client, token, cultivationId) {
  * Creates a Tilapia pond cultivation for the signed-in account from a fresh stocking
  * estimate (500 fingerlings, inside the demo range) and returns its detail.
  */
-export async function createCultivation(client, token, { stockedOn = null } = {}) {
+export async function createCultivation(client, token, options = {}) {
+  return expectEnvelope(await requestCultivation(client, token, options), 201)
+}
+
+/**
+ * Asks to create the same Tilapia pond cultivation and returns the raw response, whatever
+ * the server answered. `key` is the Idempotency-Key; a fresh one is used when omitted.
+ */
+export async function requestCultivation(
+  client,
+  token,
+  { stockedOn = null, key = idempotencyKey('cultivation') } = {},
+) {
   const [species, environment] = await Promise.all([
     findSpecies(client, 'Tilapia'),
     findEnvironment(client, 'POND'),
@@ -74,10 +86,10 @@ export async function createCultivation(client, token, { stockedOn = null } = {}
       plannedFingerlings: 500,
     }),
   )
-  const created = await client
+  return client
     .post('/cultivations')
     .set('Authorization', bearer(token))
-    .set('Idempotency-Key', idempotencyKey('cultivation'))
+    .set('Idempotency-Key', key)
     .send({
       estimateId: estimate.estimateId,
       speciesId: species.id,
@@ -86,5 +98,4 @@ export async function createCultivation(client, token, { stockedOn = null } = {}
       initialFingerlings: 500,
       stockedOn,
     })
-  return expectEnvelope(created, 201)
 }

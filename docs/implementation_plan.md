@@ -88,6 +88,7 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Auth            | `/create-account`                                             | Account creation                            |
 | Auth            | `/forgot-password`                                            | Request a password-reset link/code          |
 | Auth            | `/reset-password`                                             | Apply a valid reset token                   |
+| Setup           | `/setup/plan`                                                 | Choose a plan after account creation        |
 | Setup           | `/setup`                                                      | Setup introduction/skip                     |
 | Setup           | `/setup/species`                                              | Step 1 of 4                                 |
 | Setup           | `/setup/environment`                                          | Step 2 of 4                                 |
@@ -116,6 +117,7 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Profile         | `/app/profile/edit`                                           | Personal/farm information                   |
 | Profile         | `/app/profile/addresses`                                      | Shipping addresses                          |
 | Profile         | `/app/profile/notifications`                                  | Reminder settings and times                 |
+| Profile         | `/app/plans`                                                  | Plans, limits and upgrade requests          |
 | Support/legal   | `/app/help`, `/legal/about`, `/legal/privacy`, `/legal/terms` | Static/help content and policy entry points |
 
 Route guards distinguish guest, authenticated-without-cultivation, and authenticated users. A signed-in existing demo user lands on Home. A newly registered user lands on Setup.

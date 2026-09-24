@@ -7,9 +7,9 @@ Last verified: 2026-09-24
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 508 tests.
-- [x] Mock API contract suite passes: 49 tests, and its coverage check exercises all 68 method-and-path rows of contract §5.
-- [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Unit and component suite passes: 558 tests.
+- [x] Mock API contract suite passes: 55 tests, and its coverage check exercises all 71 method-and-path rows of contract §5.
+- [x] Mobile Playwright suite passes: 15 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -54,10 +54,10 @@ Production build on 2026-09-24 (raw and gzip summed over every emitted file):
 
 | Asset                       |        Raw |      Gzip |
 | --------------------------- | ---------: | --------: |
-| Application JavaScript      |  489.41 kB | 184.90 kB |
-| Application CSS             |   81.66 kB |  26.66 kB |
-| Entry chunk (`index-*.js`)  |  100.52 kB |  34.48 kB |
-| Precached application shell | 558.65 KiB |       n/a |
+| Application JavaScript      |  503.70 kB | 191.22 kB |
+| Application CSS             |   86.07 kB |  27.86 kB |
+| Entry chunk (`index-*.js`)  |  104.28 kB |  35.49 kB |
+| Precached application shell | 576.91 KiB |       n/a |
 
 Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); the service worker precaches all chunks, so offline navigation is unchanged. The per-file gzip total is higher than a single bundle would compress to, while the entry chunk a first visit downloads is less than half the former bundle.
 
@@ -70,7 +70,7 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] Checkout sends one `Idempotency-Key` per order submission and reuses it when that submission is retried (`tests/component/cart/useCheckout.spec.ts`).
 - [x] Feeding completion sends one `Idempotency-Key` per submission, reuses it on retry, and invalidates Home, tasks, detail, timeline and notifications through the `@core/query` map (`tests/component/cultivations/useCompleteTask.spec.ts`).
 - [x] Growth, mortality, water-check and harvest writes send one `Idempotency-Key` per submission, reuse it on retry, and invalidate through the `@core/query` map (`tests/component/cultivations/useRecordGrowth.spec.ts`, `CultivationHarvestView.spec.ts`); their forms stay disabled offline with an explanation.
-- [x] Cultivation creation sends one `Idempotency-Key` per visit to the review step, reuses it on retry, sends an above-range plan only with explicit confirmation, and invalidates Home and the cultivation list and detail through the `@core/query` map (`tests/component/setup/useCreateCultivation.spec.ts`); it stays disabled offline with an explanation.
+- [x] Cultivation creation sends one `Idempotency-Key` per visit to the review step, reuses it on retry, sends an above-range plan only with explicit confirmation, and invalidates Home, the cultivation list and detail, and the account tier through the `@core/query` map (`tests/component/setup/useCreateCultivation.spec.ts`); it stays disabled offline with an explanation. A refusal because the plan has no culture system left (403 `TIER_LIMIT_REACHED`) is explained with a way to the plans (`tests/component/setup/ReviewSetupView.spec.ts`).
 - [x] Marking notifications read is optimistic, as contract §14 allows: every cached list shows the change at once, is restored with a message if the server refuses, and the lists and Home refresh afterwards; "Mark all read" on a filtered list marks only that category (`tests/component/notifications/NotificationsView.spec.ts`).
 - [x] Request and response payloads are runtime-validated at the API boundary.
 - [x] Contract tests cover auth, onboarding, operations, commerce, harvest, and profile resources.
@@ -80,3 +80,5 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] The contract suite also drives the app's own data layer - every `src/pages/*/data/*.api.ts` read, with its query string and Zod schema - against the server it targets (`tests/contract/pwa-client.contract.spec.mjs`); unknown response fields are dropped and a missing required one fails (`tests/unit/auth/auth.model.spec.ts`).
 - [x] The journeys open the app on the API's loopback host (`127.0.0.1` for FastAPI), so the `SameSite=Lax` refresh cookie survives a reload (`tests/e2e/support/api-target.ts`).
 - [x] With only `VITE_API_BASE_URL` set to FastAPI, the contract suite and the 13 critical browser journeys pass. Verified 2026-09-24 against `aqua-lens-api` commit `101702b` run locally as its README §5 describes (fresh database, `seed-demo --date 2026-09-23`, uvicorn on port 8000): contract suite 49 of 49 with 68 of 68 catalog rows exercised, and 13 of 13 journeys.
+- [x] Plans are the API's to enforce: the plans, the account tier and upgrade requests go through `src/pages/tiers/data/`, a new account chooses its plan before setup, Profile shows the plan and its culture-system limit, and a route carrying `meta.tier` sends a farmer below it to the plans (`tests/unit/router/guards.spec.ts`, `tests/e2e/tiers.spec.ts`). Paid plans are requested, never charged (BLOCKERS D-7).
+- [ ] The three tier rows of contract §5 and the 403 `TIER_LIMIT_REACHED` refusal pass against FastAPI. Waits for aqua-lens-api Phase 26; until then a FastAPI contract run leaves those rows unexercised and `tests/e2e/tiers.spec.ts` cannot pass there (the plan step itself still lets a new account continue on Free when the plans cannot be read).

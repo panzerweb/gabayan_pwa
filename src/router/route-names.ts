@@ -6,6 +6,7 @@ export const ROUTE_NAMES = {
   createAccount: 'create-account',
   forgotPassword: 'forgot-password',
   resetPassword: 'reset-password',
+  setupPlan: 'setup-plan',
   setupIntro: 'setup-intro',
   setupSpecies: 'setup-species',
   setupEnvironment: 'setup-environment',
@@ -30,6 +31,7 @@ export const ROUTE_NAMES = {
   orderTracking: 'order-tracking',
   notifications: 'notifications',
   profile: 'profile',
+  plans: 'plans',
   offline: 'offline',
   notFound: 'not-found',
 } as const

@@ -4,7 +4,9 @@ import { useRouter } from 'vue-router'
 
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import { apiFieldErrors, describeError } from '@core/errors'
+import { ApiError } from '@core/http'
 import { invalidateAfter } from '@core/query'
+import { TIER_LIMIT_REACHED } from '@pages/tiers/domain/tiers.model'
 import { ROUTE_NAMES } from '@router/route-names'
 import { useSessionStore } from '@stores/session.store'
 
@@ -27,7 +29,8 @@ const ABOVE_RANGE_UNCONFIRMED =
 // Creates the cultivation from the reviewed estimate. One visit to the review screen is one
 // submission with one Idempotency-Key: a retry after a failure reuses it, so a lost answer can
 // never create the cultivation twice. An above-range plan is sent only with the farmer's
-// explicit confirmation, and nothing is sent while offline.
+// explicit confirmation, and nothing is sent while offline. A refusal because the plan has no
+// culture system left is flagged, so the screen can point to the plans.
 export function useCreateCultivation(repository: SetupRepository = setupRepository) {
   const setup = useSetupStore()
   const session = useSessionStore()
@@ -42,6 +45,7 @@ export function useCreateCultivation(repository: SetupRepository = setupReposito
   })
   const fieldErrors = ref<FormErrors>({})
   const formError = ref('')
+  const limitReached = ref(false)
   const idempotencyKey = crypto.randomUUID()
 
   const mutation = useMutation({
@@ -55,6 +59,7 @@ export function useCreateCultivation(repository: SetupRepository = setupReposito
   async function submit(): Promise<boolean> {
     fieldErrors.value = {}
     formError.value = ''
+    limitReached.value = false
     const current = estimate.value
     if (!current) return false
     if (!canReviewEstimate(current, setup.draft.acceptedAboveRangeWarning)) {
@@ -79,6 +84,7 @@ export function useCreateCultivation(repository: SetupRepository = setupReposito
     } catch (error) {
       fieldErrors.value = apiFieldErrors(error)
       formError.value = describeError(error, CREATE_FAILED)
+      limitReached.value = error instanceof ApiError && error.code === TIER_LIMIT_REACHED
       return false
     }
     session.markCultivationCreated()
@@ -92,6 +98,7 @@ export function useCreateCultivation(repository: SetupRepository = setupReposito
     form,
     fieldErrors,
     formError,
+    limitReached,
     isOnline,
     creating: computed(() => mutation.isPending.value),
     submit,
