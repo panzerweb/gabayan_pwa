@@ -7,9 +7,9 @@ Last verified: 2026-09-24
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 558 tests.
-- [x] Mock API contract suite passes: 55 tests, and its coverage check exercises all 71 method-and-path rows of contract §5.
-- [x] Mobile Playwright suite passes: 15 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Unit and component suite passes: 564 tests.
+- [x] Mock API contract suite passes: 61 tests, and its coverage check exercises all 71 method-and-path rows of contract §5.
+- [x] Mobile Playwright suite passes: 17 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -57,7 +57,7 @@ Production build on 2026-09-24 (raw and gzip summed over every emitted file):
 | Application JavaScript      |  503.70 kB | 191.22 kB |
 | Application CSS             |   86.07 kB |  27.86 kB |
 | Entry chunk (`index-*.js`)  |  104.28 kB |  35.49 kB |
-| Precached application shell | 576.91 KiB |       n/a |
+| Precached application shell | 580.06 KiB |       n/a |
 
 Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); the service worker precaches all chunks, so offline navigation is unchanged. The per-file gzip total is higher than a single bundle would compress to, while the entry chunk a first visit downloads is less than half the former bundle.
 
@@ -82,3 +82,4 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] With only `VITE_API_BASE_URL` set to FastAPI, the contract suite and the 13 critical browser journeys pass. Verified 2026-09-24 against `aqua-lens-api` commit `101702b` run locally as its README §5 describes (fresh database, `seed-demo --date 2026-09-23`, uvicorn on port 8000): contract suite 49 of 49 with 68 of 68 catalog rows exercised, and 13 of 13 journeys.
 - [x] Plans are the API's to enforce: the plans, the account tier and upgrade requests go through `src/pages/tiers/data/`, a new account chooses its plan before setup, Profile shows the plan and its culture-system limit, and a route carrying `meta.tier` sends a farmer below it to the plans (`tests/unit/router/guards.spec.ts`, `tests/e2e/tiers.spec.ts`). Paid plans are requested, never charged (BLOCKERS D-7).
 - [ ] The three tier rows of contract §5 and the 403 `TIER_LIMIT_REACHED` refusal pass against FastAPI. Waits for aqua-lens-api Phase 26; until then a FastAPI contract run leaves those rows unexercised and `tests/e2e/tiers.spec.ts` cannot pass there (the plan step itself still lets a new account continue on Free when the plans cannot be read).
+- [ ] The six species of contract §7 - Lapu-lapu and Shrimp with their compatibility and stocking rules, and the revised Bangus, Tilapia and Hito profiles - pass against FastAPI. Waits for aqua-lens-api Phase 28; until then a FastAPI contract run fails the species profile tests (`tests/contract/scenarios/species.scenarios.mjs`) and `tests/e2e/species.spec.ts` cannot pass there.

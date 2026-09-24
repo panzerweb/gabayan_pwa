@@ -23,6 +23,17 @@ export const milkfish: SpeciesSummary = {
   beginnerFriendly: false,
 }
 
+export const shrimp: SpeciesSummary = {
+  ...tilapia,
+  id: 'sp_shrimp',
+  commonName: 'Shrimp',
+  localName: 'Hipon',
+  slug: 'shrimp',
+  shortDescription: 'Raised in brackish-water ponds and needs close water-quality care.',
+  beginnerFriendly: false,
+  image: { url: '/mock-media/shrimp.svg', alt: 'Shrimp on a pond bottom' },
+}
+
 export const pond: CultureEnvironment = inRangeEstimate.environment
 
 export const fishCage: CultureEnvironment = {

@@ -11,6 +11,7 @@ import {
   parseMeters,
   recommendedProducts,
   speciesNote,
+  speciesSourceDisplay,
   speciesTitle,
   stockingEstimateRequest,
   stockingEstimateSchema,
@@ -40,6 +41,21 @@ describe('setup model', () => {
     expect(speciesTitle(tilapia)).toBe('Tilapia')
     expect(speciesTitle(milkfish)).toBe('Milkfish (Bangus)')
     expect(speciesNote(milkfish)).toBe('Additional planning may help')
+  })
+
+  it('says how far a species profile has been reviewed, in words beside an icon', () => {
+    expect(speciesSourceDisplay('DEMO')).toEqual({
+      label: 'Demo figures, not yet reviewed',
+      tone: 'warning',
+      icon: 'warning',
+    })
+    expect(speciesSourceDisplay('DRAFT')).toMatchObject({ label: 'Draft figures', icon: 'info' })
+    expect(speciesSourceDisplay('VERIFIED')).toMatchObject({
+      label: 'Reviewed figures',
+      tone: 'success',
+      icon: 'check',
+    })
+    expect(speciesSourceDisplay('RETIRED')).toMatchObject({ label: 'Retired profile' })
   })
 
   it('shows a compatible pairing with a check and any other with a warning', () => {

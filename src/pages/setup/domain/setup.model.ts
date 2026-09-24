@@ -214,6 +214,21 @@ export function speciesNote(species: Pick<SpeciesSummary, 'beginnerFriendly'>) {
     : 'Additional planning may help'
 }
 
+export interface SourceDisplay {
+  label: string
+  tone: 'neutral' | 'success' | 'warning'
+  icon: AppIconName
+}
+
+// How far a species profile's figures have been reviewed, in words beside an icon and colour.
+export function speciesSourceDisplay(sourceStatus: SpeciesSummary['sourceStatus']): SourceDisplay {
+  if (sourceStatus === 'VERIFIED')
+    return { label: 'Reviewed figures', tone: 'success', icon: 'check' }
+  if (sourceStatus === 'DRAFT') return { label: 'Draft figures', tone: 'warning', icon: 'info' }
+  if (sourceStatus === 'RETIRED') return { label: 'Retired profile', tone: 'neutral', icon: 'info' }
+  return { label: 'Demo figures, not yet reviewed', tone: 'warning', icon: 'warning' }
+}
+
 export function compatibilityDisplay(status: CompatibilityStatus): StatusDisplay {
   return status === 'COMPATIBLE'
     ? { tone: 'success', icon: 'check' }

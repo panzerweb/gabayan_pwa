@@ -7,6 +7,7 @@ import { registerCultivationContract } from './scenarios/cultivations.scenarios.
 import { registerNotificationContract } from './scenarios/notifications.scenarios.mjs'
 import { registerProfileContract } from './scenarios/profile.scenarios.mjs'
 import { registerReferenceContract } from './scenarios/reference.scenarios.mjs'
+import { registerSpeciesContract } from './scenarios/species.scenarios.mjs'
 import { registerSystemAndAuthContract } from './scenarios/system-auth.scenarios.mjs'
 import { registerTaskAndRecordContract } from './scenarios/tasks-records.scenarios.mjs'
 import { registerTierContract } from './scenarios/tiers.scenarios.mjs'
@@ -69,7 +70,7 @@ describe(`contract smoke tests against ${client.baseUrl}`, () => {
     expect(response.body.page).toMatchObject({
       cursor: null,
       limit: 2,
-      total: 4,
+      total: 6,
       nextCursor: expect.any(String),
     })
   })
@@ -543,6 +544,7 @@ describe(`contract smoke tests against ${client.baseUrl}`, () => {
 registerSystemAndAuthContract(client)
 registerProfileContract(client)
 registerReferenceContract(client)
+registerSpeciesContract(client)
 registerCultivationContract(client)
 registerTaskAndRecordContract(client)
 registerCommerceContract(client)
