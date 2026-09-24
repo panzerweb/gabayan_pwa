@@ -151,7 +151,8 @@ export const farmTaskSchema = z.object({
 export const feedingRecordSchema = z.object({
   id: z.string(),
   cultivationId: z.string(),
-  taskId: z.string(),
+  // Null for a feeding recorded without a task (BLOCKERS D-36).
+  taskId: z.string().nullable(),
   fedAt: z.string(),
   amount: quantitySchema,
   notes: z.string().nullable(),

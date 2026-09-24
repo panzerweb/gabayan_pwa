@@ -32,6 +32,53 @@ pnpm test:e2e
 
 `pnpm check` runs linting, strict type checking, unit tests, mock contract tests, and the production PWA build. The end-to-end command starts the app and mock API automatically.
 
+## Contract suite
+
+`npx vitest run tests/contract` drives the API through the same requests whatever server answers
+them. By default it runs an in-process mock on a fresh copy of `mock-api/fixtures/seed.json`, so it
+needs no reset. It signs in as the seeded demo farmer, creates its own accounts with unique emails,
+finds seeded records by name, SKU or order number rather than by id, and ends with a coverage check
+that fails when any method-and-path row of [the endpoint catalog](docs/api_contract.md) (§5) went
+uncalled:
+
+```text
+Endpoint catalog coverage: 68 of 68 rows exercised against in-process mock.
+```
+
+The development fixtures `demo-google-token` and `demo-reset-token` are asserted as accepted by the
+mock and refused by any other server.
+
+## Running against another API
+
+Point the suites at a server that implements the contract and holds the demo seed for the journeys'
+day, 2026-09-23. For the FastAPI service in `aqua-lens-api`, start from an empty database each time,
+because the suites change the demo farmer's tasks, records, cart and orders:
+
+```powershell
+# in aqua-lens-api
+docker compose down -v
+docker compose up -d
+python -m alembic upgrade head
+python -m app.cli seed-demo --date 2026-09-23
+uvicorn app.main:app --port 8000
+```
+
+Then, from this repository:
+
+```powershell
+$env:CONTRACT_API_BASE_URL = 'http://127.0.0.1:8000/api/v1'
+npx vitest run tests/contract
+
+# reseed as above, then run the journeys against the same server
+$env:VITE_API_BASE_URL = 'http://127.0.0.1:8000/api/v1'
+npx playwright test --reporter=line
+```
+
+`CONTRACT_API_BASE_URL` and `VITE_API_BASE_URL` are the full API root, `/api/v1` included.
+Playwright starts and resets the mock API only when `VITE_API_BASE_URL` is unset or names the mock
+(a loopback host on `MOCK_API_PORT`, 3001 by default); any other server is left to you. Clear both
+variables (`Remove-Item Env:CONTRACT_API_BASE_URL, Env:VITE_API_BASE_URL`) to return to the mock.
+
 ## Source layout
 
 Each thing a farmer does is a feature folder under `src/pages/<feature>/` (`auth`, `setup`,

@@ -232,14 +232,16 @@ Deleting a default address returns `409 CONFLICT` unless another address is prom
 
 ### Reference profiles and compatibility
 
-| Method and path                             | Query/body                            | Success response                    |
-| ------------------------------------------- | ------------------------------------- | ----------------------------------- |
-| `GET /species`                              | `active=true`; `cursor`, `limit`      | `200 Page<SpeciesSummary>`          |
-| `GET /species/{speciesId}`                  | none                                  | `200 Envelope<SpeciesProfile>`      |
-| `GET /culture-environments`                 | `active=true`; pagination             | `200 Page<CultureEnvironment>`      |
-| `GET /culture-environments/{environmentId}` | none                                  | `200 Envelope<CultureEnvironment>`  |
-| `GET /compatibility`                        | required `speciesId`, `environmentId` | `200 Envelope<CompatibilityResult>` |
-| `POST /stocking-estimates`                  | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
+| Method and path                             |   Auth | Query/body                            | Success response                    |
+| ------------------------------------------- | -----: | ------------------------------------- | ----------------------------------- |
+| `GET /species`                              | Public | `active=true`; `cursor`, `limit`      | `200 Page<SpeciesSummary>`          |
+| `GET /species/{speciesId}`                  | Public | none                                  | `200 Envelope<SpeciesProfile>`      |
+| `GET /culture-environments`                 | Public | `active=true`; pagination             | `200 Page<CultureEnvironment>`      |
+| `GET /culture-environments/{environmentId}` | Public | none                                  | `200 Envelope<CultureEnvironment>`  |
+| `GET /compatibility`                        | Public | required `speciesId`, `environmentId` | `200 Envelope<CompatibilityResult>` |
+| `POST /stocking-estimates`                  |    yes | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
+
+The reference reads are Public: they hold shared profile data and no account's records, and the setup wizard reads them before the farmer signs up.
 
 ### Dashboard and cultivations
 
@@ -284,13 +286,13 @@ Task completion is atomic. For a feeding task, it updates the task and creates e
 
 ### Catalog and favorites
 
-| Method and path                         | Query/body                                                                                        | Success response               |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `GET /product-categories`               | none                                                                                              | `200 Page<ProductCategory>`    |
-| `GET /products`                         | `search`, `categoryId`, `suitableSpeciesId`, `suitableEnvironmentId`, `availability`, `sort=price | rating                         | name`, `order`, pagination | `200 Page<ProductSummary>` |
-| `GET /products/{productId}`             | none                                                                                              | `200 Envelope<ProductDetail>`  |
-| `PUT /products/{productId}/favorite`    | none                                                                                              | `200 Envelope<FavoriteResult>` |
-| `DELETE /products/{productId}/favorite` | none                                                                                              | `200 Envelope<FavoriteResult>` |
+| Method and path                         |   Auth | Query/body                                                                                        | Success response               |
+| --------------------------------------- | -----: | ------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `GET /product-categories`               | Public | none                                                                                              | `200 Page<ProductCategory>`    |
+| `GET /products`                         |    yes | `search`, `categoryId`, `suitableSpeciesId`, `suitableEnvironmentId`, `availability`, `sort=price | rating                         | name`, `order`, pagination | `200 Page<ProductSummary>` |
+| `GET /products/{productId}`             |    yes | none                                                                                              | `200 Envelope<ProductDetail>`  |
+| `PUT /products/{productId}/favorite`    |    yes | none                                                                                              | `200 Envelope<FavoriteResult>` |
+| `DELETE /products/{productId}/favorite` |    yes | none                                                                                              | `200 Envelope<FavoriteResult>` |
 
 ### Cart and checkout
 
@@ -727,7 +729,7 @@ The server rejects mortality that would make estimated live fish negative.
 | `explanation`                                         | string                                        |
 | `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                                    |
 
-`FeedingRecord`: `{ id, cultivationId, taskId, fedAt, amount: Quantity, notes, recordedBy, createdAt }`.
+`FeedingRecord`: `{ id, cultivationId, taskId: string | null, fedAt, amount: Quantity, notes, recordedBy, createdAt }`; `taskId` is null for a feeding recorded without a task.
 
 `CreateFeedingRecordRequest`: `{ fedAt, amount, taskId?: string | null, notes?: string | null }`.
 
