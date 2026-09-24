@@ -16,6 +16,10 @@ const STEP_REQUIREMENTS: Partial<Record<RouteName, StepRequirement>> = {
     isReady: (draft) => Boolean(draft.speciesId),
     fallback: ROUTE_NAMES.setupSpecies,
   },
+  [ROUTE_NAMES.setupWaterRanges]: {
+    isReady: (draft) => Boolean(draft.environmentId),
+    fallback: ROUTE_NAMES.setupEnvironment,
+  },
   [ROUTE_NAMES.setupDimensions]: {
     isReady: (draft) => Boolean(draft.environmentId),
     fallback: ROUTE_NAMES.setupEnvironment,

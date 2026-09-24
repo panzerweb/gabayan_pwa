@@ -2325,5 +2325,1284 @@
       "updatedAt": "2026-08-06T00:00:00Z"
     }
   ],
-  "upgradeRequests": []
+  "upgradeRequests": [],
+  "waterParameters": [
+    {
+      "code": "SALINITY",
+      "name": "Salinity",
+      "unit": "PPT",
+      "readingField": "salinityPpt",
+      "inputMinimum": 0,
+      "inputMaximum": 80,
+      "explanation": "How salty the water is, in parts per thousand (ppt). Fresh water is near 0 and sea water is about 35."
+    },
+    {
+      "code": "PH",
+      "name": "pH",
+      "unit": "PH",
+      "readingField": "ph",
+      "inputMinimum": 0,
+      "inputMaximum": 14,
+      "explanation": "How acidic or alkaline the water is, on a scale of 0 to 14 where 7 is neutral. Big swings stress stock."
+    },
+    {
+      "code": "AMMONIA",
+      "name": "Ammonia",
+      "unit": "MG_PER_L",
+      "readingField": "ammoniaMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 50,
+      "explanation": "A waste that builds up from fish droppings and uneaten feed. Even a little can harm gills."
+    },
+    {
+      "code": "NITRITE",
+      "name": "Nitrite",
+      "unit": "MG_PER_L",
+      "readingField": "nitriteMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 50,
+      "explanation": "Forms as ammonia breaks down. It makes it harder for stock to carry oxygen in their blood."
+    },
+    {
+      "code": "NITRATE",
+      "name": "Nitrate",
+      "unit": "MG_PER_L",
+      "readingField": "nitrateMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 1000,
+      "explanation": "The last and mildest stage of waste breakdown. High levels show waste is piling up over time."
+    },
+    {
+      "code": "DISSOLVED_OXYGEN",
+      "name": "Dissolved oxygen",
+      "unit": "MG_PER_L",
+      "readingField": "dissolvedOxygenMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 30,
+      "explanation": "The oxygen in the water that stock breathe. It drops at night, in hot weather and when feed rots."
+    },
+    {
+      "code": "WATER_TEMPERATURE",
+      "name": "Water temperature",
+      "unit": "CELSIUS",
+      "readingField": "temperatureC",
+      "inputMinimum": 0,
+      "inputMaximum": 45,
+      "explanation": "How warm the water is. Warm water holds less oxygen and makes stock eat and breathe faster."
+    }
+  ],
+  "waterThresholds": [
+    {
+      "id": "wt_tilapia_pond_salinity",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 15,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_ph",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_ammonia",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_nitrite",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_nitrate",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_dissolved_oxygen",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_water_temperature",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_salinity",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 15,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_ph",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_ammonia",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_nitrite",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_nitrate",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_dissolved_oxygen",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_water_temperature",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_salinity",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 15,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_ph",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_ammonia",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_nitrite",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_nitrate",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_dissolved_oxygen",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_water_temperature",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_salinity",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_ph",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 7,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_ammonia",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_nitrite",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_nitrate",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_dissolved_oxygen",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_water_temperature",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_salinity",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_ph",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "PH",
+      "minimum": 7,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_ammonia",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_nitrite",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_nitrate",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_dissolved_oxygen",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_water_temperature",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_salinity",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_ph",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_ammonia",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_nitrite",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_nitrate",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_dissolved_oxygen",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_water_temperature",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_salinity",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_ph",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_ammonia",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_nitrite",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_nitrate",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_dissolved_oxygen",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_water_temperature",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_salinity",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": 20,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_ph",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_ammonia",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_nitrite",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_nitrate",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_dissolved_oxygen",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_water_temperature",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_salinity",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": 20,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_ph",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_ammonia",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_nitrite",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_nitrate",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_dissolved_oxygen",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_water_temperature",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_salinity",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "SALINITY",
+      "minimum": 20,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_ph",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_ammonia",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_nitrite",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_nitrate",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_dissolved_oxygen",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_water_temperature",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_salinity",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 25,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_ph",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_ammonia",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_nitrite",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_nitrate",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_dissolved_oxygen",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_water_temperature",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_salinity",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 25,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_ph",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_ammonia",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_nitrite",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_nitrate",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_dissolved_oxygen",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_water_temperature",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_salinity",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_ph",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_ammonia",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_nitrite",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_nitrate",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_dissolved_oxygen",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_water_temperature",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 20,
+      "maximum": 30,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_salinity",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_ph",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_ammonia",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_nitrite",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_nitrate",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_dissolved_oxygen",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_water_temperature",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 20,
+      "maximum": 30,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    }
+  ],
+  "waterRangeSources": [
+    {
+      "title": "Dissolved Oxygen for Fish Production (FA002)",
+      "organization": "University of Florida IFAS Extension",
+      "url": "https://ask.ifas.ufl.edu/publication/FA002",
+      "reviewedAt": null,
+      "reviewedBy": null
+    },
+    {
+      "title": "Dissolved Oxygen",
+      "organization": "Fondriest Environmental",
+      "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+      "reviewedAt": null,
+      "reviewedBy": null
+    },
+    {
+      "title": "Gabayan placeholder water ranges",
+      "organization": "Gabayan",
+      "url": null,
+      "reviewedAt": null,
+      "reviewedBy": null
+    }
+  ],
+  "waterGuidance": [
+    {
+      "id": "wg_within",
+      "parameter": null,
+      "status": "WITHIN_RANGE",
+      "environmentCode": null,
+      "severity": "INFO",
+      "title": "Within the suggested range",
+      "message": "This reading sits inside the demo range. Keep checking at about the same time of day so changes are easy to spot."
+    },
+    {
+      "id": "wg_below",
+      "parameter": null,
+      "status": "BELOW_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "Lower than suggested",
+      "message": "This reading is below the demo range. Check it again to confirm, watch how your stock behave, and ask a local fisheries technician if it stays low."
+    },
+    {
+      "id": "wg_above",
+      "parameter": null,
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "Higher than suggested",
+      "message": "This reading is above the demo range. Check it again to confirm, watch how your stock behave, and ask a local fisheries technician if it stays high."
+    },
+    {
+      "id": "wg_ammonia_above",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "ACTION",
+      "title": "Ammonia is higher than suggested",
+      "message": "Feed less until it comes down and remove any uneaten feed. If your stock are gasping or not eating, consider changing part of the water where your setup allows it, then check again tomorrow."
+    },
+    {
+      "id": "wg_ammonia_above_cage",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "environmentCode": "FISH_CAGE",
+      "severity": "ACTION",
+      "title": "Ammonia is higher than suggested",
+      "message": "The water in a cage cannot be changed. Feed less until it comes down, clear anything that blocks water flowing through the net, and check again tomorrow."
+    },
+    {
+      "id": "wg_nitrite_above",
+      "parameter": "NITRITE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "ACTION",
+      "title": "Nitrite is higher than suggested",
+      "message": "Feed less for a day or two and remove uneaten feed. If your stock look weak, consider changing part of the water where your setup allows it, then check again."
+    },
+    {
+      "id": "wg_nitrite_above_cage",
+      "parameter": "NITRITE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": "FISH_CAGE",
+      "severity": "ACTION",
+      "title": "Nitrite is higher than suggested",
+      "message": "The water in a cage cannot be changed. Feed less for a day or two, keep the net clean so water flows through, and check again."
+    },
+    {
+      "id": "wg_nitrate_above",
+      "parameter": "NITRATE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "Nitrate is building up",
+      "message": "Waste is collecting over time. Avoid overfeeding, and where your setup allows it, a partial water change may help over the next few days."
+    },
+    {
+      "id": "wg_oxygen_below",
+      "parameter": "DISSOLVED_OXYGEN",
+      "status": "BELOW_RANGE",
+      "environmentCode": null,
+      "severity": "ACTION",
+      "title": "Oxygen is lower than suggested",
+      "message": "Stop feeding until it recovers. If you have an aerator, run it now, especially overnight. If stock gasp at the surface, get help from a local fisheries technician."
+    },
+    {
+      "id": "wg_oxygen_below_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "status": "BELOW_RANGE",
+      "environmentCode": "FISH_CAGE",
+      "severity": "ACTION",
+      "title": "Oxygen is lower than suggested",
+      "message": "Stop feeding until it recovers and clear anything that blocks water flowing through the net. If stock gasp at the surface, get help from a local fisheries technician."
+    },
+    {
+      "id": "wg_temperature_above",
+      "parameter": "WATER_TEMPERATURE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "The water is warmer than suggested",
+      "message": "Warm water holds less oxygen. Feed smaller amounts in the cooler morning and late afternoon, and keep the water at least 1.0-1.2 m deep where you can."
+    }
+  ],
+  "waterRangeGuidance": [
+    {
+      "environmentCode": null,
+      "message": "Check readings at about the same time each day. If one leaves its range, feed less and check again before making big changes."
+    },
+    {
+      "environmentCode": "FISH_CAGE",
+      "message": "The water in a cage cannot be changed, so feeding and keeping water flowing through the net are the main ways to act on these readings."
+    }
+  ]
 }

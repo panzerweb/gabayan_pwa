@@ -55,6 +55,13 @@ export const appRoutes: RouteRecordRaw[] = [
         meta: { title: 'Harvest readiness' },
       },
       {
+        path: 'cultivations/:cultivationId/water-safety',
+        name: ROUTE_NAMES.cultivationWaterSafety,
+        component: () =>
+          import('@pages/cultivations/presentation/views/CultivationWaterSafetyView.vue'),
+        meta: { title: 'Water safety check' },
+      },
+      {
         path: 'orders',
         name: ROUTE_NAMES.orders,
         component: () => import('@pages/orders/presentation/views/OrdersView.vue'),

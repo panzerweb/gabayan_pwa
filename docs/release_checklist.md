@@ -1,15 +1,15 @@
 # Gabayan MVP Release Checklist
 
-Last verified: 2026-09-24
+Last verified: 2026-09-25
 
 ## Automated release gate
 
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 564 tests.
-- [x] Mock API contract suite passes: 61 tests, and its coverage check exercises all 71 method-and-path rows of contract §5.
-- [x] Mobile Playwright suite passes: 17 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Unit and component suite passes: 608 tests.
+- [x] Mock API contract suite passes: 70 tests, and its coverage check exercises all 73 method-and-path rows of contract §5.
+- [x] Mobile Playwright suite passes: 19 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -83,3 +83,5 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] Plans are the API's to enforce: the plans, the account tier and upgrade requests go through `src/pages/tiers/data/`, a new account chooses its plan before setup, Profile shows the plan and its culture-system limit, and a route carrying `meta.tier` sends a farmer below it to the plans (`tests/unit/router/guards.spec.ts`, `tests/e2e/tiers.spec.ts`). Paid plans are requested, never charged (BLOCKERS D-7).
 - [ ] The three tier rows of contract §5 and the 403 `TIER_LIMIT_REACHED` refusal pass against FastAPI. Waits for aqua-lens-api Phase 26; until then a FastAPI contract run leaves those rows unexercised and `tests/e2e/tiers.spec.ts` cannot pass there (the plan step itself still lets a new account continue on Free when the plans cannot be read).
 - [ ] The six species of contract §7 - Lapu-lapu and Shrimp with their compatibility and stocking rules, and the revised Bangus, Tilapia and Hito profiles - pass against FastAPI. Waits for aqua-lens-api Phase 28; until then a FastAPI contract run fails the species profile tests (`tests/contract/scenarios/species.scenarios.mjs`) and `tests/e2e/species.spec.ts` cannot pass there.
+- [x] Water quality has a feature of its own (`src/pages/water-quality/`): the setup wizard shows the suggested range of each of the seven parameters for the chosen species and culture system, with its explanation, basis and demo disclaimer, and never asks for a reading; a cultivation's water safety check evaluates typed readings through `POST /water-safety-checks`, which stores nothing, shows each status as label, icon and colour, and is disabled offline (`tests/component/water-quality/`, `tests/e2e/water-quality.spec.ts`).
+- [ ] `GET /water-thresholds` and `POST /water-safety-checks` pass against FastAPI. Waits for aqua-lens-api Phase 30; until then a FastAPI contract run fails the water-quality scenarios (`tests/contract/scenarios/water-quality.scenarios.mjs`) and `tests/e2e/water-quality.spec.ts` cannot pass there. The setup journeys still pass: the ranges step shows its retry state and never blocks Continue.

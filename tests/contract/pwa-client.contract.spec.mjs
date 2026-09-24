@@ -34,6 +34,7 @@ async function loadDataLayer() {
     import('@pages/notifications/data/notifications.api'),
     import('@pages/orders/data/orders.api'),
     import('@pages/tiers/data/tiers.api'),
+    import('@pages/water-quality/data/water-quality.api'),
   ])
   return Object.assign({}, ...modules)
 }
@@ -134,5 +135,26 @@ describe('the PWA data layer against the contract server', () => {
     const tier = (await api.getAccountTierApi(accessToken)).data
     expect(tier.plan.code).toBe('PRO')
     expect(tier.activeCultureSystems).toBeLessThanOrEqual(tier.plan.cultureSystemLimit)
+  })
+
+  it("reads the demo cultivation's water ranges and checks readings against them", async () => {
+    const cultivations = (await api.listCultivationsApi(accessToken)).data
+    const { species, environment } = byName(cultivations, 'name', DEMO_CULTIVATION)
+
+    const ranges = (await api.getWaterThresholdsApi(species.id, environment.id, accessToken)).data
+    expect(ranges.thresholds.map((threshold) => threshold.parameter)).toEqual([
+      'SALINITY',
+      'PH',
+      'AMMONIA',
+      'NITRITE',
+      'NITRATE',
+      'DISSOLVED_OXYGEN',
+      'WATER_TEMPERATURE',
+    ])
+    const check = await api.createWaterSafetyCheckApi(
+      { speciesId: species.id, environmentId: environment.id, readings: { ammoniaMgL: 1.2 } },
+      accessToken,
+    )
+    expect(check.data.results.map((result) => result.status)).toEqual(['ABOVE_RANGE'])
   })
 })

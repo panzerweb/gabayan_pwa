@@ -1213,6 +1213,185 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, { ...result, alternatives })
   })
 
+  // The species and environment of a water-quality request, or the error to answer: an
+  // unknown id, or a pairing the compatibility profile advises against, has no thresholds.
+  function waterProfileOf(speciesId, environmentId) {
+    const species = router.db.get('species').find({ id: speciesId, active: true }).value()
+    const environment = router.db
+      .get('cultureEnvironments')
+      .find({ id: environmentId, active: true })
+      .value()
+    if (!species || !environment)
+      return { missing: { species: !species, environment: !environment } }
+    const compatibility = router.db
+      .get('compatibilityRules')
+      .find({ speciesId, environmentId })
+      .value()
+    if (!compatibility || compatibility.status === 'NOT_RECOMMENDED') {
+      return {
+        incompatible:
+          compatibility?.message ?? 'No water ranges are available for this combination.',
+      }
+    }
+    return { species, environment }
+  }
+
+  // Each parameter with its threshold row for the pairing, in the contract's parameter order.
+  function waterThresholdsOf(speciesId, environmentId) {
+    const rows = router.db.get('waterThresholds').filter({ speciesId, environmentId }).value()
+    return router.db
+      .get('waterParameters')
+      .value()
+      .map((parameter) => ({
+        parameter,
+        row: rows.find((row) => row.parameter === parameter.code),
+      }))
+      .filter(({ row }) => row)
+  }
+
+  function publicWaterThreshold({ parameter, row }) {
+    return {
+      parameter: parameter.code,
+      name: parameter.name,
+      unit: parameter.unit,
+      minimum: row.minimum,
+      maximum: row.maximum,
+      explanation: parameter.explanation,
+      basis: row.basis,
+      sourceStatus: row.sourceStatus,
+      ruleVersion: row.ruleVersion,
+    }
+  }
+
+  // The most specific guidance row: parameter and environment, then parameter, then status.
+  function waterGuidanceFor(parameterCode, status, environmentCode) {
+    const rows = router.db.get('waterGuidance').filter({ status }).value()
+    return (
+      rows.find(
+        (row) => row.parameter === parameterCode && row.environmentCode === environmentCode,
+      ) ??
+      rows.find((row) => row.parameter === parameterCode && row.environmentCode === null) ??
+      rows.find((row) => row.parameter === null && row.environmentCode === null)
+    )
+  }
+
+  app.get('/api/v1/water-thresholds', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const speciesId = String(request.query.speciesId ?? '')
+    const environmentId = String(request.query.environmentId ?? '')
+    if (!speciesId || !environmentId) {
+      return sendError(response, 400, 'BAD_REQUEST', 'Choose both a species and culture system.')
+    }
+    const profile = waterProfileOf(speciesId, environmentId)
+    if (profile.missing) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish or culture system.')
+    }
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+    const thresholds = waterThresholdsOf(speciesId, environmentId)
+    const guidance = router.db.get('waterRangeGuidance').value()
+    const note =
+      guidance.find((row) => row.environmentCode === profile.environment.code) ??
+      guidance.find((row) => row.environmentCode === null)
+    return sendData(response, {
+      speciesId,
+      environmentId,
+      thresholds: thresholds.map(publicWaterThreshold),
+      guidance: note.message,
+      sources: router.db.get('waterRangeSources').value(),
+      isDemo: true,
+      sourceStatus: 'DEMO',
+      ruleVersion: thresholds[0]?.row.ruleVersion ?? 'demo-2026-09-gabayan',
+      disclaimer: ruleDisclaimer,
+    })
+  })
+
+  // Evaluates the entered readings against the pairing's ranges. Nothing is stored.
+  app.post('/api/v1/water-safety-checks', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const { speciesId, environmentId, readings } = request.body ?? {}
+    const parameters = router.db.get('waterParameters').value()
+    const fields = {}
+    const profile = waterProfileOf(String(speciesId ?? ''), String(environmentId ?? ''))
+    if (profile.missing?.species) fields.speciesId = ['Choose an available fish.']
+    if (profile.missing?.environment) fields.environmentId = ['Choose an available culture system.']
+    const entered = new Map()
+    const values = readings && typeof readings === 'object' ? readings : {}
+    for (const parameter of parameters) {
+      const value = values[parameter.readingField]
+      if (value === undefined || value === null) continue
+      if (
+        typeof value !== 'number' ||
+        !Number.isFinite(value) ||
+        value < parameter.inputMinimum ||
+        value > parameter.inputMaximum
+      ) {
+        fields[`readings.${parameter.readingField}`] = [
+          `Enter a number from ${parameter.inputMinimum} to ${parameter.inputMaximum}.`,
+        ]
+        continue
+      }
+      entered.set(parameter.code, value)
+    }
+    const invalidReadings = Object.keys(fields).some((key) => key.startsWith('readings.'))
+    if (!entered.size && !invalidReadings) fields.readings = ['Enter at least one reading.']
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the readings.', fields)
+    }
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+
+    const thresholds = waterThresholdsOf(speciesId, environmentId)
+    const results = []
+    const notChecked = []
+    for (const { parameter, row } of thresholds) {
+      if (!entered.has(parameter.code)) {
+        notChecked.push(parameter.code)
+        continue
+      }
+      const value = entered.get(parameter.code)
+      const status =
+        row.minimum !== null && value < row.minimum
+          ? 'BELOW_RANGE'
+          : row.maximum !== null && value > row.maximum
+            ? 'ABOVE_RANGE'
+            : 'WITHIN_RANGE'
+      const guidance = waterGuidanceFor(parameter.code, status, profile.environment.code)
+      results.push({
+        ...omitKeys(publicWaterThreshold({ parameter, row }), [
+          'basis',
+          'sourceStatus',
+          'ruleVersion',
+        ]),
+        value,
+        status,
+        guidance: {
+          severity: guidance.severity,
+          title: guidance.title,
+          message: guidance.message,
+          sourceStatus: row.sourceStatus,
+          ruleVersion: row.ruleVersion,
+          disclaimer: ruleDisclaimer,
+        },
+      })
+    }
+    return sendData(response, {
+      speciesId,
+      environmentId,
+      checkedAt: new Date().toISOString(),
+      results,
+      notChecked,
+      isDemo: true,
+      sourceStatus: 'DEMO',
+      ruleVersion: thresholds[0]?.row.ruleVersion ?? 'demo-2026-09-gabayan',
+      disclaimer: ruleDisclaimer,
+    })
+  })
+
   app.post('/api/v1/stocking-estimates', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return

@@ -90,10 +90,11 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Auth            | `/reset-password`                                             | Apply a valid reset token                   |
 | Setup           | `/setup/plan`                                                 | Choose a plan after account creation        |
 | Setup           | `/setup`                                                      | Setup introduction/skip                     |
-| Setup           | `/setup/species`                                              | Step 1 of 4                                 |
-| Setup           | `/setup/environment`                                          | Step 2 of 4                                 |
-| Setup           | `/setup/dimensions`                                           | Step 3 of 4                                 |
-| Setup           | `/setup/fingerlings`                                          | Step 4 of 4                                 |
+| Setup           | `/setup/species`                                              | Step 1 of 5                                 |
+| Setup           | `/setup/environment`                                          | Step 2 of 5                                 |
+| Setup           | `/setup/water-ranges`                                         | Step 3 of 5; suggested water ranges only    |
+| Setup           | `/setup/dimensions`                                           | Step 4 of 5                                 |
+| Setup           | `/setup/fingerlings`                                          | Step 5 of 5                                 |
 | Setup           | `/setup/stocking-result`                                      | Below/recommended/above result              |
 | Setup           | `/setup/review`                                               | Editable cultivation summary                |
 | Setup           | `/setup/success/:cultivationId`                               | Celebration and next step                   |
@@ -104,6 +105,7 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Cultivations    | `/app/cultivations/:id/growth`                                | Growth records/chart                        |
 | Cultivations    | `/app/cultivations/:id/records`                               | Feeding, mortality, and water records       |
 | Cultivations    | `/app/cultivations/:id/harvest`                               | Readiness and harvest recording             |
+| Cultivations    | `/app/cultivations/:id/water-safety`                          | One-off water safety check, not saved       |
 | Notifications   | `/app/notifications`                                          | Read/unread notifications with filters      |
 | Recommendations | `/app/cultivations/:id/recommendations`                       | Setup-specific equipment                    |
 | Marketplace     | `/app/marketplace`                                            | Browse/search/filter products               |

@@ -51,7 +51,7 @@ const { compatibility, checking, checkFailed, recheck, canContinue } = useCompat
       <BaseButton variant="text" @click="recheck()">Check again</BaseButton>
     </div>
     <div class="setup-flow-actions">
-      <BaseButton :to="{ name: ROUTE_NAMES.setupDimensions }" :disabled="!canContinue">
+      <BaseButton :to="{ name: ROUTE_NAMES.setupWaterRanges }" :disabled="!canContinue">
         Continue
       </BaseButton>
     </div>

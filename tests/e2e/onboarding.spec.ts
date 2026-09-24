@@ -24,6 +24,8 @@ test('new user completes the above-range onboarding path with explicit acceptanc
   await page.getByRole('radio', { name: /Pond/ }).click()
   await expect(page.getByText('This setup can be planned')).toBeVisible()
   await page.getByRole('link', { name: 'Continue' }).click()
+  await expect(page.getByRole('heading', { name: 'Good water for your stock' })).toBeVisible()
+  await page.getByRole('link', { name: 'Continue' }).click()
 
   await page.getByLabel('Length').fill('5')
   await page.getByLabel('Width').fill('4')
