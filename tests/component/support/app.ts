@@ -16,6 +16,13 @@ const blank = { template: '<div />' }
 // The routes a signed-in screen links to, each rendering nothing.
 const appRoutes = [
   ['/setup', ROUTE_NAMES.setupIntro],
+  ['/setup/species', ROUTE_NAMES.setupSpecies],
+  ['/setup/environment', ROUTE_NAMES.setupEnvironment],
+  ['/setup/dimensions', ROUTE_NAMES.setupDimensions],
+  ['/setup/fingerlings', ROUTE_NAMES.setupFingerlings],
+  ['/setup/stocking-result', ROUTE_NAMES.setupStockingResult],
+  ['/setup/review', ROUTE_NAMES.setupReview],
+  ['/setup/success/:cultivationId', ROUTE_NAMES.setupSuccess],
   ['/app/home', ROUTE_NAMES.home],
   ['/app/cultivations', ROUTE_NAMES.cultivations],
   ['/app/cultivations/:cultivationId', ROUTE_NAMES.cultivationDetail],

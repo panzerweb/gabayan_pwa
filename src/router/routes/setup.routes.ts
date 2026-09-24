@@ -15,19 +15,19 @@ export const setupRoutes: RouteRecordRaw[] = [
       {
         path: '',
         name: ROUTE_NAMES.setupIntro,
-        component: () => import('@pages/setup/SetupIntroPage.vue'),
+        component: () => import('@pages/setup/presentation/views/SetupIntroView.vue'),
         meta: { title: 'Cultivation setup' },
       },
       {
         path: 'species',
         name: ROUTE_NAMES.setupSpecies,
-        component: () => import('@pages/setup/SpeciesStepPage.vue'),
+        component: () => import('@pages/setup/presentation/views/SpeciesStepView.vue'),
         meta: { title: 'New cultivation', setupStep: 1, setupTotal: SETUP_STEPS, backTo: '/setup' },
       },
       {
         path: 'environment',
         name: ROUTE_NAMES.setupEnvironment,
-        component: () => import('@pages/setup/EnvironmentStepPage.vue'),
+        component: () => import('@pages/setup/presentation/views/EnvironmentStepView.vue'),
         meta: {
           title: 'New cultivation',
           setupStep: 2,
@@ -38,7 +38,7 @@ export const setupRoutes: RouteRecordRaw[] = [
       {
         path: 'dimensions',
         name: ROUTE_NAMES.setupDimensions,
-        component: () => import('@pages/setup/DimensionsStepPage.vue'),
+        component: () => import('@pages/setup/presentation/views/DimensionsStepView.vue'),
         meta: {
           title: 'New cultivation',
           setupStep: 3,
@@ -49,7 +49,7 @@ export const setupRoutes: RouteRecordRaw[] = [
       {
         path: 'fingerlings',
         name: ROUTE_NAMES.setupFingerlings,
-        component: () => import('@pages/setup/FingerlingsStepPage.vue'),
+        component: () => import('@pages/setup/presentation/views/FingerlingsStepView.vue'),
         meta: {
           title: 'New cultivation',
           setupStep: 4,
@@ -60,7 +60,7 @@ export const setupRoutes: RouteRecordRaw[] = [
       {
         path: 'stocking-result',
         name: ROUTE_NAMES.setupStockingResult,
-        component: () => import('@pages/setup/StockingResultPage.vue'),
+        component: () => import('@pages/setup/presentation/views/StockingResultView.vue'),
         meta: {
           title: 'Stocking estimate',
           setupStep: 4,
@@ -71,7 +71,7 @@ export const setupRoutes: RouteRecordRaw[] = [
       {
         path: 'review',
         name: ROUTE_NAMES.setupReview,
-        component: () => import('@pages/setup/ReviewSetupPage.vue'),
+        component: () => import('@pages/setup/presentation/views/ReviewSetupView.vue'),
         meta: {
           title: 'Review cultivation',
           setupStep: 4,
@@ -82,7 +82,7 @@ export const setupRoutes: RouteRecordRaw[] = [
       {
         path: 'success/:cultivationId',
         name: ROUTE_NAMES.setupSuccess,
-        component: () => import('@pages/setup/SetupSuccessPage.vue'),
+        component: () => import('@pages/setup/presentation/views/SetupSuccessView.vue'),
         meta: { title: 'Cultivation created' },
       },
     ],

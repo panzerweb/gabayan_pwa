@@ -1,6 +1,7 @@
 import type { NavigationGuardReturn, RouteLocationNormalized } from 'vue-router'
 
-import { useSetupStore, type SetupDraft } from '@stores/setup'
+import type { SetupDraft } from '@pages/setup/domain/setup.model'
+import { useSetupStore } from '@pages/setup/presentation/stores/setup.store'
 
 import { ROUTE_NAMES, type RouteName } from '../route-names'
 
