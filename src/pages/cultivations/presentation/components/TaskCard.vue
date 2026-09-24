@@ -1,28 +1,27 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import AppIcon, { type AppIconName } from '@/components/ui/AppIcon.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
-import BaseCard from '@/components/ui/BaseCard.vue'
-import StatusChip from '@/components/ui/StatusChip.vue'
-import type { FarmTask } from '@/services/api'
+import AppIcon from '@components/ui/AppIcon.vue'
+import BaseButton from '@components/ui/BaseButton.vue'
+import BaseCard from '@components/ui/BaseCard.vue'
+import StatusChip from '@components/ui/StatusChip.vue'
 import { formatManilaTime, formatQuantity } from '@core/utils/format'
 
+import {
+  canRecordFeeding,
+  taskIcon,
+  taskStatusTone,
+  type FarmTask,
+} from '../../domain/cultivations.model'
+
+// One scheduled task. `actionable` offers "Record feeding" on an open feeding task; the
+// parent opens the completion sheet for the emitted task.
 const props = defineProps<{ task: FarmTask; actionable?: boolean }>()
 const emit = defineEmits<{ select: [task: FarmTask] }>()
 
-const icon = computed<AppIconName>(() => {
-  if (props.task.status === 'COMPLETED') return 'check'
-  if (props.task.type === 'WATER_CHECK') return 'droplet'
-  return 'fish'
-})
-const statusTone = computed(() =>
-  props.task.status === 'COMPLETED'
-    ? 'success'
-    : props.task.status === 'MISSED'
-      ? 'danger'
-      : 'info',
-)
+const icon = computed(() => taskIcon(props.task))
+const statusTone = computed(() => taskStatusTone(props.task.status))
+const offersFeeding = computed(() => props.actionable && canRecordFeeding(props.task))
 </script>
 
 <template>
@@ -47,11 +46,7 @@ const statusTone = computed(() =>
           · {{ formatQuantity(task.recommendedAmount.value, task.recommendedAmount.unit) }} planned
         </template>
       </p>
-      <BaseButton
-        v-if="actionable && task.type === 'FEEDING' && task.status !== 'COMPLETED'"
-        variant="secondary"
-        @click="emit('select', task)"
-      >
+      <BaseButton v-if="offersFeeding" variant="secondary" @click="emit('select', task)">
         Record feeding
       </BaseButton>
     </div>

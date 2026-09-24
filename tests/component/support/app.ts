@@ -13,9 +13,16 @@ import { user } from '../../unit/profile/fixtures'
 
 const blank = { template: '<div />' }
 
-// The signed-in routes a commerce screen links to, each rendering nothing.
+// The routes a signed-in screen links to, each rendering nothing.
 const appRoutes = [
+  ['/setup', ROUTE_NAMES.setupIntro],
   ['/app/home', ROUTE_NAMES.home],
+  ['/app/cultivations', ROUTE_NAMES.cultivations],
+  ['/app/cultivations/:cultivationId', ROUTE_NAMES.cultivationDetail],
+  ['/app/cultivations/:cultivationId/tasks', ROUTE_NAMES.cultivationTasks],
+  ['/app/cultivations/:cultivationId/growth', ROUTE_NAMES.cultivationGrowth],
+  ['/app/cultivations/:cultivationId/records', ROUTE_NAMES.cultivationRecords],
+  ['/app/cultivations/:cultivationId/harvest', ROUTE_NAMES.cultivationHarvest],
   ['/app/marketplace', ROUTE_NAMES.marketplace],
   ['/app/products/:productId', ROUTE_NAMES.productDetail],
   ['/app/cart', ROUTE_NAMES.cart],

@@ -1,9 +1,12 @@
 import { z } from 'zod'
 
 import { apiRequest, envelopeSchema, pageSchema, sourceStatusSchema } from '@core/http'
+import {
+  cultivationDetailSchema,
+  farmTaskSchema,
+  quantitySchema,
+} from '@pages/cultivations/domain/cultivations.model'
 import { moneySchema } from '@pages/marketplace/domain/marketplace.model'
-
-import { cultivationDetailSchema, farmTaskSchema, quantitySchema } from './operations'
 
 const compactUserSchema = z.object({ id: z.string(), fullName: z.string() })
 

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 
-import TaskCard from '@/components/cultivations/TaskCard.vue'
-import type { FarmTask } from '@/services/api'
+import type { FarmTask } from '@pages/cultivations/domain/cultivations.model'
+import TaskCard from '@pages/cultivations/presentation/components/TaskCard.vue'
 
 const task: FarmTask = {
   id: 'task_feed_pm',

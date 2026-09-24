@@ -11,6 +11,7 @@ import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
+import { cultivationsKeys } from '@pages/cultivations/data/cultivations.keys'
 import {
   ApiError,
   completeHarvest,
@@ -89,9 +90,7 @@ async function submit() {
     const result = await mutation.mutateAsync()
     completion.value = result.data
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['cultivations'] }),
-      queryClient.invalidateQueries({ queryKey: ['cultivation', cultivationId.value] }),
-      queryClient.invalidateQueries({ queryKey: ['cultivation-timeline', cultivationId.value] }),
+      queryClient.invalidateQueries({ queryKey: cultivationsKeys.all() }),
       queryClient.invalidateQueries({ queryKey: ['home-dashboard'] }),
     ])
     toast.show('Harvest recorded. Cultivation moved to Completed.', 'success')

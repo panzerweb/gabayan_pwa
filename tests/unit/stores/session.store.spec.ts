@@ -4,8 +4,8 @@ import { ApiError } from '@core/http'
 import { queryClient } from '@core/query'
 import { authRepository } from '@pages/auth/data/auth.repository'
 import type { AuthSession, UserProfile } from '@pages/auth/domain/auth.model'
+import { cultivationsRepository } from '@pages/cultivations/data/cultivations.repository'
 import { ROUTE_NAMES } from '@router/route-names'
-import { listCultivations } from '@/services/api'
 import { useSessionStore } from '@stores/session.store'
 
 vi.mock('@pages/auth/data/auth.repository', () => ({
@@ -15,7 +15,9 @@ vi.mock('@pages/auth/data/auth.repository', () => ({
     logout: vi.fn(),
   },
 }))
-vi.mock('@/services/api', () => ({ listCultivations: vi.fn() }))
+vi.mock('@pages/cultivations/data/cultivations.repository', () => ({
+  cultivationsRepository: { listCultivations: vi.fn() },
+}))
 
 const meta = { requestId: 'req_1' }
 const juan = { id: 'usr_juan', fullName: 'Juan Dela Cruz' } as UserProfile
@@ -41,7 +43,7 @@ describe('session store', () => {
       meta,
     })
     vi.mocked(authRepository.getCurrentUser).mockResolvedValue({ data: juan, meta })
-    vi.mocked(listCultivations).mockResolvedValue({
+    vi.mocked(cultivationsRepository.listCultivations).mockResolvedValue({
       data: [],
       meta,
       page: { cursor: null, nextCursor: null, limit: 1, total: 2 },
@@ -54,6 +56,26 @@ describe('session store', () => {
     expect(session.isAuthenticated).toBe(true)
     expect(session.user).toEqual(juan)
     expect(session.suggestedRouteName).toBe(ROUTE_NAMES.home)
+  })
+
+  it('counts cultivations through the cultivations repository with a one-row page', async () => {
+    vi.mocked(authRepository.refreshAccessToken).mockResolvedValue({
+      data: { accessToken: 'access_1', tokenType: 'Bearer', expiresInSeconds: 900 },
+      meta,
+    })
+    vi.mocked(authRepository.getCurrentUser).mockResolvedValue({ data: juan, meta })
+    vi.mocked(cultivationsRepository.listCultivations).mockResolvedValue({
+      data: [],
+      meta,
+      page: { cursor: null, nextCursor: null, limit: 1, total: 0 },
+    } as never)
+    const session = useSessionStore()
+
+    await session.restore()
+
+    expect(cultivationsRepository.listCultivations).toHaveBeenCalledWith('access_1', 1)
+    expect(session.hasCultivation).toBe(false)
+    expect(session.suggestedRouteName).toBe(ROUTE_NAMES.setupIntro)
   })
 
   it('treats a refused refresh as signed out', async () => {

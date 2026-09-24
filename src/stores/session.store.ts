@@ -5,8 +5,8 @@ import { ApiError } from '@core/http'
 import { queryClient } from '@core/query'
 import { authRepository } from '@pages/auth/data/auth.repository'
 import type { AuthSession, UserProfile } from '@pages/auth/domain/auth.model'
+import { cultivationsRepository } from '@pages/cultivations/data/cultivations.repository'
 import { ROUTE_NAMES } from '@router/route-names'
-import { listCultivations } from '@/services/api'
 
 export const useSessionStore = defineStore('session', () => {
   const accessToken = ref<string | null>(null)
@@ -48,7 +48,8 @@ export const useSessionStore = defineStore('session', () => {
         accessToken.value = refreshed.data.accessToken
         const [profile, cultivations] = await Promise.all([
           authRepository.getCurrentUser(refreshed.data.accessToken),
-          listCultivations(refreshed.data.accessToken, 1),
+          // One row is enough: only the total says whether setup is still ahead.
+          cultivationsRepository.listCultivations(refreshed.data.accessToken, 1),
         ])
         user.value = profile.data
         hasCultivation.value = cultivations.page.total > 0
