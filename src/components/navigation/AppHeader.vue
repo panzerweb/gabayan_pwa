@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
+
 import AppBrand from '@/components/brand/AppBrand.vue'
 import AppIcon from '@/components/ui/AppIcon.vue'
 
@@ -8,7 +10,7 @@ withDefaults(
     subtitle?: string
     showBrand?: boolean
     showBack?: boolean
-    backTo?: string
+    backTo?: RouteLocationRaw
     notificationCount?: number
   }>(),
   {
