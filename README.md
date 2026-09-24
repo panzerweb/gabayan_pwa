@@ -95,10 +95,12 @@ npx playwright test --reporter=line
 ```
 
 `CONTRACT_API_BASE_URL` and `VITE_API_BASE_URL` are the full API root, `/api/v1` included.
-Playwright starts and resets the mock API only when `VITE_API_BASE_URL` is unset or names the mock
-(a loopback host on `MOCK_API_PORT`, 3001 by default); any other server is left to you. The
-journeys open the app on `127.0.0.1` when the API is on `127.0.0.1`, and on `localhost` otherwise
-(`tests/e2e/support/api-target.ts`). Clear both
+With `VITE_API_BASE_URL` unset, Playwright starts its own freshly seeded mock on port 3101 and the
+app on port 5174 (`E2E_MOCK_API_PORT`, `E2E_APP_PORT`), apart from `pnpm dev:all`, and never reuses
+a server already listening: a busy port fails the run rather than letting the journeys meet another
+run's data. Any other server named by `VITE_API_BASE_URL` is left to you, and the app opens on port
+5173, the origin FastAPI's `CORS_ORIGINS` names - on `127.0.0.1` when the API is on `127.0.0.1`, and
+on `localhost` otherwise (`tests/e2e/support/api-target.ts`). Clear both
 variables (`Remove-Item Env:CONTRACT_API_BASE_URL, Env:VITE_API_BASE_URL`) to return to the mock.
 
 ## Source layout
