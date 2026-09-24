@@ -43,9 +43,10 @@ export default tseslint.config(
     },
   },
   {
-    // Views and components bind what a composable returns; server state, HTTP and the data
-    // layer stay behind the feature's composables.
-    files: ['src/pages/*/presentation/**/*.vue'],
+    // Every .vue file binds what a composable returns; server state, HTTP and the data layer
+    // stay behind composables, whether the file is a feature view, a shared component or a
+    // layout.
+    files: ['src/**/*.vue'],
     rules: {
       'no-restricted-imports': [
         'error',

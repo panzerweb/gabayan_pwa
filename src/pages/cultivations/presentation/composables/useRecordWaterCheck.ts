@@ -6,7 +6,6 @@ import { manilaDateToday } from '@core/utils/format'
 import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
-import { LEGACY_HOME_KEY } from '../../data/cultivations.keys'
 import { cultivationsRepository } from '../../data/cultivations.repository'
 import {
   RECORD_OFFLINE_MESSAGES,
@@ -58,10 +57,7 @@ export function useRecordWaterCheck(
     if (Object.keys(write.fieldErrors.value).length) return false
     const result = await write.submit(waterCheckRequest(form))
     if (!result) return false
-    await Promise.all([
-      invalidateAfter(queryClient, 'waterCheckCreate'),
-      queryClient.invalidateQueries({ queryKey: LEGACY_HOME_KEY }),
-    ])
+    await invalidateAfter(queryClient, 'waterCheckCreate')
     toast.show(result.data.guidance[0]?.title ?? 'Water check saved.', 'success')
     return true
   }

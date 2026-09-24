@@ -5,9 +5,9 @@ Last verified: 2026-09-24
 ## Automated release gate
 
 - [x] ESLint passes across application, mock API, and tests.
-- [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in `src/pages/*/presentation/**/*.vue` (`tests/unit/core/vue-import-boundary.spec.ts`).
+- [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 456 tests.
+- [x] Unit and component suite passes: 495 tests.
 - [x] Mock API contract suite passes: 10 tests.
 - [x] Mobile Playwright suite passes: 13 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
@@ -54,10 +54,10 @@ Production build on 2026-09-24 (raw and gzip summed over every emitted file):
 
 | Asset                       |        Raw |      Gzip |
 | --------------------------- | ---------: | --------: |
-| Application JavaScript      |  484.03 kB | 183.96 kB |
-| Application CSS             |   80.43 kB |  26.29 kB |
-| Entry chunk (`index-*.js`)  |  100.57 kB |  34.51 kB |
-| Precached application shell | 552.77 KiB |       n/a |
+| Application JavaScript      |  489.41 kB | 184.90 kB |
+| Application CSS             |   81.66 kB |  26.66 kB |
+| Entry chunk (`index-*.js`)  |  100.52 kB |  34.48 kB |
+| Precached application shell | 558.65 KiB |       n/a |
 
 Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); the service worker precaches all chunks, so offline navigation is unchanged. The per-file gzip total is higher than a single bundle would compress to, while the entry chunk a first visit downloads is less than half the former bundle.
 
@@ -66,11 +66,12 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [x] Frontend HTTP calls use `VITE_API_BASE_URL` exclusively.
 - [x] Every contract §5 path is declared once in `ENDPOINTS` (`src/core/url_paths.ts`), checked against the catalog by `tests/unit/core/url-paths.spec.ts`.
 - [x] Pages and components do not call JSON Server or raw collections directly.
-- [x] The public, sign-in, setup wizard, profile, marketplace, cart, checkout, orders, cultivation list, cultivation detail, task, growth, farm records and harvest screens reach the API only through their feature repositories (`src/pages/{public,auth,setup,profile,marketplace,cart,orders,cultivations}/data/`), on `ENDPOINTS`, and navigate by route name.
+- [x] Every screen reaches the API only through its feature repository (`src/pages/<feature>/data/`), on `ENDPOINTS`, and navigates by route name; `src/services/` no longer exists. A notification's deep link is resolved to a named route before it is followed.
 - [x] Checkout sends one `Idempotency-Key` per order submission and reuses it when that submission is retried (`tests/component/cart/useCheckout.spec.ts`).
 - [x] Feeding completion sends one `Idempotency-Key` per submission, reuses it on retry, and invalidates Home, tasks, detail, timeline and notifications through the `@core/query` map (`tests/component/cultivations/useCompleteTask.spec.ts`).
 - [x] Growth, mortality, water-check and harvest writes send one `Idempotency-Key` per submission, reuse it on retry, and invalidate through the `@core/query` map (`tests/component/cultivations/useRecordGrowth.spec.ts`, `CultivationHarvestView.spec.ts`); their forms stay disabled offline with an explanation.
 - [x] Cultivation creation sends one `Idempotency-Key` per visit to the review step, reuses it on retry, sends an above-range plan only with explicit confirmation, and invalidates Home and the cultivation list and detail through the `@core/query` map (`tests/component/setup/useCreateCultivation.spec.ts`); it stays disabled offline with an explanation.
+- [x] Marking notifications read is optimistic, as contract §14 allows: every cached list shows the change at once, is restored with a message if the server refuses, and the lists and Home refresh afterwards; "Mark all read" on a filtered list marks only that category (`tests/component/notifications/NotificationsView.spec.ts`).
 - [x] Request and response payloads are runtime-validated at the API boundary.
 - [x] Contract tests cover auth, onboarding, operations, commerce, harvest, and profile resources.
 - [ ] When FastAPI staging is available, set only `VITE_API_BASE_URL`, run the contract suite against staging, and execute the 13 critical browser journeys. This external deployment gate cannot be completed from the frontend/mock repository alone.

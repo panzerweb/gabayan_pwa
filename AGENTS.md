@@ -36,31 +36,44 @@ The supplied product brief, `Gabayan.pdf`, is product input rather than executab
 |-- AGENTS.md
 |-- docs/
 |   |-- implementation_plan.md
-|   `-- api_contract.md
+|   |-- api_contract.md
+|   `-- release_checklist.md
 |-- src/
-|   |-- app/                 # app bootstrap, providers, router, guards
-|   |-- assets/              # local icons and illustrations
-|   |-- components/          # shared UI primitives and composed components
-|   |-- features/            # auth, onboarding, cultivations, tasks, shop, orders, profile
+|   |-- main.ts, App.vue     # app bootstrap and providers
+|   |-- core/
+|   |   |-- http/            # apiRequest, ApiError, envelope/page schemas, VITE_API_BASE_URL
+|   |   |-- url_paths.ts     # ENDPOINTS: every API path, ids as functions
+|   |   |-- query/           # queryClient and the cross-feature invalidation map
+|   |   |-- errors/          # ApiError -> the sentence a farmer reads
+|   |   |-- composables/     # app-wide composables such as useOnlineStatus
+|   |   |-- utils/           # pure formatters, geometry, validation
+|   |   `-- navigation.ts    # the four bottom-navigation destinations
+|   |-- components/          # shared, feature-agnostic UI: ui/, feedback/, overlays/, navigation/, brand/
 |   |-- layouts/             # public, setup, and authenticated mobile layouts
-|   |-- pages/               # route-level Vue components
-|   |-- services/            # transport, generated/manual API clients, mappers
-|   |-- stores/              # Pinia client/session state only
+|   |-- router/              # routes/<area>.routes.ts, route-names.ts, guards/, index.ts
+|   |-- stores/              # Pinia stores several features share (session, toast)
 |   |-- styles/              # tokens and global styles
-|   |-- types/               # shared TypeScript types
-|   `-- utils/               # pure helpers and formatters
+|   `-- pages/<feature>/     # auth, setup, home, cultivations, marketplace, cart, orders,
+|       |                    # notifications, profile, public
+|       |-- data/            # <feature>.api.ts, .repository.ts, .keys.ts
+|       |-- domain/          # <feature>.model.ts (Zod schemas, types, pure helpers),
+|       |                    # <feature>.repository.interface.ts
+|       `-- presentation/    # views/, components/, composables/ (and stores/ for feature-only state)
 |-- mock-api/
-|   |-- db.json              # persisted mock resources
-|   |-- fixtures/            # deterministic seed modules
-|   |-- middleware/          # auth, validation, latency, errors, actions
+|   |-- db.json              # untracked working copy, rewritten by tests
+|   |-- fixtures/seed.json   # deterministic seed
+|   |-- reset.mjs            # restores db.json from the seed
 |   `-- server.mjs           # JSON Server composition and custom routes
 |-- public/                  # PWA manifest assets and static files
 |-- tests/
-|   |-- unit/
-|   |-- component/
+|   |-- unit/<feature>/
+|   |-- component/<feature>/
+|   |-- contract/
 |   `-- e2e/
 `-- package.json
 ```
+
+Imports run view -> component/composable -> repository -> `*.api.ts` -> `@core/http` + `ENDPOINTS`. No `.vue` file imports `@core/http`, `@tanstack/vue-query`, or a `data/` module; ESLint enforces this for every `src/**/*.vue`. Across features, import only another feature's `domain/` types, its `data/<feature>.keys.ts` for invalidation, or a component meant for reuse.
 
 Create this structure incrementally; do not add empty folders solely to match the diagram.
 
@@ -83,7 +96,7 @@ Prefer maintained packages with a clear purpose. Do not add a second state manag
 
 ### API boundary
 
-- All HTTP access must go through `src/services/api`; page and component files must not call `fetch` or JSON Server directly.
+- All HTTP access goes through a feature's `src/pages/<feature>/data/<feature>.api.ts`, one function per endpoint built on `apiRequest` from `@core/http` with a path from `ENDPOINTS` in `src/core/url_paths.ts` and a Zod schema for the response. Views and components never call `fetch`, `apiRequest`, or JSON Server directly; they bind what a composable returns, and the composable calls the feature repository.
 - The base URL comes only from `VITE_API_BASE_URL`. Default development value: `http://localhost:3001/api/v1`.
 - Use the exact paths, verbs, query parameters, payloads, envelopes, and error shape in `docs/api_contract.md`.
 - Keep wire JSON in `camelCase`. FastAPI may use snake_case internally but must publish camelCase aliases.

@@ -62,12 +62,7 @@ describe('useCreateCultivation', () => {
 
     await result.submit()
 
-    for (const queryKey of [
-      ['home'],
-      ['cultivations', 'list'],
-      ['cultivations', 'detail'],
-      ['home-dashboard'],
-    ]) {
+    for (const queryKey of [['home'], ['cultivations', 'list'], ['cultivations', 'detail']]) {
       expect(invalidate).toHaveBeenCalledWith({ queryKey })
     }
   })

@@ -20,8 +20,6 @@ export const useSessionStore = defineStore('session', () => {
   const suggestedRouteName = computed(() =>
     hasCultivation.value ? ROUTE_NAMES.home : ROUTE_NAMES.setupIntro,
   )
-  // The same destination as a path, which the guest-only guard returns as its redirect.
-  const suggestedRoute = computed(() => (hasCultivation.value ? '/app/home' : '/setup'))
 
   function acceptSession(session: AuthSession) {
     accessToken.value = session.accessToken
@@ -89,7 +87,6 @@ export const useSessionStore = defineStore('session', () => {
     initialized,
     isAuthenticated,
     suggestedRouteName,
-    suggestedRoute,
     acceptSession,
     restore,
     signOut,

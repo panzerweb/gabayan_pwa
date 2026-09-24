@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import { apiFieldErrors, describeError } from '@core/errors'
 import { invalidateAfter } from '@core/query'
-import { LEGACY_HOME_KEY } from '@pages/cultivations/data/cultivations.keys'
 import { ROUTE_NAMES } from '@router/route-names'
 import { useSessionStore } from '@stores/session.store'
 
@@ -83,10 +82,7 @@ export function useCreateCultivation(repository: SetupRepository = setupReposito
       return false
     }
     session.markCultivationCreated()
-    await Promise.all([
-      invalidateAfter(queryClient, 'cultivationCreate'),
-      queryClient.invalidateQueries({ queryKey: LEGACY_HOME_KEY }),
-    ])
+    await invalidateAfter(queryClient, 'cultivationCreate')
     await router.replace({ name: ROUTE_NAMES.setupSuccess, params: { cultivationId } })
     return true
   }

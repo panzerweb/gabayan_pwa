@@ -3,6 +3,7 @@ import type { RouteLocationRaw } from 'vue-router'
 
 import AppBrand from '@/components/brand/AppBrand.vue'
 import AppIcon from '@/components/ui/AppIcon.vue'
+import { ROUTE_NAMES } from '@router/route-names'
 
 withDefaults(
   defineProps<{
@@ -16,7 +17,7 @@ withDefaults(
   {
     showBrand: false,
     showBack: false,
-    backTo: '/',
+    backTo: () => ({ name: ROUTE_NAMES.splash }),
   },
 )
 </script>
@@ -39,7 +40,7 @@ withDefaults(
         <RouterLink
           v-if="notificationCount !== undefined"
           class="app-header__icon-button"
-          to="/app/notifications"
+          :to="{ name: ROUTE_NAMES.notifications }"
           :aria-label="
             notificationCount > 0 ? `${notificationCount} unread notifications` : 'Notifications'
           "

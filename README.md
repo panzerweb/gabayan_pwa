@@ -32,6 +32,25 @@ pnpm test:e2e
 
 `pnpm check` runs linting, strict type checking, unit tests, mock contract tests, and the production PWA build. The end-to-end command starts the app and mock API automatically.
 
+## Source layout
+
+Each thing a farmer does is a feature folder under `src/pages/<feature>/` (`auth`, `setup`,
+`home`, `cultivations`, `marketplace`, `cart`, `orders`, `notifications`, `profile`, `public`):
+
+- `data/` - `<feature>.api.ts` (one function per endpoint, paths from `ENDPOINTS` in
+  `src/core/url_paths.ts`, responses parsed by Zod), `<feature>.repository.ts` and the TanStack
+  Query keys in `<feature>.keys.ts`.
+- `domain/` - `<feature>.model.ts` with schemas, types and pure helpers, and the repository
+  interface.
+- `presentation/` - routed `views/`, the feature's `components/`, and `composables/` that own
+  queries, mutations and screen state.
+
+App-wide code lives in `src/core/` (HTTP client, endpoints, query client and invalidation map,
+error wording, formatters), `src/components/`, `src/layouts/`, `src/router/` and `src/stores/`.
+Views and components never import `@core/http`, `@tanstack/vue-query` or a `data/` module;
+`npx eslint .` reports any `.vue` file that does. Routes are declared in
+`src/router/routes/*.routes.ts` and navigation goes by the names in `src/router/route-names.ts`.
+
 ## Development sign-in
 
 After `pnpm mock:reset`, the deterministic existing-user account is:

@@ -13,7 +13,7 @@ export const appRoutes: RouteRecordRaw[] = [
       {
         path: 'home',
         name: ROUTE_NAMES.home,
-        component: () => import('@pages/app/HomePage.vue'),
+        component: () => import('@pages/home/presentation/views/HomeView.vue'),
         meta: { title: 'Home' },
       },
       {
@@ -105,7 +105,7 @@ export const appRoutes: RouteRecordRaw[] = [
       {
         path: 'notifications',
         name: ROUTE_NAMES.notifications,
-        component: () => import('@pages/app/NotificationsPage.vue'),
+        component: () => import('@pages/notifications/presentation/views/NotificationsView.vue'),
         meta: { title: 'Notifications' },
       },
     ],

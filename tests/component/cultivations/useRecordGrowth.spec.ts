@@ -46,7 +46,6 @@ describe('useRecordGrowth', () => {
       ['cultivations', 'feeding-plan'],
       ['cultivations', 'harvest-readiness'],
       ['home'],
-      ['home-dashboard'],
     ]) {
       expect(invalidate).toHaveBeenCalledWith({ queryKey })
     }

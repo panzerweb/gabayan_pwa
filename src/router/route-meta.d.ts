@@ -1,5 +1,7 @@
 import 'vue-router'
 
+import type { RouteName } from './route-names'
+
 export {}
 
 // Meta a route may carry. Parent meta is merged into `to.meta`, so `requiresAuth` and
@@ -9,7 +11,7 @@ declare module 'vue-router' {
     title?: string
     setupStep?: number
     setupTotal?: number
-    backTo?: string
+    backTo?: RouteName
     requiresAuth?: boolean
     guestOnly?: boolean
   }

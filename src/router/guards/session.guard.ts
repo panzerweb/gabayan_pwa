@@ -15,6 +15,6 @@ export async function sessionGuard(to: RouteLocationNormalized): Promise<Navigat
   if (to.meta.requiresAuth && !session.isAuthenticated) {
     return { name: ROUTE_NAMES.signIn, query: { redirect: to.fullPath } }
   }
-  if (to.meta.guestOnly && session.isAuthenticated) return session.suggestedRoute
+  if (to.meta.guestOnly && session.isAuthenticated) return { name: session.suggestedRouteName }
   return true
 }

@@ -35,13 +35,18 @@ export function formatManilaDate(timestamp: string) {
   }).format(new Date(timestamp))
 }
 
-export function manilaDateToday() {
+// The Asia/Manila calendar date (YYYY-MM-DD) of a timestamp.
+export function manilaDateOf(timestamp: string | Date) {
   const parts = new Intl.DateTimeFormat('en', {
     timeZone: 'Asia/Manila',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).formatToParts(new Date())
+  }).formatToParts(new Date(timestamp))
   const value = Object.fromEntries(parts.map((part) => [part.type, part.value]))
   return `${value.year}-${value.month}-${value.day}`
+}
+
+export function manilaDateToday() {
+  return manilaDateOf(new Date())
 }
