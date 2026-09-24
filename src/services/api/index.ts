@@ -21,24 +21,6 @@ export {
   operationalQueryKeys,
 } from './operations'
 export {
-  addCartItem,
-  commerceQueryKeys,
-  createCheckoutQuote,
-  createOrder,
-  getCart,
-  getOrder,
-  getOrderTracking,
-  getProduct,
-  listAddresses,
-  listOrders,
-  listPaymentOptions,
-  listProductCategories,
-  listProducts,
-  removeCartItem,
-  setProductFavorite,
-  updateCartItem,
-} from './commerce'
-export {
   completeHarvest,
   createGrowthMeasurement,
   createMortalityRecord,
@@ -70,20 +52,6 @@ export type {
   Notification,
   Quantity,
 } from './operations'
-export type {
-  Address,
-  Cart,
-  CheckoutQuote,
-  Money,
-  OrderDetail,
-  OrderSummary,
-  OrderTracking,
-  PaymentOption,
-  ProductCategory,
-  ProductDetail,
-  ProductFilters,
-  ProductSummary,
-} from './commerce'
 export type {
   CreateGrowthMeasurementRequest,
   CreateHarvestRequest,

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 import { apiRequest, envelopeSchema, pageSchema, sourceStatusSchema } from '@core/http'
+import { moneySchema } from '@pages/marketplace/domain/marketplace.model'
 
-import { moneySchema } from './commerce'
 import { cultivationDetailSchema, farmTaskSchema, quantitySchema } from './operations'
 
 const compactUserSchema = z.object({ id: z.string(), fullName: z.string() })
