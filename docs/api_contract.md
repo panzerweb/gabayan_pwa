@@ -255,6 +255,7 @@ Every account starts on `FREE`. There is no in-app purchase in v1: a farmer reco
 | `GET /culture-environments`                 | Public | `active=true`; pagination             | `200 Page<CultureEnvironment>`      |
 | `GET /culture-environments/{environmentId}` | Public | none                                  | `200 Envelope<CultureEnvironment>`  |
 | `GET /compatibility`                        | Public | required `speciesId`, `environmentId` | `200 Envelope<CompatibilityResult>` |
+| `GET /sizing-guidance`                      | Public | required `speciesId`, `environmentId` | `200 Envelope<SizingGuidance>`      |
 | `POST /stocking-estimates`                  |    yes | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
 
 The reference reads are Public: they hold shared profile data and no account's records, and the setup wizard reads them before the farmer signs up.
@@ -598,6 +599,8 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 | `status`                 | `StockingResultStatus` | Below/recommended/above                         |
 | `differenceToRange`      | integer                | 0 in range; signed nearest-bound difference     |
 | `suggestedFingerlings`   | integer                | A reasonable point in range, not forced maximum |
+| `requiredSpace`          | `Quantity`             | Space the planned count needs; see below        |
+| `additionalSpaceNeeded`  | `Quantity`             | Space missing for the planned count; see below  |
 | `basis`                  | `EstimateBasis`        | Explainability                                  |
 | `compatibility`          | `CompatibilityResult`  | Explicit compatibility                          |
 | `isDemo`                 | boolean                | Required                                        |
@@ -607,6 +610,10 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 | `disclaimer`             | string                 | Required                                        |
 
 `EstimateBasis` is `{ type, densityMinimum, densityMaximum, densityUnit, inputAreaM2, inputVolumeM3, explanation }`. `explanation` is the stocking rule's own plain-language basis, including its citation or the fact that it is a placeholder.
+
+`requiredSpace` is the least surface area (`M2`, for a `SURFACE_AREA` basis) or water volume (`M3`, for a `WATER_VOLUME` basis) in which `plannedFingerlings` stays within the demo range: `plannedFingerlings / densityMaximum`, rounded up to two decimals. `additionalSpaceNeeded` has the same unit and is how much more than `inputAreaM2` or `inputVolumeM3` that is, rounded up to two decimals; it is `0` unless `status` is `ABOVE_RANGE`. Both are server-derived. A `stockingEstimateSnapshot` saved before these fields existed may lack them, so a client shows them only when present.
+
+Worked example from the product brief: 5,000 Bangus in a 20 x 25 m pond (500 m² of surface) answer `ABOVE_RANGE` with `requiredSpace` `{ "value": 5000, "unit": "M2" }` and `additionalSpaceNeeded` `{ "value": 4500, "unit": "M2" }`.
 
 Representative response:
 
@@ -625,6 +632,8 @@ Representative response:
     "status": "RECOMMENDED",
     "differenceToRange": 0,
     "suggestedFingerlings": 500,
+    "requiredSpace": { "value": 27.28, "unit": "M3" },
+    "additionalSpaceNeeded": { "value": 0, "unit": "M3" },
     "basis": {
       "type": "WATER_VOLUME",
       "densityMinimum": 15,
@@ -653,6 +662,34 @@ Representative response:
   "meta": { "requestId": "req_demo_001" }
 }
 ```
+
+### SizingGuidance
+
+The pond or cage size and water depth suggested for one species in one culture system, read before the farmer measures the culture area. The space comes from the pairing's stocking rule (the same density `POST /stocking-estimates` applies); the depth and the worked example are rows of the species and culture-system profile. Every figure is demo data: the Bangus pond row carries the product brief's sample (5,000 bangus need a pond of about 5,000 m², 0.5 ha, kept at least 1.0-1.2 m deep, rule version `demo-2026-09-gabayan`); other rows say what they are in `spaceBasis` and `depthBasis`.
+
+| Field                | Type                                      | Notes                                                                                 |
+| -------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
+| `speciesId`          | string                                    |                                                                                       |
+| `environmentId`      | string                                    |                                                                                       |
+| `basis`              | `"SURFACE_AREA" \| "WATER_VOLUME"`        | The stocking rule's basis; decides whether space is an area or a volume               |
+| `spacePerFish`       | `Quantity`                                | `M2` or `M3`; `1 / densityMaximum`, rounded up to four decimals                       |
+| `exampleFingerlings` | integer                                   | A count worked through for the farmer, e.g. `5000` for a Bangus pond                  |
+| `exampleSpace`       | `Quantity`                                | Space `exampleFingerlings` need, computed as `requiredSpace` is on `StockingEstimate` |
+| `waterDepth`         | `{ minimum, maximum, unit: "M" } \| null` | Suggested water depth in metres; `null` where the profile has no figure               |
+| `spaceBasis`         | string                                    | The stocking rule's explanation: its citation, or that it is a placeholder            |
+| `depthBasis`         | string                                    | Where the depth comes from, or why there is none                                      |
+| `sources`            | `RuleSource[]`                            |                                                                                       |
+| `isDemo`             | boolean                                   |                                                                                       |
+| `sourceStatus`       | `SourceStatus`                            |                                                                                       |
+| `ruleVersion`        | string                                    | The stocking rule's version                                                           |
+| `disclaimer`         | string                                    |                                                                                       |
+
+| Case                                              | Answer                                        |
+| ------------------------------------------------- | --------------------------------------------- |
+| `speciesId` or `environmentId` missing            | `400 BAD_REQUEST`                             |
+| Unknown or inactive species or environment        | `404 NOT_FOUND`                               |
+| Compatibility of the pairing is `NOT_RECOMMENDED` | `400 INCOMPATIBLE_SELECTION` with its message |
+| No stocking rule or sizing row for the pairing    | `404 NOT_FOUND`                               |
 
 ### Water-quality thresholds and safety check
 

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { sourceStatusSchema } from '@core/http'
+import { ruleSourceSchema, sourceStatusSchema } from '@core/http'
 import { formatQuantity } from '@core/utils/format'
 import { guidanceMessageSchema } from '@pages/cultivations/domain/cultivations.model'
 
@@ -25,13 +25,7 @@ export const waterParameterSchema = z.enum(WATER_PARAMETERS)
 export const waterParameterUnitSchema = z.enum(WATER_PARAMETER_UNITS)
 export const waterReadingStatusSchema = z.enum(WATER_READING_STATUSES)
 
-export const ruleSourceSchema = z.object({
-  title: z.string(),
-  organization: z.string(),
-  url: z.string().nullable(),
-  reviewedAt: z.string().nullable(),
-  reviewedBy: z.string().nullable(),
-})
+export { ruleSourceSchema }
 
 export const waterThresholdSchema = z.object({
   parameter: waterParameterSchema,

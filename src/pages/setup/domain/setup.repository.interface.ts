@@ -7,6 +7,7 @@ import type {
   CultureEnvironment,
   EquipmentRecommendations,
   ListSpeciesParams,
+  SizingGuidance,
   SpeciesSummary,
   StockingEstimate,
   StockingEstimateRequest,
@@ -16,6 +17,7 @@ export interface SetupRepository {
   listSpecies(params?: ListSpeciesParams): Promise<Page<SpeciesSummary>>
   listCultureEnvironments(): Promise<Page<CultureEnvironment>>
   getCompatibility(speciesId: string, environmentId: string): Promise<Envelope<CompatibilityResult>>
+  getSizingGuidance(speciesId: string, environmentId: string): Promise<Envelope<SizingGuidance>>
   createStockingEstimate(
     body: StockingEstimateRequest,
     accessToken: string,

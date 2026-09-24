@@ -27,6 +27,7 @@ test('new user completes the above-range onboarding path with explicit acceptanc
   await expect(page.getByRole('heading', { name: 'Good water for your stock' })).toBeVisible()
   await page.getByRole('link', { name: 'Continue' }).click()
 
+  await page.getByRole('dialog').getByRole('button', { name: 'Got it' }).click()
   await page.getByLabel('Length').fill('5')
   await page.getByLabel('Width').fill('4')
   await page.getByLabel('Average water depth').fill('1.5')

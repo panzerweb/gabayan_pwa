@@ -20,6 +20,15 @@ export const mediaAssetSchema = z.object({
 
 export const sourceStatusSchema = z.enum(['DEMO', 'DRAFT', 'VERIFIED', 'RETIRED'])
 
+// Contract §7 RuleSource: where a profile's figures come from, and whether anyone reviewed them.
+export const ruleSourceSchema = z.object({
+  title: z.string(),
+  organization: z.string(),
+  url: z.string().nullable(),
+  reviewedAt: z.string().nullable(),
+  reviewedBy: z.string().nullable(),
+})
+
 export function envelopeSchema<T extends z.ZodTypeAny>(dataSchema: T) {
   return z.object({
     data: dataSchema,

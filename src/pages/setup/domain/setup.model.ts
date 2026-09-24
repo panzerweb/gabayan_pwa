@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import type { AppIconName } from '@components/ui/AppIcon.vue'
-import { mediaAssetSchema, sourceStatusSchema } from '@core/http'
+import { mediaAssetSchema, ruleSourceSchema, sourceStatusSchema } from '@core/http'
+import { formatQuantity } from '@core/utils/format'
 import { moneySchema, productCategorySchema } from '@pages/marketplace/domain/marketplace.model'
 
 export const speciesSummarySchema = z.object({
@@ -53,6 +54,14 @@ export const dimensionsSchema = z.object({
 
 export const stockingStatusSchema = z.enum(['BELOW_RANGE', 'RECOMMENDED', 'ABOVE_RANGE'])
 
+export const stockingBasisSchema = z.enum(['SURFACE_AREA', 'WATER_VOLUME'])
+
+// A culture-area size: surface area for a SURFACE_AREA stocking rule, water volume otherwise.
+export const spaceSchema = z.object({
+  value: z.number().finite().nonnegative(),
+  unit: z.enum(['M2', 'M3']),
+})
+
 export const stockingEstimateSchema = z.object({
   estimateId: z.string().min(1),
   species: speciesSummarySchema,
@@ -66,8 +75,11 @@ export const stockingEstimateSchema = z.object({
   status: stockingStatusSchema,
   differenceToRange: z.number().int(),
   suggestedFingerlings: z.number().int().positive(),
+  // Absent from snapshots saved before the sizing fields existed (contract §7).
+  requiredSpace: spaceSchema.optional(),
+  additionalSpaceNeeded: spaceSchema.optional(),
   basis: z.object({
-    type: z.enum(['SURFACE_AREA', 'WATER_VOLUME']),
+    type: stockingBasisSchema,
     densityMinimum: z.number().nonnegative(),
     densityMaximum: z.number().nonnegative(),
     densityUnit: z.enum(['FISH_PER_M2', 'FISH_PER_M3']),
@@ -80,6 +92,29 @@ export const stockingEstimateSchema = z.object({
   sourceStatus: sourceStatusSchema,
   ruleVersion: z.string().min(1),
   expiresAt: z.string().min(1),
+  disclaimer: z.string().min(1),
+})
+
+export const sizingGuidanceSchema = z.object({
+  speciesId: z.string().min(1),
+  environmentId: z.string().min(1),
+  basis: stockingBasisSchema,
+  spacePerFish: spaceSchema,
+  exampleFingerlings: z.number().int().positive(),
+  exampleSpace: spaceSchema,
+  waterDepth: z
+    .object({
+      minimum: z.number().positive(),
+      maximum: z.number().positive(),
+      unit: z.literal('M'),
+    })
+    .nullable(),
+  spaceBasis: z.string().min(1),
+  depthBasis: z.string().min(1),
+  sources: z.array(ruleSourceSchema),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string().min(1),
   disclaimer: z.string().min(1),
 })
 
@@ -134,6 +169,9 @@ export type CompatibilityResult = z.infer<typeof compatibilityResultSchema>
 export type Dimensions = z.infer<typeof dimensionsSchema>
 export type StockingStatus = z.infer<typeof stockingStatusSchema>
 export type StockingEstimate = z.infer<typeof stockingEstimateSchema>
+export type Space = z.infer<typeof spaceSchema>
+export type SizingGuidance = z.infer<typeof sizingGuidanceSchema>
+export type WaterDepthRange = NonNullable<SizingGuidance['waterDepth']>
 export type RecommendedProduct = z.infer<typeof recommendedProductSchema>
 export type EquipmentRecommendations = z.infer<typeof equipmentRecommendationsSchema>
 
@@ -362,6 +400,65 @@ export function stockingStatusLabel(status: StockingStatus) {
 // An above-range plan goes on to review only after the farmer has confirmed the warning.
 export function canReviewEstimate(estimate: StockingEstimate, acceptedAboveRangeWarning: boolean) {
   return estimate.status !== 'ABOVE_RANGE' || acceptedAboveRangeWarning
+}
+
+const SQUARE_METRES_PER_HECTARE = 10_000
+
+// "5,000 m² (0.5 ha)" for a pond-sized area, "54.55 m³" for a volume. A space under one
+// unit keeps three decimals so the space a single fish needs does not round to nothing.
+export function formatSpace(space: Space) {
+  const text = formatQuantity(space.value, space.unit, space.value < 1 ? 3 : 2)
+  if (space.unit !== 'M2' || space.value < 1000) return text
+  const hectares = new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(
+    space.value / SQUARE_METRES_PER_HECTARE,
+  )
+  return `${text} (${hectares} ha)`
+}
+
+// What the space is measured over, in words a beginner can check with a tape measure.
+export function spaceMeasure(unit: Space['unit']) {
+  return unit === 'M2' ? 'of water surface (length × width)' : 'of water (length × width × depth)'
+}
+
+// "1.0–1.2 m": depths keep one decimal so a range reads the way the guidance is written.
+export function formatDepthRange(depth: WaterDepthRange) {
+  const format = new Intl.NumberFormat('en-PH', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2,
+  }).format
+  return depth.minimum === depth.maximum
+    ? `${format(depth.minimum)} m`
+    : `${format(depth.minimum)}–${format(depth.maximum)} m`
+}
+
+// The sizing dialog's heading for the chosen fish and culture system.
+export function sizingTitle(
+  species: Pick<SpeciesSummary, 'commonName' | 'localName'> | undefined,
+  environment: Pick<CultureEnvironment, 'name'> | undefined,
+) {
+  if (!species || !environment) return 'Suggested size'
+  return `Suggested ${environment.name.toLowerCase()} size for ${speciesTitle(species)}`
+}
+
+// For an above-range estimate, how much space the planned count needs and how much more the
+// culture area would have to give. Null when nothing is missing, or when the estimate predates
+// the sizing fields.
+export function spaceShortfallMessage(estimate: StockingEstimate): string | null {
+  const required = estimate.requiredSpace
+  const additional = estimate.additionalSpaceNeeded
+  if (estimate.status !== 'ABOVE_RANGE' || !required || !additional || additional.value <= 0) {
+    return null
+  }
+  const available: Space = {
+    value: required.unit === 'M2' ? estimate.basis.inputAreaM2 : estimate.basis.inputVolumeM3,
+    unit: required.unit,
+  }
+  const fish = formatQuantity(estimate.plannedFingerlings, 'COUNT')
+  return (
+    `${fish} fish need about ${formatSpace(required)} ${spaceMeasure(required.unit)}. ` +
+    `Your area has ${formatSpace(available)}, so it needs about ${formatSpace(additional)} more, ` +
+    'or plan fewer fish.'
+  )
 }
 
 export interface CultivationDetailsForm {

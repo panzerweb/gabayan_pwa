@@ -42,6 +42,7 @@ test('new farmer plans Bangus in a pond and sees its demo range and disclaimer',
   await expect(page.getByRole('heading', { name: 'Good water for your stock' })).toBeVisible()
   await page.getByRole('link', { name: 'Continue' }).click()
 
+  await page.getByRole('dialog').getByRole('button', { name: 'Got it' }).click()
   await page.getByLabel('Length').fill('25')
   await page.getByLabel('Width').fill('20')
   await page.getByLabel('Average water depth').fill('1.2')

@@ -4,7 +4,7 @@ export function formatPhp(amountMinor: number) {
   )
 }
 
-export function formatQuantity(value: number, unit: string) {
+export function formatQuantity(value: number, unit: string, maximumFractionDigits = 2) {
   const label: Record<string, string> = {
     G: 'g',
     KG: 'kg',
@@ -18,7 +18,7 @@ export function formatQuantity(value: number, unit: string) {
     MG_PER_L: 'mg/L',
     PH: 'pH',
   }
-  return `${new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(value)}${unit === 'PERCENT' ? '' : ' '}${label[unit] ?? unit}`.trim()
+  return `${new Intl.NumberFormat('en-PH', { maximumFractionDigits }).format(value)}${unit === 'PERCENT' ? '' : ' '}${label[unit] ?? unit}`.trim()
 }
 
 export function formatManilaTime(timestamp: string) {

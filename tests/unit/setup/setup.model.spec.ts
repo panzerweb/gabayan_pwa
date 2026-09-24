@@ -7,9 +7,15 @@ import {
   dimensionsFormFrom,
   dimensionsFrom,
   equipmentRecommendationsSchema,
+  formatDepthRange,
+  formatSpace,
   parseFingerlings,
   parseMeters,
   recommendedProducts,
+  sizingGuidanceSchema,
+  sizingTitle,
+  spaceMeasure,
+  spaceShortfallMessage,
   speciesNote,
   speciesSourceDisplay,
   speciesTitle,
@@ -21,6 +27,8 @@ import {
 
 import {
   aboveRangeEstimate,
+  bangusAboveRangeEstimate,
+  bangusPondSizing,
   compatible,
   inRangeEstimate,
   milkfish,
@@ -35,6 +43,50 @@ describe('setup model', () => {
   it('parses a representative stocking estimate and equipment recommendation payload', () => {
     expect(stockingEstimateSchema.parse(inRangeEstimate).basis.densityUnit).toBe('FISH_PER_M3')
     expect(equipmentRecommendationsSchema.parse(recommendations).sections).toHaveLength(1)
+  })
+
+  it('parses sizing guidance and an estimate carrying the space it needs', () => {
+    expect(sizingGuidanceSchema.parse(bangusPondSizing).waterDepth?.unit).toBe('M')
+    expect(sizingGuidanceSchema.parse({ ...bangusPondSizing, waterDepth: null }).waterDepth).toBe(
+      null,
+    )
+    expect(stockingEstimateSchema.parse(bangusAboveRangeEstimate).additionalSpaceNeeded).toEqual({
+      value: 4500,
+      unit: 'M2',
+    })
+  })
+
+  it('writes an area with its hectares once it is pond-sized, and keeps small spaces precise', () => {
+    expect(formatSpace({ value: 5000, unit: 'M2' })).toBe('5,000 m² (0.5 ha)')
+    expect(formatSpace({ value: 500, unit: 'M2' })).toBe('500 m²')
+    expect(formatSpace({ value: 0.0546, unit: 'M3' })).toBe('0.055 m³')
+    expect(formatSpace({ value: 27.28, unit: 'M3' })).toBe('27.28 m³')
+    expect(spaceMeasure('M2')).toContain('length × width')
+    expect(spaceMeasure('M3')).toContain('depth')
+  })
+
+  it('writes a depth range with one decimal', () => {
+    expect(formatDepthRange({ minimum: 1, maximum: 1.2, unit: 'M' })).toBe('1.0–1.2 m')
+    expect(formatDepthRange({ minimum: 1.5, maximum: 1.5, unit: 'M' })).toBe('1.5 m')
+  })
+
+  it('titles the sizing dialog with the fish and culture system', () => {
+    expect(sizingTitle(milkfish, { name: 'Pond' })).toBe(
+      'Suggested pond size for Milkfish (Bangus)',
+    )
+    expect(sizingTitle(undefined, { name: 'Pond' })).toBe('Suggested size')
+  })
+
+  it('names the extra space an above-range plan needs, and nothing otherwise', () => {
+    expect(spaceShortfallMessage(bangusAboveRangeEstimate)).toBe(
+      '5,000 fish need about 5,000 m² (0.5 ha) of water surface (length × width). ' +
+        'Your area has 500 m², so it needs about 4,500 m² (0.45 ha) more, or plan fewer fish.',
+    )
+    expect(spaceShortfallMessage({ ...bangusAboveRangeEstimate, status: 'RECOMMENDED' })).toBeNull()
+    const { additionalSpaceNeeded: _omitted, ...savedBefore } = bangusAboveRangeEstimate
+    void _omitted
+    expect(spaceShortfallMessage(savedBefore)).toBeNull()
+    expect(spaceShortfallMessage(aboveRangeEstimate)).toBeNull()
   })
 
   it('names a species by both names only where the local name differs', () => {
