@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type { AppIconName } from '@components/ui/AppIcon.vue'
 import { mediaAssetSchema, sourceStatusSchema } from '@core/http'
 import { moneySchema } from '@pages/marketplace/domain/marketplace.model'
-import { dimensionsSchema, stockingEstimateSchema } from '@/services/api/onboarding'
+import { dimensionsSchema, stockingEstimateSchema } from '@pages/setup/domain/setup.model'
 
 type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger'
 

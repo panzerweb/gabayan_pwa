@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import AppIcon from '@/components/ui/AppIcon.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
-import BaseCard from '@/components/ui/BaseCard.vue'
+import AppIcon from '@components/ui/AppIcon.vue'
+import BaseButton from '@components/ui/BaseButton.vue'
+import BaseCard from '@components/ui/BaseCard.vue'
+import { ROUTE_NAMES } from '@router/route-names'
 </script>
 
 <template>
@@ -35,8 +36,8 @@ import BaseCard from '@/components/ui/BaseCard.vue'
       qualified guidance still matter.
     </p>
     <div class="setup-flow-actions">
-      <BaseButton to="/setup/species">Start setup</BaseButton>
-      <BaseButton to="/app/home" variant="text">Set up later</BaseButton>
+      <BaseButton :to="{ name: ROUTE_NAMES.setupSpecies }">Start setup</BaseButton>
+      <BaseButton :to="{ name: ROUTE_NAMES.home }" variant="text">Set up later</BaseButton>
     </div>
   </section>
 </template>
