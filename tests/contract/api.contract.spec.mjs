@@ -9,6 +9,7 @@ import { registerProfileContract } from './scenarios/profile.scenarios.mjs'
 import { registerReferenceContract } from './scenarios/reference.scenarios.mjs'
 import { registerSystemAndAuthContract } from './scenarios/system-auth.scenarios.mjs'
 import { registerTaskAndRecordContract } from './scenarios/tasks-records.scenarios.mjs'
+import { registerTierContract } from './scenarios/tiers.scenarios.mjs'
 import {
   bearer,
   idempotencyKey,
@@ -546,6 +547,7 @@ registerCultivationContract(client)
 registerTaskAndRecordContract(client)
 registerCommerceContract(client)
 registerNotificationContract(client)
+registerTierContract(client)
 
 describe('endpoint catalog coverage', () => {
   it('reads every method-and-path row of the contract endpoint catalog', () => {

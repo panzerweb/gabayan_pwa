@@ -103,6 +103,12 @@ export const appRoutes: RouteRecordRaw[] = [
         meta: { title: 'Profile' },
       },
       {
+        path: 'plans',
+        name: ROUTE_NAMES.plans,
+        component: () => import('@pages/tiers/presentation/views/PlansView.vue'),
+        meta: { title: 'Plans' },
+      },
+      {
         path: 'notifications',
         name: ROUTE_NAMES.notifications,
         component: () => import('@pages/notifications/presentation/views/NotificationsView.vue'),

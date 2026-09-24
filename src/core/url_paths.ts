@@ -25,6 +25,11 @@ export const ENDPOINTS = {
     farm: '/users/me/farm',
     notificationSettings: '/users/me/notification-settings',
   },
+  tiers: {
+    root: '/tiers',
+    account: '/users/me/tier',
+    upgradeRequests: '/users/me/tier/upgrade-requests',
+  },
   addresses: {
     root: '/users/me/addresses',
     detail: (addressId: Id) => `/users/me/addresses/${segment(addressId)}` as const,

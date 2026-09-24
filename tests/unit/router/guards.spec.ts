@@ -3,6 +3,7 @@ import { createMemoryHistory, createRouter, type RouteLocationNormalized } from 
 
 import { sessionGuard } from '@router/guards/session.guard'
 import { setupStepGuard } from '@router/guards/setup-step.guard'
+import { tierGuard } from '@router/guards/tier.guard'
 import { ROUTE_NAMES, type RouteName } from '@router/route-names'
 import { appRoutes } from '@router/routes/app.routes'
 import { publicRoutes } from '@router/routes/public.routes'
@@ -11,6 +12,11 @@ import type { Dimensions, StockingEstimate } from '@pages/setup/domain/setup.mod
 import type { UserProfile } from '@pages/auth/domain/auth.model'
 import { useSessionStore } from '@stores/session.store'
 import { useSetupStore } from '@pages/setup/presentation/stores/setup.store'
+import { queryClient } from '@core/query'
+import { tiersRepository } from '@pages/tiers/data/tiers.repository'
+import type { TierCode } from '@pages/tiers/domain/tiers.model'
+
+import { accountTier, meta, organizationPlan, proPlan } from '../tiers/fixtures'
 
 // Resolves against the real route records so parent meta (`requiresAuth`, `guestOnly`)
 // merges exactly as it does in the app, without loading any page component.
@@ -142,5 +148,79 @@ describe('setup-step guard', () => {
   it('always opens the intro and the species step', () => {
     expect(setupStepGuard(locationOf(ROUTE_NAMES.setupIntro))).toBe(true)
     expect(setupStepGuard(locationOf(ROUTE_NAMES.setupSpecies))).toBe(true)
+  })
+})
+
+describe('tier guard', () => {
+  // No route needs a plan yet, so the guard is given the daily tasks route carrying `meta.tier`.
+  function needing(tier: TierCode) {
+    const location = locationOf(ROUTE_NAMES.cultivationTasks, { cultivationId: 'cul_001' })
+    return { ...location, meta: { ...location.meta, tier } }
+  }
+
+  function onPlan(plan = proPlan) {
+    return vi
+      .spyOn(tiersRepository, 'getAccountTier')
+      .mockResolvedValue({ data: accountTier({ plan }), meta })
+  }
+
+  beforeEach(() => {
+    queryClient.clear()
+    vi.restoreAllMocks()
+  })
+
+  it('sends a farmer below the plan a screen needs to the plans, naming both', async () => {
+    signIn({ hasCultivation: true })
+    onPlan(accountTier().plan)
+
+    expect(await tierGuard(needing('PRO'))).toEqual({
+      name: ROUTE_NAMES.plans,
+      query: { required: 'PRO', redirect: '/app/cultivations/cul_001/tasks' },
+    })
+  })
+
+  it('opens the screen for a farmer on that plan or above', async () => {
+    signIn({ hasCultivation: true })
+    onPlan(proPlan)
+    expect(await tierGuard(needing('PRO'))).toBe(true)
+
+    queryClient.clear()
+    onPlan(organizationPlan)
+    expect(await tierGuard(needing('PRO'))).toBe(true)
+    expect(await tierGuard(needing('ORGANIZATION'))).toBe(true)
+  })
+
+  it('reads the tier once and reuses it for the next navigation', async () => {
+    signIn({ hasCultivation: true })
+    const read = onPlan(proPlan)
+
+    await tierGuard(needing('PRO'))
+    await tierGuard(needing('PRO'))
+
+    expect(read).toHaveBeenCalledTimes(1)
+    expect(read).toHaveBeenCalledWith('token')
+  })
+
+  it('leaves screens without a plan requirement alone', async () => {
+    signIn({ hasCultivation: true })
+    const read = onPlan(proPlan)
+
+    expect(await tierGuard(locationOf(ROUTE_NAMES.home))).toBe(true)
+    expect(read).not.toHaveBeenCalled()
+  })
+
+  it('opens the screen when the tier cannot be read, leaving the refusal to the API', async () => {
+    signIn({ hasCultivation: true })
+    vi.spyOn(tiersRepository, 'getAccountTier').mockRejectedValue(new TypeError('offline'))
+
+    expect(await tierGuard(needing('ORGANIZATION'))).toBe(true)
+  })
+
+  it('leaves a signed-out visitor to the session guard', async () => {
+    signOut()
+    const read = onPlan(proPlan)
+
+    expect(await tierGuard(needing('PRO'))).toBe(true)
+    expect(read).not.toHaveBeenCalled()
   })
 })

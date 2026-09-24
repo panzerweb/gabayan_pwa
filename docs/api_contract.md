@@ -96,7 +96,7 @@ Stable error codes:
 | ---- | --------------------------------------------------------------------------------- |
 | 400  | `BAD_REQUEST`, `INCOMPATIBLE_SELECTION`, `RULE_INPUT_INCOMPLETE`                  |
 | 401  | `AUTH_REQUIRED`, `INVALID_CREDENTIALS`, `TOKEN_EXPIRED`                           |
-| 403  | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`                                                 |
+| 403  | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `TIER_LIMIT_REACHED`                           |
 | 404  | `NOT_FOUND`                                                                       |
 | 409  | `CONFLICT`, `DUPLICATE_EMAIL`, `IDEMPOTENCY_CONFLICT`, `INVALID_STATE_TRANSITION` |
 | 422  | `VALIDATION_ERROR`                                                                |
@@ -174,21 +174,24 @@ erDiagram
 
 ### Enums
 
-| Name                     | Values                                                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SourceStatus`           | `DEMO`, `DRAFT`, `VERIFIED`, `RETIRED`                                                                                                           |
-| `CompatibilityStatus`    | `COMPATIBLE`, `CAUTION`, `NOT_RECOMMENDED`                                                                                                       |
-| `StockingResultStatus`   | `BELOW_RANGE`, `RECOMMENDED`, `ABOVE_RANGE`                                                                                                      |
-| `CultivationStatus`      | `PLANNING`, `ACTIVE`, `GROWING`, `PRE_HARVEST`, `COMPLETED`, `CANCELLED`                                                                         |
-| `TaskType`               | `FEEDING`, `WATER_CHECK`, `WATER_MAINTENANCE`, `EQUIPMENT_INSPECTION`, `GROWTH_SAMPLING`, `CAGE_NET_INSPECTION`, `HARVEST_PREPARATION`, `CUSTOM` |
-| `TaskStatus`             | `UPCOMING`, `DUE`, `COMPLETED`, `MISSED`, `CANCELLED`                                                                                            |
-| `MortalityReason`        | `UNKNOWN`, `WATER_QUALITY`, `DISEASE`, `HANDLING`, `PREDATION`, `OTHER`                                                                          |
-| `OrderStatus`            | `TO_PAY`, `PROCESSING`, `SHIPPED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`                                                                  |
-| `PaymentMethodType`      | `CASH_ON_DELIVERY`, `GCASH`, `CARD`                                                                                                              |
-| `ProductAvailability`    | `AVAILABLE`, `LOW_STOCK`, `OUT_OF_STOCK`                                                                                                         |
-| `NotificationCategory`   | `CULTIVATION`, `ORDER`, `EDUCATION`, `SYSTEM`                                                                                                    |
-| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`                        |
-| `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                   |
+| Name                     | Values                                                                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SourceStatus`           | `DEMO`, `DRAFT`, `VERIFIED`, `RETIRED`                                                                                                                               |
+| `CompatibilityStatus`    | `COMPATIBLE`, `CAUTION`, `NOT_RECOMMENDED`                                                                                                                           |
+| `StockingResultStatus`   | `BELOW_RANGE`, `RECOMMENDED`, `ABOVE_RANGE`                                                                                                                          |
+| `CultivationStatus`      | `PLANNING`, `ACTIVE`, `GROWING`, `PRE_HARVEST`, `COMPLETED`, `CANCELLED`                                                                                             |
+| `TaskType`               | `FEEDING`, `WATER_CHECK`, `WATER_MAINTENANCE`, `EQUIPMENT_INSPECTION`, `GROWTH_SAMPLING`, `CAGE_NET_INSPECTION`, `HARVEST_PREPARATION`, `CUSTOM`                     |
+| `TaskStatus`             | `UPCOMING`, `DUE`, `COMPLETED`, `MISSED`, `CANCELLED`                                                                                                                |
+| `MortalityReason`        | `UNKNOWN`, `WATER_QUALITY`, `DISEASE`, `HANDLING`, `PREDATION`, `OTHER`                                                                                              |
+| `OrderStatus`            | `TO_PAY`, `PROCESSING`, `SHIPPED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`                                                                                      |
+| `PaymentMethodType`      | `CASH_ON_DELIVERY`, `GCASH`, `CARD`                                                                                                                                  |
+| `ProductAvailability`    | `AVAILABLE`, `LOW_STOCK`, `OUT_OF_STOCK`                                                                                                                             |
+| `NotificationCategory`   | `CULTIVATION`, `ORDER`, `EDUCATION`, `SYSTEM`                                                                                                                        |
+| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`                                            |
+| `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                                       |
+| `TierCode`               | `FREE`, `PRO`, `ORGANIZATION`                                                                                                                                        |
+| `TierEntitlement`        | `CULTIVATION_GUIDANCE`, `STOCKING_CALCULATOR`, `MARKETPLACE`, `WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`, `WATER_PARAMETER_LOGS`, `FEED_CONVERSION_TRACKING` |
+| `UpgradeRequestStatus`   | `PENDING`, `APPROVED`, `DECLINED`                                                                                                                                    |
 
 ## 5. Endpoint Catalog
 
@@ -230,6 +233,16 @@ Every body and response name below is defined in the schema sections that follow
 
 Deleting a default address returns `409 CONFLICT` unless another address is promoted in the same product flow.
 
+### Plans and account tier
+
+| Method and path                        | Query/body             | Success response               |
+| -------------------------------------- | ---------------------- | ------------------------------ |
+| `GET /tiers`                           | pagination             | `200 Page<TierPlan>`           |
+| `GET /users/me/tier`                   | none                   | `200 Envelope<AccountTier>`    |
+| `POST /users/me/tier/upgrade-requests` | `CreateUpgradeRequest` | `201 Envelope<UpgradeRequest>` |
+
+Every account starts on `FREE`. There is no in-app purchase in v1: a farmer records an upgrade request, and the tier changes only when an operator sets it. The API enforces the plan's culture-system limit at `POST /cultivations`; the client only hides and explains.
+
 ### Reference profiles and compatibility
 
 | Method and path                             |   Auth | Query/body                            | Success response                    |
@@ -256,6 +269,8 @@ The reference reads are Public: they hold shared profile data and no account's r
 | `GET /cultivations/{cultivationId}/equipment-recommendations` | optional `categoryId`                          | `200 Envelope<EquipmentRecommendations>` |
 
 `PATCH /cultivations/{id}` permits name and editable planning metadata only. Stock, growth, mortality, and harvest values change through dedicated event endpoints.
+
+`POST /cultivations` refuses a cultivation the account's plan has no room for with `403 TIER_LIMIT_REACHED` (see [Culture-system limit at cultivation creation](#culture-system-limit-at-cultivation-creation)).
 
 ### Tasks and operational records
 
@@ -443,6 +458,64 @@ with the selected identity provider and must not accept these fixture tokens.
 | `updatedAt`, `version` | audit subset    |
 
 `NotificationSettingsPatch` permits any non-empty subset and validates feeding times when reminders are enabled.
+
+### Tier schemas
+
+#### TierPlan
+
+| Field                | Type                                         | Notes                                                           |
+| -------------------- | -------------------------------------------- | --------------------------------------------------------------- |
+| `code`               | `TierCode`                                   | Plans are listed from `FREE` upward                             |
+| `name`               | string                                       | Display name, e.g. `Pro`                                        |
+| `description`        | string                                       | One plain sentence on who the plan is for                       |
+| `cultureSystemLimit` | integer                                      | Most active culture systems the plan allows; `>= 1`             |
+| `price`              | `Money \| null`                              | `null` while the plan has no price; the client shows it as such |
+| `billingPeriod`      | `MONTH \| null`                              | `null` exactly when `price` is `null`                           |
+| `entitlements`       | `{ code: TierEntitlement, label: string }[]` | Everything the plan includes, not only what it adds             |
+
+Demo plans: `FREE` (limit 1, PHP 0.00 a month), `PRO` (limit 10, no price yet) and `ORGANIZATION` (limit 100, PHP 4,999.00 a month). Prices and limits are server data and may change without a client release.
+
+#### AccountTier
+
+| Field                     | Type                     | Notes                                                                   |
+| ------------------------- | ------------------------ | ----------------------------------------------------------------------- |
+| `plan`                    | `TierPlan`               | The account's current plan                                              |
+| `activeCultureSystems`    | integer                  | The account's cultivations that are neither `COMPLETED` nor `CANCELLED` |
+| `remainingCultureSystems` | integer                  | `max(0, plan.cultureSystemLimit - activeCultureSystems)`                |
+| `pendingUpgradeRequest`   | `UpgradeRequest \| null` | The request still waiting for an operator, if any                       |
+
+One active culture system is one cultivation that is not `COMPLETED` or `CANCELLED`, whatever its environment; a `PLANNING` cultivation counts.
+
+#### CreateUpgradeRequest and UpgradeRequest
+
+- `CreateUpgradeRequest`: `{ requestedTier: TierCode, note?: string | null }`; `note` is at most 500 trimmed characters.
+- `UpgradeRequest`: `{ id, currentTier: TierCode, requestedTier: TierCode, status: UpgradeRequestStatus, note: string | null, createdAt: timestamp }`.
+
+| Case                                                            | Answer                                                         |
+| --------------------------------------------------------------- | -------------------------------------------------------------- |
+| `requestedTier` missing, unknown, or not above the current tier | `422 VALIDATION_ERROR` with `fields.requestedTier`             |
+| `note` longer than 500 characters                               | `422 VALIDATION_ERROR` with `fields.note`                      |
+| A request is already `PENDING`                                  | `409 CONFLICT`, `details: { pendingRequestId, requestedTier }` |
+
+A request stays `PENDING` until an operator changes the tier; it never charges the farmer, and the account keeps its current plan meanwhile.
+
+#### Culture-system limit at cultivation creation
+
+`POST /cultivations` checks the limit after authentication and idempotent replay and before it reads the estimate, so replaying a create that already succeeded still answers `201`. An account whose `activeCultureSystems` has reached `plan.cultureSystemLimit` receives:
+
+```json
+{
+  "error": {
+    "code": "TIER_LIMIT_REACHED",
+    "message": "Your Free plan covers 1 active culture system. Harvest or close one, or ask for a bigger plan.",
+    "fields": null,
+    "details": { "tier": "FREE", "cultureSystemLimit": 1, "activeCultureSystems": 1 },
+    "requestId": "req_01K..."
+  }
+}
+```
+
+`message` is written for the farmer; `details` lets a client explain the limit and offer the plans.
 
 ## 7. Reference, Rules, and Estimate Schemas
 
@@ -936,17 +1009,18 @@ Mock tracking advancement may be fixture-driven; the frontend must not manufactu
 
 ## 14. Derived-Data Ownership and Invalidation
 
-| Mutation           | Server recalculates/returns                          | Client invalidates                       |
-| ------------------ | ---------------------------------------------------- | ---------------------------------------- |
-| Cultivation create | status, dates, tasks, recommendation context         | Home, cultivation lists/detail           |
-| Task complete      | task, linked record, task progress                   | Home, tasks, detail, notifications       |
-| Growth create      | latest weight, growth stage, feeding plan, readiness | Detail, growth, feed, readiness, Home    |
-| Mortality create   | mortality total, live fish, feeding plan             | Detail, mortality, feed, readiness, Home |
-| Feeding create     | daily recorded/planned progress                      | Tasks, records, Home                     |
-| Water check create | guidance and generated tasks                         | Tasks, water checks, Home                |
-| Cart change        | line totals and all cart totals                      | Cart/badge/checkout quote                |
-| Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications         |
-| Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness               |
+| Mutation           | Server recalculates/returns                          | Client invalidates                           |
+| ------------------ | ---------------------------------------------------- | -------------------------------------------- |
+| Cultivation create | status, dates, tasks, recommendation context         | Home, cultivation lists/detail, account tier |
+| Task complete      | task, linked record, task progress                   | Home, tasks, detail, notifications           |
+| Growth create      | latest weight, growth stage, feeding plan, readiness | Detail, growth, feed, readiness, Home        |
+| Mortality create   | mortality total, live fish, feeding plan             | Detail, mortality, feed, readiness, Home     |
+| Feeding create     | daily recorded/planned progress                      | Tasks, records, Home                         |
+| Water check create | guidance and generated tasks                         | Tasks, water checks, Home                    |
+| Cart change        | line totals and all cart totals                      | Cart/badge/checkout quote                    |
+| Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications             |
+| Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness, account tier     |
+| Upgrade request    | pending request                                      | Account tier                                 |
 
 Client-side optimistic updates are acceptable for notification read state and favorites. Use pessimistic updates for biological records, checkout, order placement, and harvest completion.
 

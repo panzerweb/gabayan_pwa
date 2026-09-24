@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { applyDocumentTitle } from './guards/document-title'
 import { sessionGuard } from './guards/session.guard'
 import { setupStepGuard } from './guards/setup-step.guard'
+import { tierGuard } from './guards/tier.guard'
 import { appRoutes } from './routes/app.routes'
 import { publicRoutes } from './routes/public.routes'
 import { setupRoutes } from './routes/setup.routes'
@@ -17,4 +18,5 @@ export const router = createRouter({
 
 router.beforeEach(sessionGuard)
 router.beforeEach(setupStepGuard)
+router.beforeEach(tierGuard)
 router.afterEach(applyDocumentTitle)

@@ -21,7 +21,8 @@ import type { AuthRepository } from '../../domain/auth.repository.interface'
 
 const CREATE_ACCOUNT_FAILED = 'We could not create your account. Please try again.'
 
-// Create-account form state and registration. A new account always starts at setup.
+// Create-account form state and registration. A new account goes on to choose its plan,
+// then to setup.
 export function useCreateAccount(repository: AuthRepository = authRepository) {
   const router = useRouter()
   const session = useSessionStore()
@@ -72,7 +73,7 @@ export function useCreateAccount(repository: AuthRepository = authRepository) {
     }
     session.acceptSession(response.data)
     toast.show('Your account is ready.', 'success')
-    await router.replace({ name: ROUTE_NAMES.setupIntro })
+    await router.replace({ name: ROUTE_NAMES.setupPlan })
   }
 
   return {

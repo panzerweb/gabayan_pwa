@@ -4,14 +4,20 @@ import { ROUTE_NAMES } from '../route-names'
 
 const SETUP_STEPS = 4
 
-// The cultivation setup wizard. The setup-step guard keeps a step closed until the draft
-// holds what it needs.
+// The plan step a new account passes through, then the cultivation setup wizard. The
+// setup-step guard keeps a wizard step closed until the draft holds what it needs.
 export const setupRoutes: RouteRecordRaw[] = [
   {
     path: '/setup',
     component: () => import('@layouts/SetupLayout.vue'),
     meta: { requiresAuth: true },
     children: [
+      {
+        path: 'plan',
+        name: ROUTE_NAMES.setupPlan,
+        component: () => import('@pages/tiers/presentation/views/ChoosePlanView.vue'),
+        meta: { title: 'Account plan' },
+      },
       {
         path: '',
         name: ROUTE_NAMES.setupIntro,

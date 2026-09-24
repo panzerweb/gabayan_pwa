@@ -244,18 +244,24 @@ export function registerTaskAndRecordContract(client) {
     })
 
     it('refuses a feeding before stocking, in the future, without a time zone or amount', async () => {
+      // A Free account holds one active culture system, so each cultivation gets its own.
+      const planner = await registerAccount(client, 'Feeding Planner')
+      const planning = await createCultivation(client, planner.accessToken)
       const { accessToken } = await registerAccount(client, 'Feeding Validator')
-      const planning = await createCultivation(client, accessToken)
       const stocked = await createCultivation(client, accessToken, { stockedOn: STOCKING_DAY })
-      const feed = (cultivationId, overrides) =>
-        recordFeeding(client, accessToken, cultivationId, {
+      const feed = (cultivationId, overrides, token = accessToken) =>
+        recordFeeding(client, token, cultivationId, {
           fedAt: '2026-09-23T08:00:00Z',
           amount: { value: 1, unit: 'KG' },
           ...overrides,
         })
 
       expect(
-        expectError(await feed(planning.id, {}), 409, 'INVALID_STATE_TRANSITION').details,
+        expectError(
+          await feed(planning.id, {}, planner.accessToken),
+          409,
+          'INVALID_STATE_TRANSITION',
+        ).details,
       ).toMatchObject({
         status: 'PLANNING',
       })

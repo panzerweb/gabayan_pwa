@@ -22,6 +22,10 @@ vi.mock('@pages/profile/data/profile.repository', () => {
   }
 })
 
+vi.mock('@pages/tiers/data/tiers.repository', () => ({
+  tiersRepository: { getAccountTier: vi.fn(() => new Promise(() => {})) },
+}))
+
 async function mountView() {
   const router = createRouter({
     history: createMemoryHistory(),
@@ -51,12 +55,13 @@ async function mountView() {
 }
 
 describe('ProfileView', () => {
-  it('composes the summary and the four profile sections', async () => {
+  it('composes the summary, the plan and the four profile sections', async () => {
     const { wrapper } = await mountView()
 
     expect(wrapper.get('h1').text()).toBe('Juan Dela Cruz')
     expect(wrapper.text()).toContain('JD')
     expect(wrapper.findAll('h2').map((heading) => heading.text())).toEqual([
+      'Your plan',
       'Personal details',
       'Farm profile',
       'Addresses',

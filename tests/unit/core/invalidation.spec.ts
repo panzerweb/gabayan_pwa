@@ -4,7 +4,10 @@ import { INVALIDATIONS, invalidateAfter, type InvalidatingMutation } from '@core
 
 // Contract §14, one row per mutation, as the feature key prefixes each row names.
 const contractRows: Array<[InvalidatingMutation, string[][]]> = [
-  ['cultivationCreate', [['home'], ['cultivations', 'list'], ['cultivations', 'detail']]],
+  [
+    'cultivationCreate',
+    [['home'], ['cultivations', 'list'], ['cultivations', 'detail'], ['tiers']],
+  ],
   [
     'taskComplete',
     [
@@ -46,8 +49,10 @@ const contractRows: Array<[InvalidatingMutation, string[][]]> = [
       ['cultivations', 'list'],
       ['home'],
       ['cultivations', 'harvest-readiness'],
+      ['tiers'],
     ],
   ],
+  ['upgradeRequest', [['tiers']]],
 ]
 
 describe('invalidation map', () => {

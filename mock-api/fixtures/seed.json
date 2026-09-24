@@ -1199,5 +1199,127 @@
     }
   ],
   "idempotencyRecords": [],
-  "taskReopenings": []
+  "taskReopenings": [],
+  "tierPlans": [
+    {
+      "code": "FREE",
+      "name": "Free",
+      "description": "For a first pond, cage or tank: one culture system with general guidance.",
+      "cultureSystemLimit": 1,
+      "price": {
+        "amountMinor": 0,
+        "currency": "PHP"
+      },
+      "billingPeriod": "MONTH",
+      "entitlements": [
+        {
+          "code": "CULTIVATION_GUIDANCE",
+          "label": "Daily cultivation guidance and farm records"
+        },
+        {
+          "code": "STOCKING_CALCULATOR",
+          "label": "Pond size and stocking calculator"
+        },
+        {
+          "code": "MARKETPLACE",
+          "label": "Marketplace for tools and feeds"
+        },
+        {
+          "code": "WATER_THRESHOLD_GUIDELINES",
+          "label": "Water-quality guideline ranges for your fish"
+        },
+        {
+          "code": "WATER_SAFETY_CHECK",
+          "label": "One-off water safety check"
+        }
+      ]
+    },
+    {
+      "code": "PRO",
+      "name": "Pro",
+      "description": "For growers with several ponds or cages who want to keep their own water readings.",
+      "cultureSystemLimit": 10,
+      "price": null,
+      "billingPeriod": null,
+      "entitlements": [
+        {
+          "code": "CULTIVATION_GUIDANCE",
+          "label": "Daily cultivation guidance and farm records"
+        },
+        {
+          "code": "STOCKING_CALCULATOR",
+          "label": "Pond size and stocking calculator"
+        },
+        {
+          "code": "MARKETPLACE",
+          "label": "Marketplace for tools and feeds"
+        },
+        {
+          "code": "WATER_THRESHOLD_GUIDELINES",
+          "label": "Water-quality guideline ranges for your fish"
+        },
+        {
+          "code": "WATER_SAFETY_CHECK",
+          "label": "One-off water safety check"
+        },
+        {
+          "code": "WATER_PARAMETER_LOGS",
+          "label": "Saved water readings with history"
+        },
+        {
+          "code": "FEED_CONVERSION_TRACKING",
+          "label": "Feed conversion tracking"
+        }
+      ]
+    },
+    {
+      "code": "ORGANIZATION",
+      "name": "Organization",
+      "description": "For cooperatives, companies and government programmes that manage many culture systems.",
+      "cultureSystemLimit": 100,
+      "price": {
+        "amountMinor": 499900,
+        "currency": "PHP"
+      },
+      "billingPeriod": "MONTH",
+      "entitlements": [
+        {
+          "code": "CULTIVATION_GUIDANCE",
+          "label": "Daily cultivation guidance and farm records"
+        },
+        {
+          "code": "STOCKING_CALCULATOR",
+          "label": "Pond size and stocking calculator"
+        },
+        {
+          "code": "MARKETPLACE",
+          "label": "Marketplace for tools and feeds"
+        },
+        {
+          "code": "WATER_THRESHOLD_GUIDELINES",
+          "label": "Water-quality guideline ranges for your fish"
+        },
+        {
+          "code": "WATER_SAFETY_CHECK",
+          "label": "One-off water safety check"
+        },
+        {
+          "code": "WATER_PARAMETER_LOGS",
+          "label": "Saved water readings with history"
+        },
+        {
+          "code": "FEED_CONVERSION_TRACKING",
+          "label": "Feed conversion tracking"
+        }
+      ]
+    }
+  ],
+  "accountTiers": [
+    {
+      "ownerUserId": "usr_juan",
+      "tierCode": "PRO",
+      "updatedAt": "2026-08-06T00:00:00Z"
+    }
+  ],
+  "upgradeRequests": []
 }

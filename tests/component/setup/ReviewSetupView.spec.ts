@@ -7,7 +7,7 @@ import { batch001Detail } from '../../unit/cultivations/fixtures'
 import { envelope } from '../../unit/marketplace/fixtures'
 import { aboveRangeEstimate, inRangeEstimate } from '../../unit/setup/fixtures'
 import { labelled } from '../cultivations/support'
-import { goOffline, mountInApp } from '../support/app'
+import { apiError, goOffline, mountInApp } from '../support/app'
 import { seedDraft } from './support'
 
 const repositories = vi.hoisted(() => ({
@@ -79,6 +79,39 @@ describe('ReviewSetupView', () => {
       name: 'Pond A',
     })
     expect(router.currentRoute.value.name).toBe(ROUTE_NAMES.setupSuccess)
+  })
+
+  it('explains a cultivation the plan has no room for and points to the plans', async () => {
+    const message =
+      'Your Free plan covers 1 active culture system. Harvest or close one, or ask for a bigger plan.'
+    repositories.setup.createCultivation!.mockRejectedValue(
+      apiError(403, 'TIER_LIMIT_REACHED', message),
+    )
+    const { wrapper, router } = await mountReview()
+
+    await createButton(wrapper).trigger('click')
+    await flushPromises()
+
+    const notice = wrapper.get('.tier-limit-notice')
+    expect(notice.attributes('role')).toBe('alert')
+    expect(notice.text()).toContain(message)
+    expect(notice.get('a').attributes('href')).toBe('/app/plans')
+    expect(router.currentRoute.value.name).toBe(ROUTE_NAMES.setupReview)
+  })
+
+  it('keeps any other refusal as a plain message without the plans', async () => {
+    repositories.setup.createCultivation!.mockRejectedValue(
+      apiError(409, 'CONFLICT', 'The stocking estimate expired. Request a new estimate.'),
+    )
+    const { wrapper } = await mountReview()
+
+    await createButton(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.tier-limit-notice').exists()).toBe(false)
+    expect(wrapper.get('[role="alert"]').text()).toBe(
+      'The stocking estimate expired. Request a new estimate.',
+    )
   })
 
   it('disables creation offline and says it will not be queued', async () => {

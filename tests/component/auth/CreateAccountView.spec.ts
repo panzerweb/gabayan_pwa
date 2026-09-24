@@ -20,6 +20,7 @@ async function mountView() {
       { path: '/create-account', name: ROUTE_NAMES.createAccount, component: CreateAccountView },
       { path: '/sign-in', name: ROUTE_NAMES.signIn, component: { template: '<div />' } },
       { path: '/setup', name: ROUTE_NAMES.setupIntro, component: { template: '<div />' } },
+      { path: '/setup/plan', name: ROUTE_NAMES.setupPlan, component: { template: '<div />' } },
     ],
   })
   await router.push('/create-account')
@@ -86,5 +87,46 @@ describe('CreateAccountView', () => {
       'Try signing in or use another email.',
     )
     expect(router.currentRoute.value.name).toBe(ROUTE_NAMES.createAccount)
+  })
+
+  it('takes a new account on to choose its plan', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        jsonResponse(
+          {
+            data: {
+              accessToken: 'access_1',
+              tokenType: 'Bearer',
+              expiresInSeconds: 3600,
+              user: {
+                id: 'usr_0002',
+                fullName: 'Maria Santos',
+                email: 'maria@example.com',
+                mobileNumber: '+639171234568',
+                avatar: null,
+                emailVerified: false,
+                mobileVerified: false,
+                locale: 'en-PH',
+                timezone: 'Asia/Manila',
+                createdAt: '2026-09-23T00:00:00Z',
+                updatedAt: '2026-09-23T00:00:00Z',
+                version: 1,
+              },
+              onboarding: { hasCultivation: false, suggestedRoute: '/setup' },
+            },
+            meta: { requestId: 'req_1' },
+          },
+          201,
+        ),
+      ),
+    )
+    const { wrapper, router } = await mountView()
+    await fillValidForm(wrapper)
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    expect(router.currentRoute.value.name).toBe(ROUTE_NAMES.setupPlan)
   })
 })
