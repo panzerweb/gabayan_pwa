@@ -7,6 +7,7 @@ import { invalidateAfter } from '@core/query'
 import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
 
+import { LEGACY_HOME_KEY } from '../../data/cultivations.keys'
 import { cultivationsRepository } from '../../data/cultivations.repository'
 import {
   TASK_COMPLETION_OFFLINE_MESSAGE,
@@ -18,10 +19,6 @@ import {
 import type { CultivationsRepository } from '../../domain/cultivations.repository.interface'
 
 const SAVE_FAILED = 'We couldn’t save this feeding. Please try again.'
-
-// Home still keys its dashboard as `home-dashboard` rather than under the `home` prefix of
-// `@core/query` until it moves onto the feature layout, so it is refreshed by name here.
-const LEGACY_HOME_KEY = ['home-dashboard'] as const
 
 type Completion = { taskId: string; body: CompleteTaskRequest; idempotencyKey: string }
 

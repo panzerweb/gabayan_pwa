@@ -1,10 +1,20 @@
 import type { CultivationsRepository } from '../domain/cultivations.repository.interface'
 import {
+  completeHarvestApi,
   completeTaskApi,
+  createGrowthMeasurementApi,
+  createMortalityRecordApi,
+  createWaterCheckApi,
   getCultivationApi,
   getCultivationTimelineApi,
+  getFeedingPlanApi,
+  getHarvestReadinessApi,
   listCultivationsApi,
+  listFeedingRecordsApi,
+  listGrowthMeasurementsApi,
+  listMortalityRecordsApi,
   listTasksApi,
+  listWaterChecksApi,
 } from './cultivations.api'
 
 export const cultivationsRepository: CultivationsRepository = {
@@ -13,4 +23,14 @@ export const cultivationsRepository: CultivationsRepository = {
   getCultivationTimeline: getCultivationTimelineApi,
   listTasks: listTasksApi,
   completeTask: completeTaskApi,
+  listGrowthMeasurements: listGrowthMeasurementsApi,
+  createGrowthMeasurement: createGrowthMeasurementApi,
+  listMortalityRecords: listMortalityRecordsApi,
+  createMortalityRecord: createMortalityRecordApi,
+  getFeedingPlan: getFeedingPlanApi,
+  listFeedingRecords: listFeedingRecordsApi,
+  listWaterChecks: listWaterChecksApi,
+  createWaterCheck: createWaterCheckApi,
+  getHarvestReadiness: getHarvestReadinessApi,
+  completeHarvest: completeHarvestApi,
 }
