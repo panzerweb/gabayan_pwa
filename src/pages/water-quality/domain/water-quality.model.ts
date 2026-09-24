@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { ruleSourceSchema, sourceStatusSchema } from '@core/http'
 import { formatQuantity } from '@core/utils/format'
 import { guidanceMessageSchema } from '@pages/cultivations/domain/cultivations.model'
+import { productSummarySchema } from '@pages/marketplace/domain/marketplace.model'
 
 export const WATER_PARAMETERS = [
   'SALINITY',
@@ -51,6 +52,12 @@ export const waterThresholdSetSchema = z.object({
   disclaimer: z.string().min(1),
 })
 
+// A product that may help with an out-of-range reading, with the quantity "Buy now" presets.
+export const waterProblemProductSchema = productSummarySchema.extend({
+  whyRelevant: z.string().min(1),
+  suggestedQuantity: z.number().int().positive(),
+})
+
 export const waterReadingResultSchema = z.object({
   parameter: waterParameterSchema,
   name: z.string().min(1),
@@ -61,6 +68,8 @@ export const waterReadingResultSchema = z.object({
   status: waterReadingStatusSchema,
   explanation: z.string(),
   guidance: guidanceMessageSchema,
+  // Optional until every API serving the check answers it; absent reads as none.
+  recommendedProducts: z.array(waterProblemProductSchema).optional(),
 })
 
 export const waterSafetyCheckSchema = z.object({
@@ -81,6 +90,7 @@ export type WaterReadingStatus = z.infer<typeof waterReadingStatusSchema>
 export type RuleSource = z.infer<typeof ruleSourceSchema>
 export type WaterThreshold = z.infer<typeof waterThresholdSchema>
 export type WaterThresholdSet = z.infer<typeof waterThresholdSetSchema>
+export type WaterProblemProduct = z.infer<typeof waterProblemProductSchema>
 export type WaterReadingResult = z.infer<typeof waterReadingResultSchema>
 export type WaterSafetyCheck = z.infer<typeof waterSafetyCheckSchema>
 

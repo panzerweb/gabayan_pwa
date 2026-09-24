@@ -748,7 +748,20 @@ At least one of `minimum` and `maximum` is set. A reading equal to a bound is wi
 
 `{ speciesId, environmentId, checkedAt: timestamp, results: WaterReadingResult[], notChecked: WaterParameter[], isDemo, sourceStatus, ruleVersion, disclaimer }`. `results` holds one entry per entered reading and `notChecked` the parameters passed over, both in parameter order. Nothing is stored.
 
-`WaterReadingResult`: `{ parameter, name, unit, value, minimum, maximum, status: WaterReadingStatus, explanation, guidance: GuidanceMessage }`. `status` is `BELOW_RANGE` when `value < minimum`, `ABOVE_RANGE` when `value > maximum`, and otherwise `WITHIN_RANGE`. `guidance` is chosen by parameter, status and culture environment; it uses conditional language and never tells the farmer to replace all the water.
+`WaterReadingResult`: `{ parameter, name, unit, value, minimum, maximum, status: WaterReadingStatus, explanation, guidance: GuidanceMessage, recommendedProducts: WaterProblemProduct[] }`. `status` is `BELOW_RANGE` when `value < minimum`, `ABOVE_RANGE` when `value > maximum`, and otherwise `WITHIN_RANGE`. `guidance` is chosen by parameter, status and culture environment; it uses conditional language and never tells the farmer to replace all the water.
+
+`recommendedProducts` names the products that may help with an out-of-range reading, so the farmer can buy one straight from the result. It comes from rows linking a parameter and direction to a product SKU (`{ parameter, status, productSku, whyRelevant, suggestedQuantity, sortOrder }`), in `sortOrder`, and holds only products whose `suitableEnvironmentIds` include the check's `environmentId` (a product with an empty list suits every culture system). Availability does not filter the list; an out-of-stock product is still named and says so. A reading `WITHIN_RANGE` always answers `[]`. The recommendation is optional support covered by the check's `isDemo` and `disclaimer`, never a required purchase.
+
+`WaterProblemProduct` extends `ProductSummary` with `{ whyRelevant: string, suggestedQuantity: integer >= 1 }`.
+
+| Parameter and status           | Seeded products (SKU)                                                     |
+| ------------------------------ | ------------------------------------------------------------------------- |
+| `DISSOLVED_OXYGEN` below range | `GBY-AER-001` Compact Pond Aerator                                        |
+| `AMMONIA` above range          | `GBY-FLT-009` Washable Pond Filter Pad, `GBY-TST-004` Freshwater Test Kit |
+| `NITRITE` above range          | `GBY-TST-004` Freshwater Test Kit                                         |
+| `PH` below or above range      | `GBY-TST-004` Freshwater Test Kit                                         |
+
+Every product is quantity 1. Other parameters and directions recommend nothing yet.
 
 ## 8. Cultivation Schemas
 
@@ -992,7 +1005,21 @@ Revenue equals total harvest kilograms multiplied by price per kilogram using de
 
 ### ProductDetail
 
-Extends `ProductSummary` with `{ images, description, specifications: [{ label, value }], suitableSpeciesIds, suitableEnvironmentIds, recommendation: { cultivationId, why } | null, maximumOrderQuantity }`.
+Extends `ProductSummary` with `{ images, description, specifications: [{ label, value }], suitableSpeciesIds, suitableEnvironmentIds, recommendation: { cultivationId, why } | null, maximumOrderQuantity, installationGuide: InstallationGuide | null }`.
+
+`installationGuide` is how to set the product up, or `null` for a product that needs no installing (feed, nets).
+
+#### InstallationGuide
+
+| Field          | Type                                       | Notes                                                                            |
+| -------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| `steps`        | `[{ order: integer, title, instruction }]` | At least one; in `order`, numbered from 1                                        |
+| `cautions`     | string[]                                   | Safety points to read before starting; may be empty                              |
+| `isDemo`       | boolean                                    | `true` while `sourceStatus` is `DEMO`                                            |
+| `sourceStatus` | `SourceStatus`                             |                                                                                  |
+| `disclaimer`   | string                                     | Shown with the guide; the seeded text points the farmer to the supplier's manual |
+
+The seed carries guides for the aerator (`GBY-AER-001`), water pump (`GBY-PMP-018`), filter pad (`GBY-FLT-009`) and test kit (`GBY-TST-004`); the feed and scoop net answer `null`. Disclaimer: "General steps for this demo listing, not the supplier's manual. Follow the manual that comes with the product and local electrical safety rules."
 
 `FavoriteResult`: `{ productId, isFavorite }`.
 

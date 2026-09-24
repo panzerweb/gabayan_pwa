@@ -77,4 +77,14 @@ describe('SetupSuccessView', () => {
 
     expect(storedDraft()?.speciesId ?? null).toBeNull()
   })
+
+  it('offers Buy now on each recommended tool with its suggested quantity', async () => {
+    const { wrapper } = await mountSuccess()
+
+    const buy = wrapper.get('a[aria-label="Buy now: Compact Pond Aerator"]')
+    expect(buy.text()).toBe('Buy now')
+    expect(buy.attributes('href')).toBe(
+      '/app/products/prd_pond_aerator?quantity=1&cultivationId=cul_00002',
+    )
+  })
 })

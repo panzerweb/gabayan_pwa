@@ -11,6 +11,8 @@ const seedDatabasePath = resolve(process.cwd(), 'mock-api', 'fixtures', 'seed.js
 const apiVersion = '0.7.0'
 const ruleDisclaimer =
   "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+const installationDisclaimer =
+  "General steps for this demo listing, not the supplier's manual. Follow the manual that comes with the product and local electrical safety rules."
 
 function parsePositiveInteger(value, fallback, maximum) {
   if (value === undefined) return fallback
@@ -461,7 +463,47 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       suitableEnvironmentIds: product.suitableEnvironmentIds,
       recommendation: product.recommendation,
       maximumOrderQuantity: product.maximumOrderQuantity,
+      installationGuide: installationGuideOf(product.id),
     }
+  }
+
+  // The product's installation steps and cautions in step order, or null when it has none.
+  function installationGuideOf(productId) {
+    const guide = router.db.get('installationGuides').find({ productId }).value()
+    if (!guide) return null
+    return {
+      steps: [...guide.steps].sort((left, right) => left.order - right.order),
+      cautions: guide.cautions,
+      isDemo: guide.sourceStatus === 'DEMO',
+      sourceStatus: guide.sourceStatus,
+      disclaimer: installationDisclaimer,
+    }
+  }
+
+  // Products that may address an out-of-range reading, limited to those listed as suitable
+  // for the culture system. A reading within its range recommends nothing.
+  function waterProblemProductsFor(parameterCode, status, environmentId, userId) {
+    if (status === 'WITHIN_RANGE') return []
+    return router.db
+      .get('waterProblemProducts')
+      .filter({ parameter: parameterCode, status })
+      .sortBy('sortOrder')
+      .value()
+      .map((row) => ({
+        row,
+        product: router.db.get('products').find({ sku: row.productSku }).value(),
+      }))
+      .filter(
+        ({ product }) =>
+          product &&
+          (!product.suitableEnvironmentIds.length ||
+            product.suitableEnvironmentIds.includes(environmentId)),
+      )
+      .map(({ row, product }) => ({
+        ...productSummary(product, userId),
+        whyRelevant: row.whyRelevant,
+        suggestedQuantity: row.suggestedQuantity,
+      }))
   }
 
   function getOrCreateCart(user) {
@@ -1435,6 +1477,12 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
           ruleVersion: row.ruleVersion,
           disclaimer: ruleDisclaimer,
         },
+        recommendedProducts: waterProblemProductsFor(
+          parameter.code,
+          status,
+          environmentId,
+          user.id,
+        ),
       })
     }
     return sendData(response, {

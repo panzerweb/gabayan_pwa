@@ -1,4 +1,5 @@
 import type {
+  InstallationGuide,
   ProductCategory,
   ProductDetail,
   ProductSummary,
@@ -65,4 +66,29 @@ export function envelope<T>(data: T) {
 
 export function page<T>(items: T[]) {
   return { data: items, page: { ...pageInfo, total: items.length }, meta }
+}
+
+export const aeratorGuide: InstallationGuide = {
+  steps: [
+    {
+      order: 1,
+      title: 'Choose a spot',
+      instruction: 'Place the aerator where the water is deep enough to cover it fully.',
+    },
+    {
+      order: 2,
+      title: 'Keep the power point dry',
+      instruction: 'Use an outlet sheltered from rain and above flood level.',
+    },
+  ],
+  cautions: ['Switch off and unplug the aerator before touching it or reaching into the water.'],
+  isDemo: true,
+  sourceStatus: 'DEMO',
+  disclaimer:
+    "General steps for this demo listing, not the supplier's manual. Follow the manual that comes with the product and local electrical safety rules.",
+}
+
+export const aeratorDetailWithGuide: ProductDetail = {
+  ...aeratorDetail,
+  installationGuide: aeratorGuide,
 }

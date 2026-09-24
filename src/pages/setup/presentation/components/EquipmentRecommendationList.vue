@@ -3,6 +3,7 @@ import AppIcon from '@components/ui/AppIcon.vue'
 import BaseButton from '@components/ui/BaseButton.vue'
 import BaseCard from '@components/ui/BaseCard.vue'
 import { formatPhp } from '@core/utils/format'
+import BuyNowButton from '@pages/marketplace/presentation/components/BuyNowButton.vue'
 import { ROUTE_NAMES } from '@router/route-names'
 
 import type { RecommendedProduct } from '../../domain/setup.model'
@@ -32,16 +33,24 @@ defineProps<{
         <strong>{{ product.name }}</strong>
         <p>{{ product.whyRelevant }}</p>
         <span>{{ formatPhp(product.price.amountMinor) }}</span>
-        <BaseButton
-          :to="{
-            name: ROUTE_NAMES.productDetail,
-            params: { productId: product.id },
-            query: { cultivationId },
-          }"
-          variant="text"
-        >
-          View product
-        </BaseButton>
+        <div class="recommendation-card__actions">
+          <BuyNowButton
+            :product-id="product.id"
+            :product-name="product.name"
+            :quantity="product.suggestedQuantity"
+            :cultivation-id="cultivationId"
+          />
+          <BaseButton
+            :to="{
+              name: ROUTE_NAMES.productDetail,
+              params: { productId: product.id },
+              query: { cultivationId },
+            }"
+            variant="text"
+          >
+            View product
+          </BaseButton>
+        </div>
       </div>
     </BaseCard>
     <p class="recommendations__disclaimer">
@@ -105,6 +114,14 @@ defineProps<{
   color: var(--color-brand-800);
   font-size: 0.8125rem;
   font-weight: 800;
+}
+
+.recommendation-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .recommendations__disclaimer {
