@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import AppIcon from '@components/ui/AppIcon.vue'
 import BaseCard from '@components/ui/BaseCard.vue'
 import { formatQuantity } from '@core/utils/format'
 
-import type { StockingEstimate } from '../../domain/setup.model'
+import { formatSpace, spaceShortfallMessage, type StockingEstimate } from '../../domain/setup.model'
 
-defineProps<{ estimate: StockingEstimate }>()
+const props = defineProps<{ estimate: StockingEstimate }>()
+
+const shortfall = computed(() => spaceShortfallMessage(props.estimate))
 
 const fish = (count: number) => `${formatQuantity(count, 'COUNT')} fish`
 </script>
@@ -27,7 +31,15 @@ const fish = (count: number) => `${formatQuantity(count, 'COUNT')} fish`
       <span>Estimated water volume</span
       ><strong>{{ formatQuantity(estimate.estimatedWaterVolumeM3, 'M3') }}</strong>
     </div>
+    <div v-if="estimate.requiredSpace">
+      <span>Space your plan needs</span
+      ><strong>About {{ formatSpace(estimate.requiredSpace) }}</strong>
+    </div>
   </BaseCard>
+  <p v-if="shortfall" class="result-shortfall">
+    <AppIcon name="warning" :size="18" />
+    <span><strong>More space needed. </strong>{{ shortfall }}</span>
+  </p>
   <p class="result-basis">{{ estimate.basis.explanation }}</p>
   <p class="result-disclaimer">
     <AppIcon name="info" :size="18" />
@@ -57,6 +69,19 @@ const fish = (count: number) => `${formatQuantity(count, 'COUNT')} fish`
 .result-card strong {
   font-size: 0.875rem;
   text-align: right;
+}
+
+.result-shortfall {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-warning-950);
+  background: var(--color-warning-100);
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 .result-basis {

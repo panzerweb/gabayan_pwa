@@ -7,6 +7,8 @@ export const setupKeys = {
   environments: () => ['setup', 'environments', 'active'] as const,
   compatibility: (speciesId: string, environmentId: string) =>
     ['setup', 'compatibility', speciesId, environmentId] as const,
+  sizing: (speciesId: string, environmentId: string) =>
+    ['setup', 'sizing', speciesId, environmentId] as const,
   equipmentRecommendations: (cultivationId: string) =>
     ['setup', 'equipment-recommendations', cultivationId] as const,
 }

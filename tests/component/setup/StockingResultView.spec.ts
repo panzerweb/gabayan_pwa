@@ -4,7 +4,12 @@ import StockingResultView from '@pages/setup/presentation/views/StockingResultVi
 import { ROUTE_NAMES } from '@router/route-names'
 
 import { envelope } from '../../unit/marketplace/fixtures'
-import { aboveRangeEstimate, belowRangeEstimate, inRangeEstimate } from '../../unit/setup/fixtures'
+import {
+  aboveRangeEstimate,
+  bangusAboveRangeEstimate,
+  belowRangeEstimate,
+  inRangeEstimate,
+} from '../../unit/setup/fixtures'
 import { mountInApp } from '../support/app'
 import { seedDraft, storedDraft } from './support'
 
@@ -52,6 +57,28 @@ describe('StockingResultView', () => {
     expect(wrapper.text()).toContain(inRangeEstimate.disclaimer)
     expect(wrapper.text()).toContain('Rule version demo-2026-09')
     expect(wrapper.text()).not.toContain('Use suggested')
+  })
+
+  it('names the extra pond area 5,000 Bangus need beyond a 20 x 25 m pond', async () => {
+    const { wrapper } = await mountResult(bangusAboveRangeEstimate)
+
+    expect(wrapper.text()).toContain('Space your plan needs')
+    expect(wrapper.text()).toContain('About 5,000 m² (0.5 ha)')
+    expect(wrapper.text()).toContain('More space needed.')
+    expect(wrapper.text()).toContain(
+      'Your area has 500 m², so it needs about 4,500 m² (0.45 ha) more, or plan fewer fish.',
+    )
+  })
+
+  it('shows no missing space for a plan within the range', async () => {
+    const { wrapper } = await mountResult({
+      ...inRangeEstimate,
+      requiredSpace: { value: 27.28, unit: 'M3' },
+      additionalSpaceNeeded: { value: 0, unit: 'M3' },
+    })
+
+    expect(wrapper.text()).toContain('About 27.28 m³')
+    expect(wrapper.text()).not.toContain('More space needed.')
   })
 
   it('holds an above-range plan back from review until the warning is confirmed', async () => {

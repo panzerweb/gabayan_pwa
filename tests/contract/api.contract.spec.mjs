@@ -7,6 +7,7 @@ import { registerCultivationContract } from './scenarios/cultivations.scenarios.
 import { registerNotificationContract } from './scenarios/notifications.scenarios.mjs'
 import { registerProfileContract } from './scenarios/profile.scenarios.mjs'
 import { registerReferenceContract } from './scenarios/reference.scenarios.mjs'
+import { registerSizingContract } from './scenarios/sizing.scenarios.mjs'
 import { registerSpeciesContract } from './scenarios/species.scenarios.mjs'
 import { registerSystemAndAuthContract } from './scenarios/system-auth.scenarios.mjs'
 import { registerTaskAndRecordContract } from './scenarios/tasks-records.scenarios.mjs'
@@ -546,6 +547,7 @@ registerSystemAndAuthContract(client)
 registerProfileContract(client)
 registerReferenceContract(client)
 registerSpeciesContract(client)
+registerSizingContract(client)
 registerCultivationContract(client)
 registerTaskAndRecordContract(client)
 registerCommerceContract(client)

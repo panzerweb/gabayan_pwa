@@ -45,6 +45,9 @@ export const ENDPOINTS = {
   compatibility: {
     root: '/compatibility',
   },
+  sizingGuidance: {
+    root: '/sizing-guidance',
+  },
   stockingEstimates: {
     root: '/stocking-estimates',
   },

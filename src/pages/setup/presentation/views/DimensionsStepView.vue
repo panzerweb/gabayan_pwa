@@ -6,10 +6,21 @@ import BaseInput from '@components/ui/BaseInput.vue'
 import { ROUTE_NAMES } from '@router/route-names'
 
 import DimensionDiagram from '../components/DimensionDiagram.vue'
+import SizingGuidanceDialog from '../components/SizingGuidanceDialog.vue'
 import { useDimensionsForm } from '../composables/useDimensionsForm'
+import { useSizingDialog } from '../composables/useSizingDialog'
 
 const router = useRouter()
 const { form, fieldErrors, surfaceArea, waterVolume, submit } = useDimensionsForm()
+const {
+  speciesId: sizingSpeciesId,
+  environmentId: sizingEnvironmentId,
+  available: sizingAvailable,
+  open: sizingOpen,
+  title: sizingTitle,
+  show: showSizing,
+  close: closeSizing,
+} = useSizingDialog()
 
 async function continueToFingerlings() {
   if (submit()) await router.push({ name: ROUTE_NAMES.setupFingerlings })
@@ -21,6 +32,14 @@ async function continueToFingerlings() {
     <div class="setup-flow-intro">
       <h2>Measure your culture area</h2>
       <p>Use the internal water dimensions in meters. You can update them before saving.</p>
+      <BaseButton
+        v-if="sizingAvailable"
+        class="dimension-sizing"
+        variant="text"
+        @click="showSizing"
+      >
+        See the suggested size and depth
+      </BaseButton>
     </div>
     <DimensionDiagram />
     <form class="dimension-form" novalidate @submit.prevent="continueToFingerlings">
@@ -70,10 +89,21 @@ async function continueToFingerlings() {
       </div>
       <div class="setup-flow-actions"><BaseButton type="submit">Continue</BaseButton></div>
     </form>
+    <SizingGuidanceDialog
+      :open="sizingOpen"
+      :title="sizingTitle"
+      :species-id="sizingSpeciesId"
+      :environment-id="sizingEnvironmentId"
+      @close="closeSizing"
+    />
   </section>
 </template>
 
 <style scoped>
+.dimension-sizing {
+  margin-top: var(--space-2);
+}
+
 .dimension-form {
   display: grid;
   gap: var(--space-4);

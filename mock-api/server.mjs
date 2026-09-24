@@ -212,6 +212,23 @@ function parseIfMatch(header) {
   return /^\d+$/.test(text) && Number(text) >= 1 ? Number(text) : null
 }
 
+// Rounds up at `digits` decimals, so a space the fish need is never understated. The small
+// tolerance keeps a product such as 27.28 * 100 from rounding up past itself.
+function roundUp(value, digits) {
+  const scale = 10 ** digits
+  return Math.ceil(value * scale - 1e-9) / scale
+}
+
+// Contract §7: the least area (M2) or volume (M3) in which `fingerlings` stays within a
+// stocking rule's demo range, at the rule's highest density.
+function spaceFor(fingerlings, rule) {
+  return fingerlings / rule.maximumDensity
+}
+
+function spaceUnit(rule) {
+  return rule.basis === 'SURFACE_AREA' ? 'M2' : 'M3'
+}
+
 // Day number, progress and harvest date as FastAPI derives them from the stocking date.
 function stockingSchedule(stockedOn, durationDays, today) {
   const dayNumber = daysBetween(stockedOn, today) + 1
@@ -1213,6 +1230,47 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, { ...result, alternatives })
   })
 
+  // Contract §7 SizingGuidance: the space a fish needs from the pairing's stocking rule, with
+  // the profile's worked example and suggested depth. Public reference data, like compatibility.
+  app.get('/api/v1/sizing-guidance', (request, response) => {
+    const speciesId = String(request.query.speciesId ?? '')
+    const environmentId = String(request.query.environmentId ?? '')
+    if (!speciesId || !environmentId) {
+      return sendError(response, 400, 'BAD_REQUEST', 'Choose both a species and culture system.')
+    }
+    const profile = waterProfileOf(speciesId, environmentId)
+    if (profile.missing) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish or culture system.')
+    }
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+    const rule = router.db.get('stockingRules').find({ speciesId, environmentId }).value()
+    const sizing = router.db.get('sizingGuidance').find({ speciesId, environmentId }).value()
+    if (!rule || !sizing) {
+      return sendError(response, 404, 'NOT_FOUND', 'No suggested size is available yet.')
+    }
+    const unit = spaceUnit(rule)
+    const sources =
+      router.db.get('speciesProfiles').find({ speciesId }).get('sources').value() ?? []
+    return sendData(response, {
+      speciesId,
+      environmentId,
+      basis: rule.basis,
+      spacePerFish: { value: roundUp(spaceFor(1, rule), 4), unit },
+      exampleFingerlings: sizing.exampleFingerlings,
+      exampleSpace: { value: roundUp(spaceFor(sizing.exampleFingerlings, rule), 2), unit },
+      waterDepth: sizing.waterDepth,
+      spaceBasis: rule.explanation ?? 'Demo density range for this prototype profile.',
+      depthBasis: sizing.depthBasis,
+      sources,
+      isDemo: true,
+      sourceStatus: rule.sourceStatus,
+      ruleVersion: rule.ruleVersion,
+      disclaimer: ruleDisclaimer,
+    })
+  })
+
   // The species and environment of a water-quality request, or the error to answer: an
   // unknown id, or a pairing the compatibility profile advises against, has no thresholds.
   function waterProfileOf(speciesId, environmentId) {
@@ -1464,6 +1522,10 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         : status === 'ABOVE_RANGE'
           ? plannedFingerlings - recommendedMaximum
           : 0
+    const requiredSpace = spaceFor(plannedFingerlings, rule)
+    const unit = spaceUnit(rule)
+    const additionalSpace =
+      status === 'ABOVE_RANGE' ? roundUp(Math.max(0, requiredSpace - basisValue), 2) : 0
     const estimateId = `est_${String(router.db.get('stockingEstimates').size().value() + 1).padStart(5, '0')}`
     const compatibility = omitKeys(compatibilityRule, ['id'])
     compatibility.alternatives = []
@@ -1481,6 +1543,8 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       status,
       differenceToRange,
       suggestedFingerlings: Math.round((recommendedMinimum + recommendedMaximum) / 2),
+      requiredSpace: { value: roundUp(requiredSpace, 2), unit },
+      additionalSpaceNeeded: { value: additionalSpace, unit },
       basis: {
         type: rule.basis,
         densityMinimum: rule.minimumDensity,

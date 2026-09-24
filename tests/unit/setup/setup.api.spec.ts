@@ -4,6 +4,7 @@ import {
   createStockingEstimateApi,
   getCompatibilityApi,
   getEquipmentRecommendationsApi,
+  getSizingGuidanceApi,
   listCultureEnvironmentsApi,
   listSpeciesApi,
 } from '@pages/setup/data/setup.api'
@@ -12,7 +13,15 @@ import { setupRepository } from '@pages/setup/data/setup.repository'
 
 import { batch001Detail } from '../cultivations/fixtures'
 import { envelope, page } from '../marketplace/fixtures'
-import { compatible, inRangeEstimate, milkfish, pond, recommendations, tilapia } from './fixtures'
+import {
+  bangusPondSizing,
+  compatible,
+  inRangeEstimate,
+  milkfish,
+  pond,
+  recommendations,
+  tilapia,
+} from './fixtures'
 
 function respondWith(payload: unknown, status = 200) {
   const fetchMock = vi.fn().mockResolvedValue(
@@ -65,6 +74,25 @@ describe('setup api', () => {
 
     expect(result.data.status).toBe('COMPATIBLE')
     expect(sent(fetchMock).url).toBe('/compatibility?speciesId=sp_tilapia&environmentId=env_pond')
+  })
+
+  it('reads the suggested size of one fish in one culture system without a session', async () => {
+    const fetchMock = respondWith(envelope(bangusPondSizing))
+
+    const result = await getSizingGuidanceApi('sp_milkfish', 'env_pond')
+
+    expect(result.data.exampleSpace).toEqual({ value: 5000, unit: 'M2' })
+    expect(sent(fetchMock)).toMatchObject({
+      url: '/sizing-guidance?speciesId=sp_milkfish&environmentId=env_pond',
+      method: 'GET',
+    })
+    expect(sent(fetchMock).headers.get('Authorization')).toBeNull()
+  })
+
+  it('refuses sizing guidance whose depth has no unit', async () => {
+    respondWith(envelope({ ...bangusPondSizing, waterDepth: { minimum: 1, maximum: 1.2 } }))
+
+    await expect(getSizingGuidanceApi('sp_milkfish', 'env_pond')).rejects.toThrow()
   })
 
   it('posts the planned stocking to the estimate endpoint with the session token', async () => {
@@ -135,6 +163,7 @@ describe('setup api', () => {
       listSpecies: listSpeciesApi,
       listCultureEnvironments: listCultureEnvironmentsApi,
       getCompatibility: getCompatibilityApi,
+      getSizingGuidance: getSizingGuidanceApi,
       createStockingEstimate: createStockingEstimateApi,
       createCultivation: createCultivationApi,
       getEquipmentRecommendations: getEquipmentRecommendationsApi,
@@ -146,6 +175,7 @@ describe('setup api', () => {
       setupKeys.species(),
       setupKeys.environments(),
       setupKeys.compatibility('sp_tilapia', 'env_pond'),
+      setupKeys.sizing('sp_milkfish', 'env_pond'),
       setupKeys.equipmentRecommendations('cul_00002'),
     ]) {
       expect(key[0]).toBe('setup')

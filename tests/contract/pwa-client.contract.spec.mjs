@@ -91,6 +91,27 @@ describe('the PWA data layer against the contract server', () => {
     expect(estimate.data.isDemo).toEqual(expect.any(Boolean))
   })
 
+  it('reads the suggested Bangus pond size and the space an estimate needs', async () => {
+    const milkfish = byName((await api.listSpeciesApi()).data, 'commonName', 'Milkfish')
+    const pond = byName((await api.listCultureEnvironmentsApi()).data, 'code', 'POND')
+
+    const sizing = (await api.getSizingGuidanceApi(milkfish.id, pond.id)).data
+    expect(sizing.exampleSpace.unit).toBe('M2')
+    expect(sizing.waterDepth?.unit).toBe('M')
+
+    const estimate = await api.createStockingEstimateApi(
+      {
+        speciesId: milkfish.id,
+        environmentId: pond.id,
+        dimensions: { lengthM: 20, widthM: 25, waterDepthM: 1.2 },
+        plannedFingerlings: 5000,
+      },
+      accessToken,
+    )
+    expect(estimate.data.status).toBe('ABOVE_RANGE')
+    expect(estimate.data.additionalSpaceNeeded?.unit).toBe('M2')
+  })
+
   it("reads the demo cultivation, the seed day's tasks, its records and its guidance", async () => {
     const list = (await api.listCultivationsApi(accessToken)).data
     const { id } = byName(list, 'name', DEMO_CULTIVATION)

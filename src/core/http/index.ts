@@ -7,6 +7,7 @@ export {
   pageInfoSchema,
   pageSchema,
   responseMetaSchema,
+  ruleSourceSchema,
   sourceStatusSchema,
 } from './schemas'
 export type { Envelope, Page, PageInfo, ResponseMeta } from './types'

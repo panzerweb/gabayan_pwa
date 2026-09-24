@@ -6,6 +6,7 @@ import {
   compatibilityResultSchema,
   cultureEnvironmentSchema,
   equipmentRecommendationsSchema,
+  sizingGuidanceSchema,
   speciesSummarySchema,
   stockingEstimateSchema,
   type CreateCultivationRequest,
@@ -39,6 +40,15 @@ export async function getCompatibilityApi(speciesId: string, environmentId: stri
   return apiRequest(`${ENDPOINTS.compatibility.root}?${query.toString()}`, {
     method: 'GET',
     schema: envelopeSchema(compatibilityResultSchema),
+  })
+}
+
+// The suggested pond or cage size and depth for one fish in one culture system. Public.
+export async function getSizingGuidanceApi(speciesId: string, environmentId: string) {
+  const query = new URLSearchParams({ speciesId, environmentId })
+  return apiRequest(`${ENDPOINTS.sizingGuidance.root}?${query.toString()}`, {
+    method: 'GET',
+    schema: envelopeSchema(sizingGuidanceSchema),
   })
 }
 

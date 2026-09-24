@@ -7,9 +7,9 @@ Last verified: 2026-09-25
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 608 tests.
-- [x] Mock API contract suite passes: 70 tests, and its coverage check exercises all 73 method-and-path rows of contract §5.
-- [x] Mobile Playwright suite passes: 19 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Unit and component suite passes: 625 tests.
+- [x] Mock API contract suite passes: 76 tests, and its coverage check exercises all 74 method-and-path rows of contract §5.
+- [x] Mobile Playwright suite passes: 20 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -85,3 +85,5 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [ ] The six species of contract §7 - Lapu-lapu and Shrimp with their compatibility and stocking rules, and the revised Bangus, Tilapia and Hito profiles - pass against FastAPI. Waits for aqua-lens-api Phase 28; until then a FastAPI contract run fails the species profile tests (`tests/contract/scenarios/species.scenarios.mjs`) and `tests/e2e/species.spec.ts` cannot pass there.
 - [x] Water quality has a feature of its own (`src/pages/water-quality/`): the setup wizard shows the suggested range of each of the seven parameters for the chosen species and culture system, with its explanation, basis and demo disclaimer, and never asks for a reading; a cultivation's water safety check evaluates typed readings through `POST /water-safety-checks`, which stores nothing, shows each status as label, icon and colour, and is disabled offline (`tests/component/water-quality/`, `tests/e2e/water-quality.spec.ts`).
 - [ ] `GET /water-thresholds` and `POST /water-safety-checks` pass against FastAPI. Waits for aqua-lens-api Phase 30; until then a FastAPI contract run fails the water-quality scenarios (`tests/contract/scenarios/water-quality.scenarios.mjs`) and `tests/e2e/water-quality.spec.ts` cannot pass there. The setup journeys still pass: the ranges step shows its retry state and never blocks Continue.
+- [x] The dimensions step opens the suggested pond or cage size and depth for the chosen species and culture system from `GET /sizing-guidance`, with its basis, sources and demo label, and can reopen it; an above-range stocking result names the extra area or volume the planned count needs from `additionalSpaceNeeded` (`tests/component/setup/SizingGuidancePanel.spec.ts`, `tests/e2e/pond-sizing.spec.ts`).
+- [ ] `GET /sizing-guidance` and the `requiredSpace` and `additionalSpaceNeeded` estimate fields pass against FastAPI. Waits for aqua-lens-api Phase 32; until then a FastAPI contract run fails the sizing scenarios (`tests/contract/scenarios/sizing.scenarios.mjs`) and `tests/e2e/pond-sizing.spec.ts` cannot pass there. The other setup journeys still pass: the dialog shows its retry state, and a result without the space fields leaves the shortfall out.

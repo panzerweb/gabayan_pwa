@@ -1461,6 +1461,8 @@
         "status": "RECOMMENDED",
         "differenceToRange": 0,
         "suggestedFingerlings": 500,
+        "requiredSpace": { "value": 27.28, "unit": "M3" },
+        "additionalSpaceNeeded": { "value": 0, "unit": "M3" },
         "basis": {
           "type": "WATER_VOLUME",
           "densityMinimum": 15,
@@ -3603,6 +3605,180 @@
     {
       "environmentCode": "FISH_CAGE",
       "message": "The water in a cage cannot be changed, so feeding and keeping water flowing through the net are the main ways to act on these readings."
+    }
+  ],
+  "sizingGuidance": [
+    {
+      "id": "size_tilapia_pond",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_tilapia_tank",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_tilapia_cage",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_milkfish_pond",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 5000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief's sizing sample: a semi-intensive bangus pond kept at least 1.0-1.2 m deep. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_milkfish_cage",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_catfish_pond",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_catfish_tank",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_grouper_pond",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_grouper_tank",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_grouper_cage",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_shrimp_pond",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 10000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_shrimp_tank",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 1000,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_carp_pond",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for Carp yet. Its prototype profile carries no depth figure.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "size_carp_tank",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for Carp yet. Its prototype profile carries no depth figure.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
     }
   ]
 }
