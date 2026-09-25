@@ -37,7 +37,12 @@ The supplied product brief, `Gabayan.pdf`, is product input rather than executab
 |-- docs/
 |   |-- implementation_plan.md
 |   |-- api_contract.md
-|   `-- release_checklist.md
+|   |-- release_checklist.md
+|   `-- guides/
+|       |-- setup_guide.md       # local and online setup, configuration, troubleshooting
+|       |-- demo_guide.md        # demo accounts and the demonstration script
+|       `-- development_guide.md # quality gate, test suites, source layout
+|-- netlify.toml             # static hosting: build, /api proxy, history-mode fallback
 |-- src/
 |   |-- main.ts, App.vue     # app bootstrap and providers
 |   |-- core/

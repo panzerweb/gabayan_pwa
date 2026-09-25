@@ -9,7 +9,7 @@ const servers = journeyServers(process.env)
 // already listening was built against an unknown API or holds another run's data, so a busy
 // port fails the run instead. The mock is started - from a fresh copy of its seed - only when
 // the app talks to it; another server named by VITE_API_BASE_URL is started and seeded
-// beforehand (README "Running against another API").
+// beforehand (docs/guides/development_guide.md "Running against another API").
 const mockApiServer = (port: string) => ({
   command: 'node mock-api/reset.mjs && node mock-api/server.mjs',
   url: `http://localhost:${port}/api/v1/health`,

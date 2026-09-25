@@ -44,7 +44,7 @@ import {
 
 // One client for the whole file: the scenarios run in order against one server, and the
 // coverage check at the end reads every call they made. The server is the in-process mock
-// unless CONTRACT_API_BASE_URL names another; see README "Contract suite".
+// unless CONTRACT_API_BASE_URL names another; see docs/guides/development_guide.md "Contract suite".
 const client = createContractClient()
 
 describe(`contract smoke tests against ${client.baseUrl}`, () => {
