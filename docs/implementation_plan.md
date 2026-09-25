@@ -2,11 +2,14 @@
 
 ## 1. Document Status
 
-- Status: active implementation baseline; Phases 0, 1, 2, 3, and 4 completed
+- Status: active implementation baseline; Phases 0-6 completed
 - Product input: the 59-page Gabayan product brief supplied by the product owner
 - Frontend: Vue 3 PWA
 - Development API: JSON Server with custom middleware/actions
-- Production API: separate FastAPI service
+- Production API: separate FastAPI service (`aqua-lens-api`)
+- Backend swap: done on 2026-09-24. With only `VITE_API_BASE_URL` changed to a local FastAPI
+  (`aqua-lens-api` commit `101702b`, seeded with `seed-demo --date 2026-09-23`), the contract suite
+  and all 13 browser journeys pass; `docs/release_checklist.md` records the counts
 - Primary locale/market: Philippines
 - Primary viewport: `390 x 844 px`
 
@@ -56,7 +59,7 @@ The primary outcome is not “buy equipment.” It is “know what to do next in
 
 - Real payments, courier integrations, inventory reservation, refunds, and seller tools.
 - Real Google OAuth, SMS/email verification, password reset delivery, and push notifications.
-- GPS, sensor/IoT integrations, weather feeds, disease diagnosis, image recognition, and community/social features.
+- GPS, sensor/IoT integrations, weather feeds beyond the in-app weather alerts read from a daily forecast for the farm's municipality and province (contract §12 "Weather alerts"), disease diagnosis, image recognition, and community/social features.
 - Scientific validation of stocking/feed/water/harvest rules.
 - Multiple currencies, imperial units, localization beyond an English-first Philippines experience.
 - Full offline write synchronization and conflict resolution.
@@ -85,11 +88,13 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Auth            | `/create-account`                                             | Account creation                            |
 | Auth            | `/forgot-password`                                            | Request a password-reset link/code          |
 | Auth            | `/reset-password`                                             | Apply a valid reset token                   |
+| Setup           | `/setup/plan`                                                 | Choose a plan after account creation        |
 | Setup           | `/setup`                                                      | Setup introduction/skip                     |
-| Setup           | `/setup/species`                                              | Step 1 of 4                                 |
-| Setup           | `/setup/environment`                                          | Step 2 of 4                                 |
-| Setup           | `/setup/dimensions`                                           | Step 3 of 4                                 |
-| Setup           | `/setup/fingerlings`                                          | Step 4 of 4                                 |
+| Setup           | `/setup/species`                                              | Step 1 of 5                                 |
+| Setup           | `/setup/environment`                                          | Step 2 of 5                                 |
+| Setup           | `/setup/water-ranges`                                         | Step 3 of 5; suggested water ranges only    |
+| Setup           | `/setup/dimensions`                                           | Step 4 of 5                                 |
+| Setup           | `/setup/fingerlings`                                          | Step 5 of 5                                 |
 | Setup           | `/setup/stocking-result`                                      | Below/recommended/above result              |
 | Setup           | `/setup/review`                                               | Editable cultivation summary                |
 | Setup           | `/setup/success/:cultivationId`                               | Celebration and next step                   |
@@ -100,6 +105,7 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Cultivations    | `/app/cultivations/:id/growth`                                | Growth records/chart                        |
 | Cultivations    | `/app/cultivations/:id/records`                               | Feeding, mortality, and water records       |
 | Cultivations    | `/app/cultivations/:id/harvest`                               | Readiness and harvest recording             |
+| Cultivations    | `/app/cultivations/:id/water-safety`                          | One-off water safety check, not saved       |
 | Notifications   | `/app/notifications`                                          | Read/unread notifications with filters      |
 | Recommendations | `/app/cultivations/:id/recommendations`                       | Setup-specific equipment                    |
 | Marketplace     | `/app/marketplace`                                            | Browse/search/filter products               |
@@ -113,6 +119,7 @@ Marketplace, cart, notifications, settings, and cultivation sub-sections are sec
 | Profile         | `/app/profile/edit`                                           | Personal/farm information                   |
 | Profile         | `/app/profile/addresses`                                      | Shipping addresses                          |
 | Profile         | `/app/profile/notifications`                                  | Reminder settings and times                 |
+| Profile         | `/app/plans`                                                  | Plans, limits and upgrade requests          |
 | Support/legal   | `/app/help`, `/legal/about`, `/legal/privacy`, `/legal/terms` | Static/help content and policy entry points |
 
 Route guards distinguish guest, authenticated-without-cultivation, and authenticated users. A signed-in existing demo user lands on Home. A newly registered user lands on Setup.
@@ -358,8 +365,9 @@ Exit: growth/mortality affect derived outputs, and completed cultivation appears
 Status: completed on 2026-09-23 for the mock-backed frontend. Personal/farm details, addresses,
 reminder preferences, explicit offline write protection, keyboard/reduced-motion behavior, bounded
 PWA caching, install/update metadata, and the cross-width regression suite are implemented. The
-external FastAPI staging swap remains a deployment gate until that service is available; see
-`docs/release_checklist.md`.
+FastAPI swap followed on 2026-09-24: setting only `VITE_API_BASE_URL` to the FastAPI service ran the
+contract suite and the 13 journeys with no feature code change (the journeys open the app on the
+API's host so the refresh cookie stays same-site); see `docs/release_checklist.md`.
 
 - Profile/farm info, addresses, notification settings and reminder times.
 - Complete loading/empty/error/offline states.

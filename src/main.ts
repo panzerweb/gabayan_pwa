@@ -2,9 +2,10 @@ import { createPinia } from 'pinia'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { createApp } from 'vue'
 
+import { queryClient } from '@core/query'
+
 import App from './App.vue'
-import { queryClient } from './app/queryClient'
-import { router } from './app/router'
+import { router } from './router'
 import './styles/tokens.css'
 import './styles/global.css'
 

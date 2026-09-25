@@ -3,6 +3,9 @@ import { expect, test } from '@playwright/test'
 test('new user completes the above-range onboarding path with explicit acceptance', async ({
   page,
 }) => {
+  // Account, plan and all four setup steps: with the dev server compiling each page on its
+  // first visit, this journey runs close to the default 30 s budget.
+  test.slow()
   await page.goto('/create-account')
   await page.getByLabel('Full name').fill('Maria Santos')
   await page.getByLabel('Email address').fill('maria.e2e@example.com')
@@ -12,6 +15,8 @@ test('new user completes the above-range onboarding path with explicit acceptanc
   await page.getByRole('checkbox').check()
   await page.getByRole('button', { name: 'Create account' }).click()
 
+  await expect(page).toHaveURL(/\/setup\/plan$/)
+  await page.getByRole('button', { name: 'Continue with Free' }).click()
   await expect(page).toHaveURL(/\/setup$/)
   await page.getByRole('link', { name: 'Start setup' }).click()
   await page.getByRole('radio', { name: /Tilapia/ }).click()
@@ -19,7 +24,10 @@ test('new user completes the above-range onboarding path with explicit acceptanc
   await page.getByRole('radio', { name: /Pond/ }).click()
   await expect(page.getByText('This setup can be planned')).toBeVisible()
   await page.getByRole('link', { name: 'Continue' }).click()
+  await expect(page.getByRole('heading', { name: 'Good water for your stock' })).toBeVisible()
+  await page.getByRole('link', { name: 'Continue' }).click()
 
+  await page.getByRole('dialog').getByRole('button', { name: 'Got it' }).click()
   await page.getByLabel('Length').fill('5')
   await page.getByLabel('Width').fill('4')
   await page.getByLabel('Average water depth').fill('1.5')
@@ -50,6 +58,7 @@ test('new user can postpone setup and sees an honest empty dashboard', async ({ 
   await page.getByLabel('Confirm password').fill('SafeDemo123!')
   await page.getByRole('checkbox').check()
   await page.getByRole('button', { name: 'Create account' }).click()
+  await page.getByRole('button', { name: 'Continue with Free' }).click()
   await page.getByRole('link', { name: 'Set up later' }).click()
 
   await expect(page).toHaveURL(/\/app\/home$/)

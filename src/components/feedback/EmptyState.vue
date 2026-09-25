@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
+
 import AppIcon, { type AppIconName } from '@/components/ui/AppIcon.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
@@ -8,7 +10,7 @@ withDefaults(
     message: string
     icon?: AppIconName
     actionLabel?: string
-    actionTo?: string
+    actionTo?: RouteLocationRaw
   }>(),
   {
     icon: 'fish',

@@ -96,7 +96,7 @@ Stable error codes:
 | ---- | --------------------------------------------------------------------------------- |
 | 400  | `BAD_REQUEST`, `INCOMPATIBLE_SELECTION`, `RULE_INPUT_INCOMPLETE`                  |
 | 401  | `AUTH_REQUIRED`, `INVALID_CREDENTIALS`, `TOKEN_EXPIRED`                           |
-| 403  | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`                                                 |
+| 403  | `FORBIDDEN`, `EMAIL_NOT_VERIFIED`, `TIER_LIMIT_REACHED`                           |
 | 404  | `NOT_FOUND`                                                                       |
 | 409  | `CONFLICT`, `DUPLICATE_EMAIL`, `IDEMPOTENCY_CONFLICT`, `INVALID_STATE_TRANSITION` |
 | 422  | `VALIDATION_ERROR`                                                                |
@@ -127,6 +127,7 @@ erDiagram
     USER ||--|| CART : owns
     USER ||--o{ ORDER : places
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ WEATHER_ALERT : receives
     SPECIES ||--o{ CULTIVATION : configures
     CULTURE_ENVIRONMENT ||--o{ CULTIVATION : configures
     CULTIVATION ||--o{ FARM_TASK : schedules
@@ -134,6 +135,7 @@ erDiagram
     CULTIVATION ||--o{ MORTALITY_RECORD : records
     CULTIVATION ||--o{ FEEDING_RECORD : records
     CULTIVATION ||--o{ WATER_CHECK : records
+    CULTIVATION ||--o{ WATER_PARAMETER_LOG : records
     CULTIVATION ||--o| HARVEST_RECORD : completes
     PRODUCT ||--o{ CART_ITEM : selected
     PRODUCT ||--o{ ORDER_ITEM : snapshots
@@ -174,21 +176,31 @@ erDiagram
 
 ### Enums
 
-| Name                     | Values                                                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SourceStatus`           | `DEMO`, `DRAFT`, `VERIFIED`, `RETIRED`                                                                                                           |
-| `CompatibilityStatus`    | `COMPATIBLE`, `CAUTION`, `NOT_RECOMMENDED`                                                                                                       |
-| `StockingResultStatus`   | `BELOW_RANGE`, `RECOMMENDED`, `ABOVE_RANGE`                                                                                                      |
-| `CultivationStatus`      | `PLANNING`, `ACTIVE`, `GROWING`, `PRE_HARVEST`, `COMPLETED`, `CANCELLED`                                                                         |
-| `TaskType`               | `FEEDING`, `WATER_CHECK`, `WATER_MAINTENANCE`, `EQUIPMENT_INSPECTION`, `GROWTH_SAMPLING`, `CAGE_NET_INSPECTION`, `HARVEST_PREPARATION`, `CUSTOM` |
-| `TaskStatus`             | `UPCOMING`, `DUE`, `COMPLETED`, `MISSED`, `CANCELLED`                                                                                            |
-| `MortalityReason`        | `UNKNOWN`, `WATER_QUALITY`, `DISEASE`, `HANDLING`, `PREDATION`, `OTHER`                                                                          |
-| `OrderStatus`            | `TO_PAY`, `PROCESSING`, `SHIPPED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`                                                                  |
-| `PaymentMethodType`      | `CASH_ON_DELIVERY`, `GCASH`, `CARD`                                                                                                              |
-| `ProductAvailability`    | `AVAILABLE`, `LOW_STOCK`, `OUT_OF_STOCK`                                                                                                         |
-| `NotificationCategory`   | `CULTIVATION`, `ORDER`, `EDUCATION`, `SYSTEM`                                                                                                    |
-| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`                        |
-| `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                   |
+| Name                     | Values                                                                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SourceStatus`           | `DEMO`, `DRAFT`, `VERIFIED`, `RETIRED`                                                                                                                               |
+| `CompatibilityStatus`    | `COMPATIBLE`, `CAUTION`, `NOT_RECOMMENDED`                                                                                                                           |
+| `StockingResultStatus`   | `BELOW_RANGE`, `RECOMMENDED`, `ABOVE_RANGE`                                                                                                                          |
+| `CultivationStatus`      | `PLANNING`, `ACTIVE`, `GROWING`, `PRE_HARVEST`, `COMPLETED`, `CANCELLED`                                                                                             |
+| `TaskType`               | `FEEDING`, `WATER_CHECK`, `WATER_MAINTENANCE`, `EQUIPMENT_INSPECTION`, `GROWTH_SAMPLING`, `CAGE_NET_INSPECTION`, `HARVEST_PREPARATION`, `CUSTOM`                     |
+| `TaskStatus`             | `UPCOMING`, `DUE`, `COMPLETED`, `MISSED`, `CANCELLED`                                                                                                                |
+| `MortalityReason`        | `UNKNOWN`, `WATER_QUALITY`, `DISEASE`, `HANDLING`, `PREDATION`, `OTHER`                                                                                              |
+| `OrderStatus`            | `TO_PAY`, `PROCESSING`, `SHIPPED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`                                                                                      |
+| `PaymentMethodType`      | `CASH_ON_DELIVERY`, `GCASH`, `CARD`                                                                                                                                  |
+| `ProductAvailability`    | `AVAILABLE`, `LOW_STOCK`, `OUT_OF_STOCK`                                                                                                                             |
+| `NotificationCategory`   | `CULTIVATION`, `ORDER`, `EDUCATION`, `SYSTEM`                                                                                                                        |
+| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `WATER_CHANGE_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `WEATHER_ALERT`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`       |
+| `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                                       |
+| `TierCode`               | `FREE`, `PRO`, `ORGANIZATION`                                                                                                                                        |
+| `TierEntitlement`        | `CULTIVATION_GUIDANCE`, `STOCKING_CALCULATOR`, `MARKETPLACE`, `WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`, `WATER_PARAMETER_LOGS`, `FEED_CONVERSION_TRACKING` |
+| `FeedConversionStatus`   | `CALCULATED`, `INSUFFICIENT_DATA`                                                                                                                                    |
+| `UpgradeRequestStatus`   | `PENDING`, `APPROVED`, `DECLINED`                                                                                                                                    |
+| `WaterParameter`         | `SALINITY`, `PH`, `AMMONIA`, `NITRITE`, `NITRATE`, `DISSOLVED_OXYGEN`, `WATER_TEMPERATURE`                                                                           |
+| `WaterParameterUnit`     | `PPT`, `PH`, `MG_PER_L`, `CELSIUS`                                                                                                                                   |
+| `WaterReadingStatus`     | `BELOW_RANGE`, `WITHIN_RANGE`, `ABOVE_RANGE`                                                                                                                         |
+| `WeatherAlertKind`       | `HIGH_TEMPERATURE`, `OVERCAST_SPELL`                                                                                                                                 |
+| `WeatherAlertSeverity`   | `ADVISORY`, `WARNING`                                                                                                                                                |
+| `WeatherAlertsStatus`    | `AVAILABLE`, `LOCATION_MISSING`, `FORECAST_UNAVAILABLE`                                                                                                              |
 
 ## 5. Endpoint Catalog
 
@@ -230,16 +242,41 @@ Every body and response name below is defined in the schema sections that follow
 
 Deleting a default address returns `409 CONFLICT` unless another address is promoted in the same product flow.
 
+### Plans and account tier
+
+| Method and path                        | Query/body             | Success response               |
+| -------------------------------------- | ---------------------- | ------------------------------ |
+| `GET /tiers`                           | pagination             | `200 Page<TierPlan>`           |
+| `GET /users/me/tier`                   | none                   | `200 Envelope<AccountTier>`    |
+| `POST /users/me/tier/upgrade-requests` | `CreateUpgradeRequest` | `201 Envelope<UpgradeRequest>` |
+
+Every account starts on `FREE`. There is no in-app purchase in v1: a farmer records an upgrade request, and the tier changes only when an operator sets it. The API enforces the plan's culture-system limit at `POST /cultivations`; the client only hides and explains.
+
 ### Reference profiles and compatibility
 
-| Method and path                             | Query/body                            | Success response                    |
-| ------------------------------------------- | ------------------------------------- | ----------------------------------- |
-| `GET /species`                              | `active=true`; `cursor`, `limit`      | `200 Page<SpeciesSummary>`          |
-| `GET /species/{speciesId}`                  | none                                  | `200 Envelope<SpeciesProfile>`      |
-| `GET /culture-environments`                 | `active=true`; pagination             | `200 Page<CultureEnvironment>`      |
-| `GET /culture-environments/{environmentId}` | none                                  | `200 Envelope<CultureEnvironment>`  |
-| `GET /compatibility`                        | required `speciesId`, `environmentId` | `200 Envelope<CompatibilityResult>` |
-| `POST /stocking-estimates`                  | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
+| Method and path                             |   Auth | Query/body                            | Success response                    |
+| ------------------------------------------- | -----: | ------------------------------------- | ----------------------------------- |
+| `GET /species`                              | Public | `active=true`; `cursor`, `limit`      | `200 Page<SpeciesSummary>`          |
+| `GET /species/{speciesId}`                  | Public | none                                  | `200 Envelope<SpeciesProfile>`      |
+| `GET /species/{speciesId}/feed-guide`       |    yes | none                                  | `200 Envelope<FeedGuide>`           |
+| `GET /culture-environments`                 | Public | `active=true`; pagination             | `200 Page<CultureEnvironment>`      |
+| `GET /culture-environments/{environmentId}` | Public | none                                  | `200 Envelope<CultureEnvironment>`  |
+| `GET /compatibility`                        | Public | required `speciesId`, `environmentId` | `200 Envelope<CompatibilityResult>` |
+| `GET /sizing-guidance`                      | Public | required `speciesId`, `environmentId` | `200 Envelope<SizingGuidance>`      |
+| `POST /stocking-estimates`                  |    yes | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
+
+The reference reads are Public: they hold shared profile data and no account's records, and the setup wizard reads them before the farmer signs up. The feed guide is the exception: it is signed in, because the Feeds products it links carry the caller's `isFavorite`.
+
+### Water quality
+
+| Method and path                                | Query/body                                           | Success response                  |
+| ---------------------------------------------- | ---------------------------------------------------- | --------------------------------- |
+| `GET /water-thresholds`                        | required `speciesId`, `environmentId`                | `200 Envelope<WaterThresholdSet>` |
+| `POST /water-safety-checks`                    | `WaterSafetyCheckRequest`                            | `200 Envelope<WaterSafetyCheck>`  |
+| `GET /cultivations/{id}/water-parameter-logs`  | `cursor`, `limit`                                    | `200 Page<WaterParameterLog>`     |
+| `POST /cultivations/{id}/water-parameter-logs` | `CreateWaterParameterLogRequest` + `Idempotency-Key` | `201 Envelope<WaterParameterLog>` |
+
+The first two are signed in and part of every plan (`WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`). A safety check is a one-off evaluation: it stores nothing, needs no `Idempotency-Key`, and answers `200`. Saved water-parameter logs with their history are the Pro entitlement `WATER_PARAMETER_LOGS`: both log rows need the `PRO` plan or above and refuse a Free account as [Plan-gated routes](#plan-gated-routes) describes. The history is the log list, newest first; a client draws a parameter's trend from it and never re-evaluates a reading.
 
 ### Dashboard and cultivations
 
@@ -254,6 +291,8 @@ Deleting a default address returns `409 CONFLICT` unless another address is prom
 | `GET /cultivations/{cultivationId}/equipment-recommendations` | optional `categoryId`                          | `200 Envelope<EquipmentRecommendations>` |
 
 `PATCH /cultivations/{id}` permits name and editable planning metadata only. Stock, growth, mortality, and harvest values change through dedicated event endpoints.
+
+`POST /cultivations` refuses a cultivation the account's plan has no room for with `403 TIER_LIMIT_REACHED` (see [Culture-system limit at cultivation creation](#culture-system-limit-at-cultivation-creation)).
 
 ### Tasks and operational records
 
@@ -270,10 +309,13 @@ Deleting a default address returns `409 CONFLICT` unless another address is prom
 | `GET /cultivations/{id}/feeding-plan`         | optional `date`                                                 | `200 Envelope<FeedingPlan>`              |
 | `GET /cultivations/{id}/feeding-records`      | pagination/date filters                                         | `200 Page<FeedingRecord>`                |
 | `POST /cultivations/{id}/feeding-records`     | `CreateFeedingRecordRequest` + idempotency                      | `201 Envelope<FeedingMutationResult>`    |
+| `GET /cultivations/{id}/feed-conversion`      | none                                                            | `200 Envelope<FeedConversion>`           |
 | `GET /cultivations/{id}/water-checks`         | pagination/date filters                                         | `200 Page<WaterCheck>`                   |
 | `POST /cultivations/{id}/water-checks`        | `CreateWaterCheckRequest` + idempotency                         | `201 Envelope<WaterCheckMutationResult>` |
 
 Task completion is atomic. For a feeding task, it updates the task and creates exactly one linked feeding record. Retrying with the same idempotency key returns the original response.
+
+The feed conversion read is the Pro entitlement `FEED_CONVERSION_TRACKING`: it needs the `PRO` plan or above and refuses a Free account as [Plan-gated routes](#plan-gated-routes) describes. The server derives it from the feeding, growth and mortality records; the farmer never types a ratio.
 
 ### Harvest
 
@@ -284,13 +326,13 @@ Task completion is atomic. For a feeding task, it updates the task and creates e
 
 ### Catalog and favorites
 
-| Method and path                         | Query/body                                                                                        | Success response               |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `GET /product-categories`               | none                                                                                              | `200 Page<ProductCategory>`    |
-| `GET /products`                         | `search`, `categoryId`, `suitableSpeciesId`, `suitableEnvironmentId`, `availability`, `sort=price | rating                         | name`, `order`, pagination | `200 Page<ProductSummary>` |
-| `GET /products/{productId}`             | none                                                                                              | `200 Envelope<ProductDetail>`  |
-| `PUT /products/{productId}/favorite`    | none                                                                                              | `200 Envelope<FavoriteResult>` |
-| `DELETE /products/{productId}/favorite` | none                                                                                              | `200 Envelope<FavoriteResult>` |
+| Method and path                         |   Auth | Query/body                                                                                        | Success response               |
+| --------------------------------------- | -----: | ------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `GET /product-categories`               | Public | none                                                                                              | `200 Page<ProductCategory>`    |
+| `GET /products`                         |    yes | `search`, `categoryId`, `suitableSpeciesId`, `suitableEnvironmentId`, `availability`, `sort=price | rating                         | name`, `order`, pagination | `200 Page<ProductSummary>` |
+| `GET /products/{productId}`             |    yes | none                                                                                              | `200 Envelope<ProductDetail>`  |
+| `PUT /products/{productId}/favorite`    |    yes | none                                                                                              | `200 Envelope<FavoriteResult>` |
+| `DELETE /products/{productId}/favorite` |    yes | none                                                                                              | `200 Envelope<FavoriteResult>` |
 
 ### Cart and checkout
 
@@ -326,6 +368,23 @@ Cancellation is allowed only in server-defined states. Invalid cancellation retu
 | `GET /notifications/unread-count`           | none                                                                 | `200 Envelope<UnreadCount>`  |
 | `POST /notifications/{notificationId}/read` | none                                                                 | `200 Envelope<Notification>` |
 | `POST /notifications/read-all`              | optional `ReadAllNotificationsRequest`                               | `200 Envelope<UnreadCount>`  |
+
+`GET /dashboard/home`, `GET /notifications` and `GET /notifications/unread-count` first raise the
+reminders that have fallen due for the account (§12 Reminders) and its weather alerts (§12 Weather
+alerts), so the answer already holds them.
+
+### Weather alerts
+
+| Method and path       | Query/body | Success response              |
+| --------------------- | ---------- | ----------------------------- |
+| `GET /weather-alerts` | none       | `200 Envelope<WeatherAlerts>` |
+
+Signed in and part of every plan. The alerts are for the farm's municipality and province from
+`FarmProfile`; the read raises any alert the current forecast calls for, as Home and the
+notifications do, then answers the alerts still current. A farm without both a municipality and a
+province - or an account with no farm profile yet - answers `200` with status `LOCATION_MISSING`
+rather than an error, and a forecast that cannot be read answers `200` with status
+`FORECAST_UNAVAILABLE`, so Home never fails because of the weather.
 
 ## 6. Identity and User Schemas
 
@@ -442,13 +501,94 @@ with the selected identity provider and must not accept these fixture tokens.
 
 `NotificationSettingsPatch` permits any non-empty subset and validates feeding times when reminders are enabled.
 
+The reminder switches govern the notifications of §12 Reminders: `feedingReminders` the
+`FEEDING_DUE` notification at `morningFeedingTime` and `afternoonFeedingTime` (a null time has no
+feeding slot), `waterMaintenance` the `WATER_CHANGE_DUE` partial water-change reminder, and
+`harvestReminders` the `HARVEST_APPROACHING` harvest alert. Feeding times are read in Asia/Manila.
+
+### Tier schemas
+
+#### TierPlan
+
+| Field                | Type                                         | Notes                                                           |
+| -------------------- | -------------------------------------------- | --------------------------------------------------------------- |
+| `code`               | `TierCode`                                   | Plans are listed from `FREE` upward                             |
+| `name`               | string                                       | Display name, e.g. `Pro`                                        |
+| `description`        | string                                       | One plain sentence on who the plan is for                       |
+| `cultureSystemLimit` | integer                                      | Most active culture systems the plan allows; `>= 1`             |
+| `price`              | `Money \| null`                              | `null` while the plan has no price; the client shows it as such |
+| `billingPeriod`      | `MONTH \| null`                              | `null` exactly when `price` is `null`                           |
+| `entitlements`       | `{ code: TierEntitlement, label: string }[]` | Everything the plan includes, not only what it adds             |
+
+Demo plans: `FREE` (limit 1, PHP 0.00 a month), `PRO` (limit 10, no price yet) and `ORGANIZATION` (limit 100, PHP 4,999.00 a month). Prices and limits are server data and may change without a client release.
+
+#### AccountTier
+
+| Field                     | Type                     | Notes                                                                   |
+| ------------------------- | ------------------------ | ----------------------------------------------------------------------- |
+| `plan`                    | `TierPlan`               | The account's current plan                                              |
+| `activeCultureSystems`    | integer                  | The account's cultivations that are neither `COMPLETED` nor `CANCELLED` |
+| `remainingCultureSystems` | integer                  | `max(0, plan.cultureSystemLimit - activeCultureSystems)`                |
+| `pendingUpgradeRequest`   | `UpgradeRequest \| null` | The request still waiting for an operator, if any                       |
+
+One active culture system is one cultivation that is not `COMPLETED` or `CANCELLED`, whatever its environment; a `PLANNING` cultivation counts.
+
+#### CreateUpgradeRequest and UpgradeRequest
+
+- `CreateUpgradeRequest`: `{ requestedTier: TierCode, note?: string | null }`; `note` is at most 500 trimmed characters.
+- `UpgradeRequest`: `{ id, currentTier: TierCode, requestedTier: TierCode, status: UpgradeRequestStatus, note: string | null, createdAt: timestamp }`.
+
+| Case                                                            | Answer                                                         |
+| --------------------------------------------------------------- | -------------------------------------------------------------- |
+| `requestedTier` missing, unknown, or not above the current tier | `422 VALIDATION_ERROR` with `fields.requestedTier`             |
+| `note` longer than 500 characters                               | `422 VALIDATION_ERROR` with `fields.note`                      |
+| A request is already `PENDING`                                  | `409 CONFLICT`, `details: { pendingRequestId, requestedTier }` |
+
+A request stays `PENDING` until an operator changes the tier; it never charges the farmer, and the account keeps its current plan meanwhile.
+
+#### Culture-system limit at cultivation creation
+
+`POST /cultivations` checks the limit after authentication and idempotent replay and before it reads the estimate, so replaying a create that already succeeded still answers `201`. An account whose `activeCultureSystems` has reached `plan.cultureSystemLimit` receives:
+
+```json
+{
+  "error": {
+    "code": "TIER_LIMIT_REACHED",
+    "message": "Your Free plan covers 1 active culture system. Harvest or close one, or ask for a bigger plan.",
+    "fields": null,
+    "details": { "tier": "FREE", "cultureSystemLimit": 1, "activeCultureSystems": 1 },
+    "requestId": "req_01K..."
+  }
+}
+```
+
+`message` is written for the farmer; `details` lets a client explain the limit and offer the plans.
+
+#### Plan-gated routes
+
+A route that needs a plan above `FREE` names it in its catalog note: today the water-parameter logs (`PRO`) and the feed conversion read (`PRO`). `ORGANIZATION` includes everything `PRO` does. Authentication is checked first, so a signed-out call still answers `401 AUTH_REQUIRED`; then the plan, before the resource is read or the request body validated, so a Free account is refused the same way whichever cultivation it names:
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "This needs the Pro plan. See the plans to ask for it.",
+    "fields": null,
+    "details": { "requiredTier": "PRO", "currentTier": "FREE" },
+    "requestId": "req_01K..."
+  }
+}
+```
+
+`details.requiredTier` and `details.currentTier` are `TierCode` values. The client hides and explains Pro screens and sends the farmer to the plans, but the API is what enforces the plan.
+
 ## 7. Reference, Rules, and Estimate Schemas
 
 ### SpeciesSummary
 
 `{ id, commonName, localName, slug, shortDescription, beginnerFriendly, image, estimatedCultureDays: { minimum, maximum }, active, sourceStatus }`.
 
-Initial mock species: Tilapia, Milkfish/Bangus, Catfish/Hito, and Carp.
+Initial species: Tilapia, Milkfish/Bangus, Catfish/Hito, Grouper/Lapu-lapu, Shrimp/Hipon, and Carp, in that order. Every species is `sourceStatus` `DEMO`. Tilapia, Bangus, Hito, Lapu-lapu, and Shrimp carry the figures cited in the product brief (dissolved oxygen critical below about 2.0-3.0 mg/L, water depth of at least 1.0-1.2 m, about one square metre of pond per bangus) under rule version `demo-2026-09-gabayan`; figures the brief does not give (feeding bands, harvest target, the Lapu-lapu and Shrimp densities) are placeholders whose `basis` says so. Carp keeps the prototype profile (`demo-2026-09`).
 
 ### SpeciesProfile
 
@@ -477,7 +617,9 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 - `GrowthStageRule`: `{ id, name, minimumDay, maximumDay, expectedWeightRange: { minimum: Quantity, maximum: Quantity }, sourceStatus }`.
 - `StockingRule`: `{ id, speciesId, environmentId, basis: "SURFACE_AREA" | "WATER_VOLUME", minimumDensity, maximumDensity, densityUnit: "FISH_PER_M2" | "FISH_PER_M3", sourceStatus, ruleVersion }`.
 - `FeedingRule`: `{ id, speciesId, growthStage, feedRatePercentRange, feedingsPerDay, sourceStatus, ruleVersion }`.
-- `GuidanceRule`: `{ id, title, message, trigger, sourceStatus, ruleVersion }`.
+- `GuidanceRule`: `{ id, title, message, trigger, sourceStatus, ruleVersion }`. Seeded triggers: `ROUTINE_OBSERVATION` and `UNUSUAL_CHANGE` (answered by a water check), and `LOW_DISSOLVED_OXYGEN` and `WATER_DEPTH` (reference guidance shown with the profile).
+- `WaterExchangeRule`: `{ id, environmentId, percentOfVolume, intervalDays, basis, sourceStatus, ruleVersion }`, one per species and culture environment where a partial water change applies; it drives the §12 water-change reminder and is not yet part of the `SpeciesProfile` payload. Seeded for Pond and Tank/Container at 30 % every 7 days, `DEMO`, for every species; Fish Cage has none, since a cage in open water is not drained.
+- `HarvestTarget` (held with the profile, drives the §10 readiness and §12 harvest alert): target band `350-450 g`, a sample counts as current for `measurementFreshDays` (14), and `harvestWindowDays` `{ minimum: 120, maximum: 150 }` is the brief's typical culture length, shown only as a hint. All `DEMO`.
 - `RuleSource`: `{ title, organization, url: string | null, reviewedAt: string | null, reviewedBy: string | null }`.
 
 ### CompatibilityResult
@@ -511,6 +653,8 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 | `status`                 | `StockingResultStatus` | Below/recommended/above                         |
 | `differenceToRange`      | integer                | 0 in range; signed nearest-bound difference     |
 | `suggestedFingerlings`   | integer                | A reasonable point in range, not forced maximum |
+| `requiredSpace`          | `Quantity`             | Space the planned count needs; see below        |
+| `additionalSpaceNeeded`  | `Quantity`             | Space missing for the planned count; see below  |
 | `basis`                  | `EstimateBasis`        | Explainability                                  |
 | `compatibility`          | `CompatibilityResult`  | Explicit compatibility                          |
 | `isDemo`                 | boolean                | Required                                        |
@@ -519,7 +663,11 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 | `expiresAt`              | timestamp              | Prevent stale plan creation                     |
 | `disclaimer`             | string                 | Required                                        |
 
-`EstimateBasis` is `{ type, densityMinimum, densityMaximum, densityUnit, inputAreaM2, inputVolumeM3, explanation }`.
+`EstimateBasis` is `{ type, densityMinimum, densityMaximum, densityUnit, inputAreaM2, inputVolumeM3, explanation }`. `explanation` is the stocking rule's own plain-language basis, including its citation or the fact that it is a placeholder.
+
+`requiredSpace` is the least surface area (`M2`, for a `SURFACE_AREA` basis) or water volume (`M3`, for a `WATER_VOLUME` basis) in which `plannedFingerlings` stays within the demo range: `plannedFingerlings / densityMaximum`, rounded up to two decimals. `additionalSpaceNeeded` has the same unit and is how much more than `inputAreaM2` or `inputVolumeM3` that is, rounded up to two decimals; it is `0` unless `status` is `ABOVE_RANGE`. Both are server-derived. A `stockingEstimateSnapshot` saved before these fields existed may lack them, so a client shows them only when present.
+
+Worked example from the product brief: 5,000 Bangus in a 20 x 25 m pond (500 m² of surface) answer `ABOVE_RANGE` with `requiredSpace` `{ "value": 5000, "unit": "M2" }` and `additionalSpaceNeeded` `{ "value": 4500, "unit": "M2" }`.
 
 Representative response:
 
@@ -538,6 +686,8 @@ Representative response:
     "status": "RECOMMENDED",
     "differenceToRange": 0,
     "suggestedFingerlings": 500,
+    "requiredSpace": { "value": 27.28, "unit": "M3" },
+    "additionalSpaceNeeded": { "value": 0, "unit": "M3" },
     "basis": {
       "type": "WATER_VOLUME",
       "densityMinimum": 15,
@@ -566,6 +716,144 @@ Representative response:
   "meta": { "requestId": "req_demo_001" }
 }
 ```
+
+### SizingGuidance
+
+The pond or cage size and water depth suggested for one species in one culture system, read before the farmer measures the culture area. The space comes from the pairing's stocking rule (the same density `POST /stocking-estimates` applies); the depth and the worked example are rows of the species and culture-system profile. Every figure is demo data: the Bangus pond row carries the product brief's sample (5,000 bangus need a pond of about 5,000 m², 0.5 ha, kept at least 1.0-1.2 m deep, rule version `demo-2026-09-gabayan`); other rows say what they are in `spaceBasis` and `depthBasis`.
+
+| Field                | Type                                      | Notes                                                                                 |
+| -------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------- |
+| `speciesId`          | string                                    |                                                                                       |
+| `environmentId`      | string                                    |                                                                                       |
+| `basis`              | `"SURFACE_AREA" \| "WATER_VOLUME"`        | The stocking rule's basis; decides whether space is an area or a volume               |
+| `spacePerFish`       | `Quantity`                                | `M2` or `M3`; `1 / densityMaximum`, rounded up to four decimals                       |
+| `exampleFingerlings` | integer                                   | A count worked through for the farmer, e.g. `5000` for a Bangus pond                  |
+| `exampleSpace`       | `Quantity`                                | Space `exampleFingerlings` need, computed as `requiredSpace` is on `StockingEstimate` |
+| `waterDepth`         | `{ minimum, maximum, unit: "M" } \| null` | Suggested water depth in metres; `null` where the profile has no figure               |
+| `spaceBasis`         | string                                    | The stocking rule's explanation: its citation, or that it is a placeholder            |
+| `depthBasis`         | string                                    | Where the depth comes from, or why there is none                                      |
+| `sources`            | `RuleSource[]`                            |                                                                                       |
+| `isDemo`             | boolean                                   |                                                                                       |
+| `sourceStatus`       | `SourceStatus`                            |                                                                                       |
+| `ruleVersion`        | string                                    | The stocking rule's version                                                           |
+| `disclaimer`         | string                                    |                                                                                       |
+
+| Case                                              | Answer                                        |
+| ------------------------------------------------- | --------------------------------------------- |
+| `speciesId` or `environmentId` missing            | `400 BAD_REQUEST`                             |
+| Unknown or inactive species or environment        | `404 NOT_FOUND`                               |
+| Compatibility of the pairing is `NOT_RECOMMENDED` | `400 INCOMPATIBLE_SELECTION` with its message |
+| No stocking rule or sizing row for the pairing    | `404 NOT_FOUND`                               |
+
+### FeedGuide
+
+Which commercial feed suits each growth stage of one species: the feed type, its protein percentage and pellet size, how many feedings a day, and the Feeds products in the shop that fit. One row per species and growth stage, linked to products by SKU. Every row is demo data under rule version `demo-2026-09-gabayan`: the product brief asks for "data on which feeds to use, depending on the fish" and "standard commercial feed brand profiles" but gives no figure, so each range is a placeholder taken from typical commercial feed labels, whose `basis` says so, with SEAFDEC/AQD's feed-efficiency work (cited in the brief) as the reference it is to be reviewed against. The guide names feed types, not brands.
+
+| Field          | Type                            | Notes                                                        |
+| -------------- | ------------------------------- | ------------------------------------------------------------ |
+| `species`      | `{ id, commonName, localName }` |                                                              |
+| `stages`       | `FeedGuideStage[]`              | In the species profile's growth-stage order; at least one    |
+| `sources`      | `RuleSource[]`                  |                                                              |
+| `isDemo`       | boolean                         | `true` while any stage is `DEMO`                             |
+| `sourceStatus` | `SourceStatus`                  | `VERIFIED` only when every stage is                          |
+| `ruleVersion`  | string                          |                                                              |
+| `disclaimer`   | string                          | Shown with the guide and with any one stage shown on its own |
+
+#### FeedGuideStage
+
+| Field             | Type                                               | Notes                                                                                               |
+| ----------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `growthStageCode` | string                                             | A `GrowthStageRule` code of the profile; matches `CultivationDetail.growthStage.code`               |
+| `growthStage`     | string                                             | The stage's name, e.g. `Growing`                                                                    |
+| `weightRange`     | `{ minimum: Quantity, maximum: Quantity \| null }` | The stage's feeding-rule weight band in `G`; `maximum` is `null` for the last band                  |
+| `feedType`        | string                                             | Plain description, e.g. `Tilapia grower pellets, floating`                                          |
+| `proteinPercent`  | `{ minimum, maximum }`                             | Crude protein, percent of the feed                                                                  |
+| `pelletSize`      | `{ minimum, maximum, unit: "MM" }`                 | Pellet diameter                                                                                     |
+| `feedingsPerDay`  | integer \| null                                    | The stage's `FeedingRule.feedingsPerDay`, so the guide matches the feeding plan; `null` without one |
+| `basis`           | string                                             | Where the figures come from, or that they are placeholders                                          |
+| `sourceStatus`    | `SourceStatus`                                     |                                                                                                     |
+| `ruleVersion`     | string                                             |                                                                                                     |
+| `products`        | `ProductSummary[]`                                 | Feeds-category products the row links by SKU, in the row's order; may be empty                      |
+
+A linked product outside the Feeds category is left out; availability never hides one, so an out-of-stock feed is listed with its `availability`. Only Tilapia's growing stage links a product in the seed (`GBY-FED-020`, Tilapia Grower Feed 20 kg); every other stage answers `products: []` until feed listings exist for it. Disclaimer: "Typical figures from commercial feed labels, not yet reviewed for your farm. Follow the label on the feed you buy and local technical guidance, and watch how your fish eat."
+
+| Case                              | Answer              |
+| --------------------------------- | ------------------- |
+| No access token                   | `401 AUTH_REQUIRED` |
+| Unknown or inactive species       | `404 NOT_FOUND`     |
+| A species with no feed-guide rows | `404 NOT_FOUND`     |
+
+### Water-quality thresholds and safety check
+
+The suggested range of each water parameter is a row of the species and culture-system profile, served with its provenance. Every threshold is demo data under rule version `demo-2026-09-gabayan`: dissolved oxygen carries the product brief's figure (critical below about 2.0-3.0 mg/L, IFAS FA002 and Fondriest); every other range is a placeholder whose `basis` says so. A pairing whose compatibility is `NOT_RECOMMENDED` has no thresholds.
+
+The seven parameters, always in this order, with the `WaterReadings` field that carries each reading and the values a reading may take:
+
+| `parameter`         | `unit`     | Reading field        | Accepted reading |
+| ------------------- | ---------- | -------------------- | ---------------- |
+| `SALINITY`          | `PPT`      | `salinityPpt`        | 0-80             |
+| `PH`                | `PH`       | `ph`                 | 0-14             |
+| `AMMONIA`           | `MG_PER_L` | `ammoniaMgL`         | 0-50             |
+| `NITRITE`           | `MG_PER_L` | `nitriteMgL`         | 0-50             |
+| `NITRATE`           | `MG_PER_L` | `nitrateMgL`         | 0-1000           |
+| `DISSOLVED_OXYGEN`  | `MG_PER_L` | `dissolvedOxygenMgL` | 0-30             |
+| `WATER_TEMPERATURE` | `CELSIUS`  | `temperatureC`       | 0-45             |
+
+#### WaterThreshold
+
+| Field          | Type                 | Notes                                                             |
+| -------------- | -------------------- | ----------------------------------------------------------------- |
+| `parameter`    | `WaterParameter`     |                                                                   |
+| `name`         | string               | Display name, e.g. `Ammonia`                                      |
+| `unit`         | `WaterParameterUnit` | Unit of `minimum`, `maximum` and the reading                      |
+| `minimum`      | number or null       | Lowest suggested value; `null` when the range has no lower bound  |
+| `maximum`      | number or null       | Highest suggested value; `null` when the range has no upper bound |
+| `explanation`  | string               | One plain sentence on what the parameter is and why it matters    |
+| `basis`        | string               | Where the figure comes from, or that it is a placeholder          |
+| `sourceStatus` | `SourceStatus`       |                                                                   |
+| `ruleVersion`  | string               |                                                                   |
+
+At least one of `minimum` and `maximum` is set. A reading equal to a bound is within the range.
+
+#### WaterThresholdSet
+
+`{ speciesId, environmentId, thresholds: WaterThreshold[], guidance: string, sources: RuleSource[], isDemo, sourceStatus, ruleVersion, disclaimer }`. `thresholds` holds the seven parameters in the order above; `guidance` is one environment-aware sentence on acting on the ranges (the water in a fish cage cannot be changed).
+
+| Case                                              | Answer                                        |
+| ------------------------------------------------- | --------------------------------------------- |
+| `speciesId` or `environmentId` missing            | `400 BAD_REQUEST`                             |
+| Unknown or inactive species or environment        | `404 NOT_FOUND`                               |
+| Compatibility of the pairing is `NOT_RECOMMENDED` | `400 INCOMPATIBLE_SELECTION` with its message |
+
+#### WaterSafetyCheckRequest
+
+`{ speciesId, environmentId, readings: WaterReadings }`. `WaterReadings` is `{ salinityPpt?, ph?, ammoniaMgL?, nitriteMgL?, nitrateMgL?, dissolvedOxygenMgL?, temperatureC? }`, each a number or `null`; an omitted or `null` field is a parameter the farmer did not measure.
+
+| Case                                                           | Answer                                                                       |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `speciesId` or `environmentId` missing or unknown              | `422 VALIDATION_ERROR` with `fields.speciesId` or `fields.environmentId`     |
+| No reading entered                                             | `422 VALIDATION_ERROR` with `fields.readings`                                |
+| A reading that is not a number, or outside its accepted values | `422 VALIDATION_ERROR` with `fields["readings.<field>"]`, e.g. `readings.ph` |
+| Compatibility of the pairing is `NOT_RECOMMENDED`              | `400 INCOMPATIBLE_SELECTION` with its message                                |
+
+#### WaterSafetyCheck
+
+`{ speciesId, environmentId, checkedAt: timestamp, results: WaterReadingResult[], notChecked: WaterParameter[], isDemo, sourceStatus, ruleVersion, disclaimer }`. `results` holds one entry per entered reading and `notChecked` the parameters passed over, both in parameter order. Nothing is stored.
+
+`WaterReadingResult`: `{ parameter, name, unit, value, minimum, maximum, status: WaterReadingStatus, explanation, guidance: GuidanceMessage, recommendedProducts: WaterProblemProduct[] }`. `status` is `BELOW_RANGE` when `value < minimum`, `ABOVE_RANGE` when `value > maximum`, and otherwise `WITHIN_RANGE`. `guidance` is chosen by parameter, status and culture environment; it uses conditional language and never tells the farmer to replace all the water.
+
+`recommendedProducts` names the products that may help with an out-of-range reading, so the farmer can buy one straight from the result. It comes from rows linking a parameter and direction to a product SKU (`{ parameter, status, productSku, whyRelevant, suggestedQuantity, sortOrder }`), in `sortOrder`, and holds only products whose `suitableEnvironmentIds` include the check's `environmentId` (a product with an empty list suits every culture system). Availability does not filter the list; an out-of-stock product is still named and says so. A reading `WITHIN_RANGE` always answers `[]`. The recommendation is optional support covered by the check's `isDemo` and `disclaimer`, never a required purchase.
+
+`WaterProblemProduct` extends `ProductSummary` with `{ whyRelevant: string, suggestedQuantity: integer >= 1 }`.
+
+| Parameter and status           | Seeded products (SKU)                                                     |
+| ------------------------------ | ------------------------------------------------------------------------- |
+| `DISSOLVED_OXYGEN` below range | `GBY-AER-001` Compact Pond Aerator                                        |
+| `AMMONIA` above range          | `GBY-FLT-009` Washable Pond Filter Pad, `GBY-TST-004` Freshwater Test Kit |
+| `NITRITE` above range          | `GBY-TST-004` Freshwater Test Kit                                         |
+| `PH` below or above range      | `GBY-TST-004` Freshwater Test Kit                                         |
+
+Every product is quantity 1. Other parameters and directions recommend nothing yet.
 
 ## 8. Cultivation Schemas
 
@@ -727,7 +1015,7 @@ The server rejects mortality that would make estimated live fish negative.
 | `explanation`                                         | string                                        |
 | `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                                    |
 
-`FeedingRecord`: `{ id, cultivationId, taskId, fedAt, amount: Quantity, notes, recordedBy, createdAt }`.
+`FeedingRecord`: `{ id, cultivationId, taskId: string | null, fedAt, amount: Quantity, notes, recordedBy, createdAt }`; `taskId` is null for a feeding recorded without a task.
 
 `CreateFeedingRecordRequest`: `{ fedAt, amount, taskId?: string | null, notes?: string | null }`.
 
@@ -744,6 +1032,71 @@ The server rejects mortality that would make estimated live fish negative.
 `WaterCheckMutationResult`: `{ record: WaterCheck, generatedTasks: FarmTask[], guidance: GuidanceMessage[] }`.
 
 `GuidanceMessage`: `{ severity: "INFO" | "CAUTION" | "ACTION", title, message, sourceStatus, ruleVersion, disclaimer }`. Guidance must use conditional language; never universally instruct full water replacement.
+
+### Water-parameter logs
+
+A Pro farmer's saved readings of the seven water parameters for one cultivation. Each reading is evaluated when the log is saved, against the cultivation's species and culture-system ranges as they stand then (see [Water-quality thresholds and safety check](#water-quality-thresholds-and-safety-check)), and the log keeps that evaluation with its `ruleVersion`, so the history reads as it did when each log was saved.
+
+`CreateWaterParameterLogRequest`: `{ readings: WaterReadings, loggedAt?: timestamp | null, notes?: string | null }`. `readings` takes the fields and accepted values of the safety check; an omitted or `null` field is a parameter not measured. `loggedAt` is when the reading was taken, and the server's current time when omitted. `notes` is at most 500 trimmed characters.
+
+`WaterParameterLog`:
+
+| Field                                                 | Type                | Notes                                                               |
+| ----------------------------------------------------- | ------------------- | ------------------------------------------------------------------- |
+| `id`, `cultivationId`                                 | string              |                                                                     |
+| `loggedAt`                                            | timestamp           | When the reading was taken; the list is ordered by it, newest first |
+| `readings`                                            | `WaterReadings`     | All seven fields, `null` for a parameter not measured               |
+| `results`                                             | `WaterLogReading[]` | One per entered reading, in parameter order                         |
+| `notLogged`                                           | `WaterParameter[]`  | The parameters not measured, in parameter order                     |
+| `outOfRangeCount`                                     | integer             | Results whose `status` is not `WITHIN_RANGE`                        |
+| `notes`                                               | string or null      |                                                                     |
+| `recordedBy`                                          | compact user        |                                                                     |
+| `createdAt`                                           | timestamp           |                                                                     |
+| `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance          | Of the ranges the readings were evaluated against                   |
+
+`WaterLogReading`: `{ parameter, name, unit, value, minimum, maximum, status: WaterReadingStatus }`, with `minimum` and `maximum` the bounds the value was evaluated against and `status` worked out as in the safety check (a value equal to a bound is within the range). A log carries no guidance or products; the safety check gives those.
+
+| Case                                                           | Answer                                                            |
+| -------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Signed out                                                     | `401 AUTH_REQUIRED`                                               |
+| Account below `PRO`                                            | `403 FORBIDDEN` (see [Plan-gated routes](#plan-gated-routes))     |
+| `Idempotency-Key` missing on the create                        | `400 BAD_REQUEST`                                                 |
+| A key already used with another body                           | `409 IDEMPOTENCY_CONFLICT`; the same body replays the first `201` |
+| Cultivation missing or another account's                       | `404 NOT_FOUND`                                                   |
+| Create on a `COMPLETED` or `CANCELLED` cultivation             | `409 INVALID_STATE_TRANSITION`; its history stays readable        |
+| No reading entered                                             | `422 VALIDATION_ERROR` with `fields.readings`                     |
+| A reading that is not a number, or outside its accepted values | `422 VALIDATION_ERROR` with `fields["readings.<field>"]`          |
+| `loggedAt` not a timestamp, or more than 5 minutes after now   | `422 VALIDATION_ERROR` with `fields.loggedAt`                     |
+| `notes` longer than 500 characters                             | `422 VALIDATION_ERROR` with `fields.notes`                        |
+| The cultivation's pairing is `NOT_RECOMMENDED`                 | `400 INCOMPATIBLE_SELECTION` with its message                     |
+
+The demo seed holds three logs for Tilapia Batch #001: 10 September (all seven readings, all within range), 17 September (five readings, ammonia above range) and 22 September (all seven, dissolved oxygen below range).
+
+### Feed conversion
+
+`FeedConversion` is the feed conversion ratio (FCR) the cultivation's own records imply: the feed given over the weight the stock gained. It is calculated by the server and never typed in.
+
+- The period runs from the earliest growth sample to the latest. Feed given is the sum of the feeding records dated (Asia/Manila) from the earliest sample's day up to the day before the latest sample's.
+- Stock weight at a sample is its average weight times the estimated live fish that day: `initialFingerlings` less the mortality recorded on or before it. The gain is the latest stock weight less the earliest; fish that died are not counted as gain.
+- `ratio` is feed given over gain, to two decimals. It is `null`, with `status` `INSUFFICIENT_DATA`, when there are fewer than two samples, no feeding record in the period, or no gain.
+- `intervals` is the history: one entry per pair of consecutive samples, oldest first, worked out the same way.
+
+| Field                                                 | Type                       | Notes                                                                   |
+| ----------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------- |
+| `cultivationId`                                       | string                     |                                                                         |
+| `status`                                              | `FeedConversionStatus`     |                                                                         |
+| `ratio`                                               | number or null             | kg of feed per kg gained                                                |
+| `periodStart`, `periodEnd`                            | date or null               | The earliest and latest sample days; `null` with fewer than two samples |
+| `feedGiven`                                           | `Quantity` (`KG`) or null  | `null` with fewer than two samples                                      |
+| `startBiomass`, `endBiomass`, `biomassGain`           | `Quantity` (`KG`) or null  | `null` with fewer than two samples                                      |
+| `feedingRecordCount`                                  | integer                    | Feeding records counted in the period                                   |
+| `growthSampleCount`                                   | integer                    | All the cultivation's growth samples                                    |
+| `intervals`                                           | `FeedConversionInterval[]` | `{ periodStart, periodEnd, feedGiven, biomassGain, ratio }`             |
+| `basis`                                               | string[]                   | Plain sentences on how the figure was worked out                        |
+| `message`                                             | string                     | One sentence for the farmer on the result or on what is missing         |
+| `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                 | The method is unreviewed demo logic (`demo-2026-09-fcr`)                |
+
+A signed-out call answers `401 AUTH_REQUIRED`, an account below `PRO` `403 FORBIDDEN`, and a missing or another account's cultivation `404 NOT_FOUND`. With the demo seed, Tilapia Batch #001 reads 90.5 kg of feed over a 66.3 kg gain (21.0 kg to 87.3 kg) from 21 August to 21 September: a ratio of 1.37.
 
 ## 10. Harvest Schemas
 
@@ -809,7 +1162,21 @@ Revenue equals total harvest kilograms multiplied by price per kilogram using de
 
 ### ProductDetail
 
-Extends `ProductSummary` with `{ images, description, specifications: [{ label, value }], suitableSpeciesIds, suitableEnvironmentIds, recommendation: { cultivationId, why } | null, maximumOrderQuantity }`.
+Extends `ProductSummary` with `{ images, description, specifications: [{ label, value }], suitableSpeciesIds, suitableEnvironmentIds, recommendation: { cultivationId, why } | null, maximumOrderQuantity, installationGuide: InstallationGuide | null }`.
+
+`installationGuide` is how to set the product up, or `null` for a product that needs no installing (feed, nets).
+
+#### InstallationGuide
+
+| Field          | Type                                       | Notes                                                                            |
+| -------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| `steps`        | `[{ order: integer, title, instruction }]` | At least one; in `order`, numbered from 1                                        |
+| `cautions`     | string[]                                   | Safety points to read before starting; may be empty                              |
+| `isDemo`       | boolean                                    | `true` while `sourceStatus` is `DEMO`                                            |
+| `sourceStatus` | `SourceStatus`                             |                                                                                  |
+| `disclaimer`   | string                                     | Shown with the guide; the seeded text points the farmer to the supplier's manual |
+
+The seed carries guides for the aerator (`GBY-AER-001`), water pump (`GBY-PMP-018`), filter pad (`GBY-FLT-009`) and test kit (`GBY-TST-004`); the feed and scoop net answer `null`. Disclaimer: "General steps for this demo listing, not the supplier's manual. Follow the manual that comes with the product and local electrical safety rules."
 
 `FavoriteResult`: `{ productId, isFavorite }`.
 
@@ -891,12 +1258,122 @@ Representative order creation request:
 | `readAt`                             | timestamp or null             |
 | `action`                             | `{ label, deepLink } \| null` |
 | `cultivationId`, `orderId`, `taskId` | string or null                |
+| `reminder`                           | `ReminderDetail \| null`      |
+| `weatherAlert`                       | `WeatherAlert \| null`        |
+
+`reminder` is set on the reminders below and null on every other notification. `weatherAlert` is
+set on a `WEATHER_ALERT` notification (§12 Weather alerts) and null on every other.
+
+#### ReminderDetail
+
+| Field                                                          | Type                                               | Notes                            |
+| -------------------------------------------------------------- | -------------------------------------------------- | -------------------------------- |
+| `waterChangePercent`                                           | number or null                                     | `WATER_CHANGE_DUE` only          |
+| `harvestWindowDays`                                            | `{ minimum, maximum }` or null                     | `HARVEST_APPROACHING` only; hint |
+| `latestAverageWeight`                                          | `Quantity \| null`                                 | `HARVEST_APPROACHING` only       |
+| `targetWeightRange`                                            | `{ minimum: Quantity, maximum: Quantity } \| null` | `HARVEST_APPROACHING` only       |
+| `basis`, `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                                         | Required; shown when `isDemo`    |
 
 `UnreadCount`: `{ count: integer }`.
 
 `ReadAllNotificationsRequest`: optional `{ category: NotificationCategory | null, through: timestamp | null }`.
 
 Notifications are grouped by localized date on the client. The API returns precise timestamps, not labels such as “Yesterday.”
+
+### Reminders
+
+There is no background scheduler and no push. When the signed-in account reads Home, the
+notification list or the unread count, the server first raises the reminders that have fallen
+due for each of its cultivations that is `ACTIVE`, `GROWING` or `PRE_HARVEST` with a `stockedOn`
+on or before today (Asia/Manila). Each reminder is keyed per cultivation, kind and slot, so it
+appears once however often those reads repeat. A slot is decided when it falls due: raised while
+its `NotificationSettings` switch is on, skipped for good while it is off, and never raised later
+when the switch comes back on. Only today's slots are raised; days the farmer did not open the app
+are not back-filled. All reminders are `category` `CULTIVATION`.
+
+| Reminder     | Slot                                                  | Raises                                                                                                                                                                                                                                                     | Switch             |
+| ------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| Feeding      | today at `morningFeedingTime`, `afternoonFeedingTime` | once the time has passed: a `FEEDING` task (`DUE`, `dueAt` one hour later, `recommendedAmount` the day's feeding-plan portion once a growth sample exists, else null) and a `FEEDING_DUE` notification for it, `occurredAt` the feeding time, `taskId` set | `feedingReminders` |
+| Water change | each `intervalDays` since `stockedOn`, from the first | a `WATER_CHANGE_DUE` notification naming the species/environment `percentOfVolume` (30 % by default, `isDemo` true) as a partial change; `waterChangePercent` carries it. No row for the environment, no reminder                                          | `waterMaintenance` |
+| Harvest      | each growth sample                                    | a `HARVEST_APPROACHING` alert once the latest sample reaches the target band's minimum and is no older than `measurementFreshDays`; it says the grower decides when the size is right, and `harvestWindowDays` (120-150) is only a hint                    | `harvestReminders` |
+
+The feeding task is part of the day's schedule, so it is created even while `feedingReminders` is
+off; only its notification follows the switch. Days since stocking never raise a harvest alert: a
+cultivation without a current sample gets none however long it has run. No reminder asks for a
+full water replacement; the message and `waterChangePercent` describe a partial change.
+Completing a feeding task marks its reminder read (§9).
+
+### Weather alerts
+
+Weather alerts warn the farmer ahead of weather that GABAYAN.md ties to fish losses: hot days,
+when warm water holds less oxygen while the fish need more, and runs of overcast days, when the
+algae stop making oxygen and a dying bloom can use it up overnight. They come from a daily forecast
+for the farm's `municipality` and `province` (matched ignoring case and surrounding spaces); there
+is no GPS location in v1. Nothing runs in the background: `GET /weather-alerts`, `GET
+/dashboard/home`, `GET /notifications` and `GET /notifications/unread-count` first read the
+forecast for today and the following days (`forecastDays`, 3 in v1, today included) and raise the
+alerts it calls for.
+
+An alert is a run of consecutive forecast days on which a rule's measure reaches its demo
+threshold, lasting at least the rule's minimum run. It is keyed per farm, location, kind and first
+day, so it is raised once however often those reads repeat, and it keeps the period and figures of
+the forecast that raised it. Raising one also raises a notification - `category` `CULTIVATION`,
+`type` `WEATHER_ALERT`, `action` null, `cultivationId`/`orderId`/`taskId` null, `weatherAlert` the
+alert - once, with no settings switch. Alerts are for the farm, so they are raised whether or not a
+cultivation is running. A farm without a location, and a forecast that cannot be read, raise
+nothing.
+
+| Rule (DEMO, `demo-2026-09-weather`) | Measure                           | A day counts from | `WARNING` when a day reaches | Minimum run |
+| ----------------------------------- | --------------------------------- | ----------------- | ---------------------------- | ----------- |
+| `HIGH_TEMPERATURE`                  | the day's maximum air temperature | 34 °C             | 36 °C                        | 1 day       |
+| `OVERCAST_SPELL`                    | the day's mean cloud cover        | 80 %              | 90 %                         | 2 days      |
+
+Every other alert is `ADVISORY`. The thresholds are rule data held by revision, not constants,
+and are demo values not yet reviewed for Philippine farms; an alert never tells the farmer to
+replace the pond water.
+
+#### WeatherAlerts
+
+| Field          | Type                                 | Notes                                                                                                                           |
+| -------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `status`       | `WeatherAlertsStatus`                | `LOCATION_MISSING` without a farm profile, or with no `municipality` or no `province`                                           |
+| `location`     | `{ municipality, province } \| null` | the farm's place as saved; null when `LOCATION_MISSING`                                                                         |
+| `forecastDays` | integer                              | days the forecast covers from today, today included                                                                             |
+| `checkedAt`    | timestamp or null                    | when the forecast was read; null unless `AVAILABLE`                                                                             |
+| `alerts`       | `WeatherAlert[]`                     | alerts raised for this location whose `periodEnd` is today or later, by `periodStart` then kind                                 |
+| `message`      | string                               | one plain sentence for the state: no alerts in the coming days, how to add the location, or that the forecast could not be read |
+
+`alerts` is empty when `LOCATION_MISSING`. With `FORECAST_UNAVAILABLE` it still lists the current
+alerts raised from an earlier forecast.
+
+#### WeatherAlert
+
+| Field                                                          | Type                         | Notes                                                                           |
+| -------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| `id`                                                           | string                       |                                                                                 |
+| `kind`                                                         | `WeatherAlertKind`           |                                                                                 |
+| `severity`                                                     | `WeatherAlertSeverity`       |                                                                                 |
+| `location`                                                     | `{ municipality, province }` | the place the forecast was read for                                             |
+| `periodStart`, `periodEnd`                                     | date                         | first and last forecast day of the run, Asia/Manila; equal for a single day     |
+| `peak`                                                         | `Quantity`                   | highest value in the period: `CELSIUS` air temperature or `PERCENT` cloud cover |
+| `threshold`                                                    | `Quantity`                   | the rule's "a day counts from" value, in the same unit                          |
+| `title`, `message`                                             | string                       | short heading and one-line summary, as on the notification                      |
+| `explanation`                                                  | string                       | the risk to the fish in plain words                                             |
+| `actions`                                                      | string[]                     | a few practical steps; never a full water replacement                           |
+| `raisedAt`                                                     | timestamp                    |                                                                                 |
+| `basis`, `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                   | Required; shown when `isDemo`                                                   |
+
+#### Fixture forecast
+
+The development mock, and the fake weather adapter the backend's tests select, answer from this
+fixture, with days counted from the server's today. Every other location reads as San Pablo City.
+
+| Municipality, province   | Day 0 / 1 / 2: maximum air temperature; mean cloud cover | Answer                                                                 |
+| ------------------------ | -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| San Pablo City, Laguna   | 31 / 32 / 31 °C; 45 / 55 / 60 %                          | `AVAILABLE`, no alerts                                                 |
+| Dagupan City, Pangasinan | 33.5 / 34.6 / 35.3 °C; 30 / 20 / 15 %                    | `AVAILABLE`, one `HIGH_TEMPERATURE` `ADVISORY`, days 1-2, peak 35.3 °C |
+| Dumangas, Iloilo         | 29 / 28 / 28 °C; 85 / 92 / 88 %                          | `AVAILABLE`, one `OVERCAST_SPELL` `WARNING`, days 0-2, peak 92 %       |
+| Jomalig, Quezon          | cannot be read                                           | `FORECAST_UNAVAILABLE`                                                 |
 
 ## 13. State Transition Rules
 
@@ -934,17 +1411,21 @@ Mock tracking advancement may be fixture-driven; the frontend must not manufactu
 
 ## 14. Derived-Data Ownership and Invalidation
 
-| Mutation           | Server recalculates/returns                          | Client invalidates                       |
-| ------------------ | ---------------------------------------------------- | ---------------------------------------- |
-| Cultivation create | status, dates, tasks, recommendation context         | Home, cultivation lists/detail           |
-| Task complete      | task, linked record, task progress                   | Home, tasks, detail, notifications       |
-| Growth create      | latest weight, growth stage, feeding plan, readiness | Detail, growth, feed, readiness, Home    |
-| Mortality create   | mortality total, live fish, feeding plan             | Detail, mortality, feed, readiness, Home |
-| Feeding create     | daily recorded/planned progress                      | Tasks, records, Home                     |
-| Water check create | guidance and generated tasks                         | Tasks, water checks, Home                |
-| Cart change        | line totals and all cart totals                      | Cart/badge/checkout quote                |
-| Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications         |
-| Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness               |
+| Mutation           | Server recalculates/returns                          | Client invalidates                                        |
+| ------------------ | ---------------------------------------------------- | --------------------------------------------------------- |
+| Cultivation create | status, dates, tasks, recommendation context         | Home, cultivation lists/detail, account tier              |
+| Task complete      | task, linked record, task progress                   | Home, tasks, detail, notifications, feed conversion       |
+| Growth create      | latest weight, growth stage, feeding plan, readiness | Detail, growth, feed, readiness, Home, feed conversion    |
+| Mortality create   | mortality total, live fish, feeding plan             | Detail, mortality, feed, readiness, Home, feed conversion |
+| Feeding create     | daily recorded/planned progress                      | Tasks, records, Home, feed conversion                     |
+| Water check create | guidance and generated tasks                         | Tasks, water checks, Home                                 |
+| Cart change        | line totals and all cart totals                      | Cart/badge/checkout quote                                 |
+| Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications                          |
+| Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness, account tier                  |
+| Upgrade request    | pending request                                      | Account tier                                              |
+| Water safety check | per-reading result; stores nothing                   | nothing                                                   |
+| Water log create   | per-reading status against the ranges                | Water-parameter logs                                      |
+| Farm update        | location the weather alerts are read for             | Weather alerts, notifications, Home                       |
 
 Client-side optimistic updates are acceptable for notification read state and favorites. Use pessimistic updates for biological records, checkout, order placement, and harvest completion.
 
@@ -960,9 +1441,10 @@ Suggested persisted collections:
 users, farms, addresses, notificationSettings,
 species, cultureEnvironments, compatibilityRules, stockingRules,
 cultivations, tasks, growthMeasurements, mortalityRecords,
-feedingPlans, feedingRecords, waterChecks, harvestRecords,
+feedingPlans, feedingRecords, waterChecks, waterParameterLogs, harvestRecords,
 productCategories, products, favorites, carts, cartItems,
-orders, orderItems, trackingEvents, notifications, idempotencyRecords
+orders, orderItems, trackingEvents, notifications, idempotencyRecords,
+weatherAlertRules, weatherForecasts, weatherAlerts
 ```
 
 ### Parity checklist
@@ -976,7 +1458,7 @@ orders, orderItems, trackingEvents, notifications, idempotencyRecords
 - Snapshot rule version, product price, address, and estimate data where specified.
 - Return `camelCase` exactly.
 - Implement `Idempotency-Key` storage and replay for protected mutations.
-- Support deterministic clock/ID hooks in automated tests.
+- Support deterministic clock/ID hooks in automated tests. The mock takes its clock - which day is today and which reminders are due - from `createMockApi({ now })` or `MOCK_API_NOW`, and a request may pin it for itself with the test-only `X-Mock-Now: <RFC 3339 time>` header, which the app never sends. The contract and E2E suites pin the mock to `2026-09-23T07:30:00+08:00`, before the seed day's first feeding time.
 - Add configurable latency; disable it in contract/E2E tests.
 - Add explicit seeded error users/scenarios rather than frontend-only failures.
 - Reset from immutable fixtures through `npm run mock:reset` (final script name may vary but must be documented).

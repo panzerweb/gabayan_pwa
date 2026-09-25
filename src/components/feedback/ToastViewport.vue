@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
-import { useToastStore, type ToastTone } from '@/stores/toast'
+import { useToastStore, type ToastTone } from '@stores/toast.store'
 
 import AppIcon, { type AppIconName } from '../ui/AppIcon.vue'
 

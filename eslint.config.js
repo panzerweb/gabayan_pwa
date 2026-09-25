@@ -43,6 +43,35 @@ export default tseslint.config(
     },
   },
   {
+    // Every .vue file binds what a composable returns; server state, HTTP and the data layer
+    // stay behind composables, whether the file is a feature view, a shared component or a
+    // layout.
+    files: ['src/**/*.vue'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@tanstack/vue-query',
+              message: 'Wrap queries and mutations in a presentation/composables/use<Thing>.ts.',
+            },
+          ],
+          patterns: [
+            {
+              regex: '^@/?core/http(/|$)',
+              message: 'Call the API through the feature repository, from a composable.',
+            },
+            {
+              regex: '(^|/)data(/|$)',
+              message: 'Import data/ modules from a composable, never from a .vue file.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['mock-api/**/*.mjs', 'tests/contract/**/*.mjs'],
     languageOptions: {
       globals: globals.node,

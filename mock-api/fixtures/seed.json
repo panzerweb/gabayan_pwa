@@ -96,6 +96,42 @@
       "sourceStatus": "DEMO"
     },
     {
+      "id": "sp_grouper",
+      "commonName": "Grouper",
+      "localName": "Lapu-lapu",
+      "slug": "grouper",
+      "shortDescription": "A high-value saltwater fish, usually raised in sea cages or brackish ponds.",
+      "beginnerFriendly": false,
+      "image": {
+        "url": "/mock-media/grouper.svg",
+        "alt": "Grouper resting near a rocky bottom"
+      },
+      "estimatedCultureDays": {
+        "minimum": 180,
+        "maximum": 240
+      },
+      "active": true,
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "sp_shrimp",
+      "commonName": "Shrimp",
+      "localName": "Hipon",
+      "slug": "shrimp",
+      "shortDescription": "Raised in brackish-water ponds and needs close water-quality care.",
+      "beginnerFriendly": false,
+      "image": {
+        "url": "/mock-media/shrimp.svg",
+        "alt": "Shrimp on a pond bottom"
+      },
+      "estimatedCultureDays": {
+        "minimum": 90,
+        "maximum": 150
+      },
+      "active": true,
+      "sourceStatus": "DEMO"
+    },
+    {
       "id": "sp_carp",
       "commonName": "Carp",
       "localName": "Carp",
@@ -238,6 +274,66 @@
       "ruleVersion": "demo-2026-09"
     },
     {
+      "id": "compat_grouper_pond",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "status": "CAUTION",
+      "title": "Check the water before continuing",
+      "message": "Lapu-lapu need brackish or salt water. Plan a pond only where the salinity suits them and local technical guidance is available.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "compat_grouper_tank",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "status": "CAUTION",
+      "title": "Review water management first",
+      "message": "A Lapu-lapu tank needs steady salinity, filtration, and aeration. Plan it with local technical guidance.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "compat_grouper_cage",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Lapu-lapu in a sea cage at a suitable, approved site.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "compat_shrimp_pond",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "status": "COMPATIBLE",
+      "title": "This setup can be planned",
+      "message": "This demo profile supports Shrimp in a brackish-water pond.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "compat_shrimp_tank",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "status": "CAUTION",
+      "title": "Review water management first",
+      "message": "A Shrimp tank needs strong aeration and close water-quality checks. Plan it with local technical guidance.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "compat_shrimp_cage",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_cage",
+      "status": "NOT_RECOMMENDED",
+      "title": "Choose another culture environment",
+      "message": "Shrimp live and feed on the bottom, so a floating fish cage does not suit them. This prototype has no Shrimp cage profile.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
       "id": "compat_carp_pond",
       "speciesId": "sp_carp",
       "environmentId": "env_pond",
@@ -306,12 +402,13 @@
       "id": "stock_milkfish_pond",
       "speciesId": "sp_milkfish",
       "environmentId": "env_pond",
-      "basis": "WATER_VOLUME",
-      "minimumDensity": 10,
-      "maximumDensity": 14,
-      "densityUnit": "FISH_PER_M3",
+      "basis": "SURFACE_AREA",
+      "minimumDensity": 0.8,
+      "maximumDensity": 1,
+      "densityUnit": "FISH_PER_M2",
+      "explanation": "Demo range of about one square metre of pond per bangus, for a semi-intensive pond kept at least 1.0-1.2 m deep. Taken from the Gabayan brief's sizing sample (5,000 bangus in about 5,000 m²); not yet reviewed.",
       "sourceStatus": "DEMO",
-      "ruleVersion": "demo-2026-09"
+      "ruleVersion": "demo-2026-09-gabayan"
     },
     {
       "id": "stock_milkfish_cage",
@@ -347,6 +444,66 @@
       "ruleVersion": "demo-2026-09"
     },
     {
+      "id": "stock_grouper_pond",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "basis": "SURFACE_AREA",
+      "minimumDensity": 0.5,
+      "maximumDensity": 1,
+      "densityUnit": "FISH_PER_M2",
+      "explanation": "Placeholder demo density for planning only. No reviewed Lapu-lapu pond figure is available yet.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "stock_grouper_tank",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 5,
+      "maximumDensity": 10,
+      "densityUnit": "FISH_PER_M3",
+      "explanation": "Placeholder demo density for planning only. No reviewed Lapu-lapu tank figure is available yet.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "stock_grouper_cage",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 10,
+      "maximumDensity": 15,
+      "densityUnit": "FISH_PER_M3",
+      "explanation": "Placeholder demo density for planning only. No reviewed Lapu-lapu cage figure is available yet.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "stock_shrimp_pond",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "basis": "SURFACE_AREA",
+      "minimumDensity": 10,
+      "maximumDensity": 20,
+      "densityUnit": "FISH_PER_M2",
+      "explanation": "Placeholder demo density for planning only. No reviewed Shrimp pond figure is available yet.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "stock_shrimp_tank",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "basis": "WATER_VOLUME",
+      "minimumDensity": 20,
+      "maximumDensity": 40,
+      "densityUnit": "FISH_PER_M3",
+      "explanation": "Placeholder demo density for planning only. No reviewed Shrimp tank figure is available yet.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
       "id": "stock_carp_pond",
       "speciesId": "sp_carp",
       "environmentId": "env_pond",
@@ -367,6 +524,985 @@
       "densityUnit": "FISH_PER_M3",
       "sourceStatus": "DEMO",
       "ruleVersion": "demo-2026-09"
+    }
+  ],
+  "speciesProfiles": [
+    {
+      "id": "profile_tilapia",
+      "speciesId": "sp_tilapia",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "growthStages": [
+        {
+          "id": "stage_tilapia_growing",
+          "code": "GROWING",
+          "name": "Growing",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 0,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 300,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        },
+        {
+          "id": "stage_tilapia_pre_harvest",
+          "code": "PRE_HARVEST",
+          "name": "Pre-harvest",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 300,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 450,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        }
+      ],
+      "feedingRules": [
+        {
+          "id": "feed_tilapia_growing",
+          "growthStageCode": "GROWING",
+          "growthStage": "Growing",
+          "minimumWeightG": 0,
+          "maximumWeightG": 300,
+          "feedRatePercentRange": {
+            "minimum": 3,
+            "maximum": 3
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "feed_tilapia_pre_harvest",
+          "growthStageCode": "PRE_HARVEST",
+          "growthStage": "Pre-harvest",
+          "minimumWeightG": 300,
+          "maximumWeightG": null,
+          "feedRatePercentRange": {
+            "minimum": 2.5,
+            "maximum": 2.5
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "waterGuidance": [
+        {
+          "id": "guide_tilapia_routine",
+          "trigger": "ROUTINE_OBSERVATION",
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_tilapia_unusual",
+          "trigger": "UNUSUAL_CHANGE",
+          "severity": "CAUTION",
+          "title": "Review the change promptly",
+          "message": "An unusual change was recorded. Check available water-quality measurements and seek local technical guidance before taking major action.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_tilapia_low_oxygen",
+          "trigger": "LOW_DISSOLVED_OXYGEN",
+          "severity": "CAUTION",
+          "title": "Watch for low oxygen",
+          "message": "Dissolved oxygen below about 2.0-3.0 mg/L can leave stock gasping at the surface and cause losses overnight. Uneaten feed uses up oxygen as it rots, so avoid overfeeding.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_tilapia_water_depth",
+          "trigger": "WATER_DEPTH",
+          "severity": "CAUTION",
+          "title": "Keep enough water depth",
+          "message": "In ponds and cages, keep at least 1.0-1.2 m of water. Deeper water warms more slowly at midday and holds oxygen better.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "harvestTarget": {
+        "targetMinimumG": 350,
+        "targetMaximumG": 450,
+        "readySoonFromG": 300,
+        "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan"
+      },
+      "waterExchange": [
+        {
+          "id": "water_exchange_tilapia_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_tilapia_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Dissolved Oxygen for Fish Production (FA002)",
+          "organization": "University of Florida IFAS Extension",
+          "url": "https://ask.ifas.ufl.edu/publication/FA002",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Dissolved Oxygen",
+          "organization": "Fondriest Environmental",
+          "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Gabayan prototype demo profile",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        }
+      ]
+    },
+    {
+      "id": "profile_milkfish",
+      "speciesId": "sp_milkfish",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "growthStages": [
+        {
+          "id": "stage_milkfish_growing",
+          "code": "GROWING",
+          "name": "Growing",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 0,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 300,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        },
+        {
+          "id": "stage_milkfish_pre_harvest",
+          "code": "PRE_HARVEST",
+          "name": "Pre-harvest",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 300,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 450,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        }
+      ],
+      "feedingRules": [
+        {
+          "id": "feed_milkfish_growing",
+          "growthStageCode": "GROWING",
+          "growthStage": "Growing",
+          "minimumWeightG": 0,
+          "maximumWeightG": 300,
+          "feedRatePercentRange": {
+            "minimum": 3,
+            "maximum": 3
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "feed_milkfish_pre_harvest",
+          "growthStageCode": "PRE_HARVEST",
+          "growthStage": "Pre-harvest",
+          "minimumWeightG": 300,
+          "maximumWeightG": null,
+          "feedRatePercentRange": {
+            "minimum": 2.5,
+            "maximum": 2.5
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "waterGuidance": [
+        {
+          "id": "guide_milkfish_routine",
+          "trigger": "ROUTINE_OBSERVATION",
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_milkfish_unusual",
+          "trigger": "UNUSUAL_CHANGE",
+          "severity": "CAUTION",
+          "title": "Review the change promptly",
+          "message": "An unusual change was recorded. Check available water-quality measurements and seek local technical guidance before taking major action.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_milkfish_low_oxygen",
+          "trigger": "LOW_DISSOLVED_OXYGEN",
+          "severity": "CAUTION",
+          "title": "Watch for low oxygen",
+          "message": "Dissolved oxygen below about 2.0-3.0 mg/L can leave stock gasping at the surface and cause losses overnight. Uneaten feed uses up oxygen as it rots, so avoid overfeeding.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_milkfish_water_depth",
+          "trigger": "WATER_DEPTH",
+          "severity": "CAUTION",
+          "title": "Keep enough water depth",
+          "message": "In ponds and cages, keep at least 1.0-1.2 m of water. Deeper water warms more slowly at midday and holds oxygen better.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "harvestTarget": {
+        "targetMinimumG": 350,
+        "targetMaximumG": 450,
+        "readySoonFromG": 300,
+        "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan"
+      },
+      "waterExchange": [
+        {
+          "id": "water_exchange_milkfish_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_milkfish_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Gabayan product brief: semi-intensive bangus pond sizing sample",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Dissolved Oxygen for Fish Production (FA002)",
+          "organization": "University of Florida IFAS Extension",
+          "url": "https://ask.ifas.ufl.edu/publication/FA002",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Dissolved Oxygen",
+          "organization": "Fondriest Environmental",
+          "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Gabayan prototype demo profile",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        }
+      ]
+    },
+    {
+      "id": "profile_catfish",
+      "speciesId": "sp_catfish",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "growthStages": [
+        {
+          "id": "stage_catfish_growing",
+          "code": "GROWING",
+          "name": "Growing",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 0,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 300,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        },
+        {
+          "id": "stage_catfish_pre_harvest",
+          "code": "PRE_HARVEST",
+          "name": "Pre-harvest",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 300,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 450,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        }
+      ],
+      "feedingRules": [
+        {
+          "id": "feed_catfish_growing",
+          "growthStageCode": "GROWING",
+          "growthStage": "Growing",
+          "minimumWeightG": 0,
+          "maximumWeightG": 300,
+          "feedRatePercentRange": {
+            "minimum": 3,
+            "maximum": 3
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "feed_catfish_pre_harvest",
+          "growthStageCode": "PRE_HARVEST",
+          "growthStage": "Pre-harvest",
+          "minimumWeightG": 300,
+          "maximumWeightG": null,
+          "feedRatePercentRange": {
+            "minimum": 2.5,
+            "maximum": 2.5
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "waterGuidance": [
+        {
+          "id": "guide_catfish_routine",
+          "trigger": "ROUTINE_OBSERVATION",
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_catfish_unusual",
+          "trigger": "UNUSUAL_CHANGE",
+          "severity": "CAUTION",
+          "title": "Review the change promptly",
+          "message": "An unusual change was recorded. Check available water-quality measurements and seek local technical guidance before taking major action.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_catfish_low_oxygen",
+          "trigger": "LOW_DISSOLVED_OXYGEN",
+          "severity": "CAUTION",
+          "title": "Watch for low oxygen",
+          "message": "Dissolved oxygen below about 2.0-3.0 mg/L can leave stock gasping at the surface and cause losses overnight. Uneaten feed uses up oxygen as it rots, so avoid overfeeding.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_catfish_water_depth",
+          "trigger": "WATER_DEPTH",
+          "severity": "CAUTION",
+          "title": "Keep enough water depth",
+          "message": "In ponds and cages, keep at least 1.0-1.2 m of water. Deeper water warms more slowly at midday and holds oxygen better.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "harvestTarget": {
+        "targetMinimumG": 350,
+        "targetMaximumG": 450,
+        "readySoonFromG": 300,
+        "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan"
+      },
+      "waterExchange": [
+        {
+          "id": "water_exchange_catfish_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_catfish_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Dissolved Oxygen for Fish Production (FA002)",
+          "organization": "University of Florida IFAS Extension",
+          "url": "https://ask.ifas.ufl.edu/publication/FA002",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Dissolved Oxygen",
+          "organization": "Fondriest Environmental",
+          "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Gabayan prototype demo profile",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        }
+      ]
+    },
+    {
+      "id": "profile_grouper",
+      "speciesId": "sp_grouper",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "growthStages": [
+        {
+          "id": "stage_grouper_growing",
+          "code": "GROWING",
+          "name": "Growing",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 0,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 300,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        },
+        {
+          "id": "stage_grouper_pre_harvest",
+          "code": "PRE_HARVEST",
+          "name": "Pre-harvest",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 300,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 450,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        }
+      ],
+      "feedingRules": [
+        {
+          "id": "feed_grouper_growing",
+          "growthStageCode": "GROWING",
+          "growthStage": "Growing",
+          "minimumWeightG": 0,
+          "maximumWeightG": 300,
+          "feedRatePercentRange": {
+            "minimum": 3,
+            "maximum": 3
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "feed_grouper_pre_harvest",
+          "growthStageCode": "PRE_HARVEST",
+          "growthStage": "Pre-harvest",
+          "minimumWeightG": 300,
+          "maximumWeightG": null,
+          "feedRatePercentRange": {
+            "minimum": 2.5,
+            "maximum": 2.5
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "waterGuidance": [
+        {
+          "id": "guide_grouper_routine",
+          "trigger": "ROUTINE_OBSERVATION",
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_grouper_unusual",
+          "trigger": "UNUSUAL_CHANGE",
+          "severity": "CAUTION",
+          "title": "Review the change promptly",
+          "message": "An unusual change was recorded. Check available water-quality measurements and seek local technical guidance before taking major action.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_grouper_low_oxygen",
+          "trigger": "LOW_DISSOLVED_OXYGEN",
+          "severity": "CAUTION",
+          "title": "Watch for low oxygen",
+          "message": "Dissolved oxygen below about 2.0-3.0 mg/L can leave stock gasping at the surface and cause losses overnight. Uneaten feed uses up oxygen as it rots, so avoid overfeeding.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_grouper_water_depth",
+          "trigger": "WATER_DEPTH",
+          "severity": "CAUTION",
+          "title": "Keep enough water depth",
+          "message": "In ponds and cages, keep at least 1.0-1.2 m of water. Deeper water warms more slowly at midday and holds oxygen better.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "harvestTarget": {
+        "targetMinimumG": 350,
+        "targetMaximumG": 450,
+        "readySoonFromG": 300,
+        "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan"
+      },
+      "waterExchange": [
+        {
+          "id": "water_exchange_grouper_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_grouper_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Dissolved Oxygen for Fish Production (FA002)",
+          "organization": "University of Florida IFAS Extension",
+          "url": "https://ask.ifas.ufl.edu/publication/FA002",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Dissolved Oxygen",
+          "organization": "Fondriest Environmental",
+          "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Gabayan prototype demo profile",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        }
+      ]
+    },
+    {
+      "id": "profile_shrimp",
+      "speciesId": "sp_shrimp",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "growthStages": [
+        {
+          "id": "stage_shrimp_growing",
+          "code": "GROWING",
+          "name": "Growing",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 0,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 300,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        },
+        {
+          "id": "stage_shrimp_pre_harvest",
+          "code": "PRE_HARVEST",
+          "name": "Pre-harvest",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 300,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 450,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        }
+      ],
+      "feedingRules": [
+        {
+          "id": "feed_shrimp_growing",
+          "growthStageCode": "GROWING",
+          "growthStage": "Growing",
+          "minimumWeightG": 0,
+          "maximumWeightG": 300,
+          "feedRatePercentRange": {
+            "minimum": 3,
+            "maximum": 3
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "feed_shrimp_pre_harvest",
+          "growthStageCode": "PRE_HARVEST",
+          "growthStage": "Pre-harvest",
+          "minimumWeightG": 300,
+          "maximumWeightG": null,
+          "feedRatePercentRange": {
+            "minimum": 2.5,
+            "maximum": 2.5
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "waterGuidance": [
+        {
+          "id": "guide_shrimp_routine",
+          "trigger": "ROUTINE_OBSERVATION",
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_shrimp_unusual",
+          "trigger": "UNUSUAL_CHANGE",
+          "severity": "CAUTION",
+          "title": "Review the change promptly",
+          "message": "An unusual change was recorded. Check available water-quality measurements and seek local technical guidance before taking major action.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_shrimp_low_oxygen",
+          "trigger": "LOW_DISSOLVED_OXYGEN",
+          "severity": "CAUTION",
+          "title": "Watch for low oxygen",
+          "message": "Dissolved oxygen below about 2.0-3.0 mg/L can leave stock gasping at the surface and cause losses overnight. Uneaten feed uses up oxygen as it rots, so avoid overfeeding.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "guide_shrimp_water_depth",
+          "trigger": "WATER_DEPTH",
+          "severity": "CAUTION",
+          "title": "Keep enough water depth",
+          "message": "In ponds and cages, keep at least 1.0-1.2 m of water. Deeper water warms more slowly at midday and holds oxygen better.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "harvestTarget": {
+        "targetMinimumG": 350,
+        "targetMaximumG": 450,
+        "readySoonFromG": 300,
+        "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan"
+      },
+      "waterExchange": [
+        {
+          "id": "water_exchange_shrimp_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_shrimp_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Dissolved Oxygen for Fish Production (FA002)",
+          "organization": "University of Florida IFAS Extension",
+          "url": "https://ask.ifas.ufl.edu/publication/FA002",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Dissolved Oxygen",
+          "organization": "Fondriest Environmental",
+          "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+          "reviewedAt": null,
+          "reviewedBy": null
+        },
+        {
+          "title": "Gabayan prototype demo profile",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        }
+      ]
+    },
+    {
+      "id": "profile_carp",
+      "speciesId": "sp_carp",
+      "ruleVersion": "demo-2026-09",
+      "growthStages": [
+        {
+          "id": "stage_carp_growing",
+          "code": "GROWING",
+          "name": "Growing",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 0,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 300,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        },
+        {
+          "id": "stage_carp_pre_harvest",
+          "code": "PRE_HARVEST",
+          "name": "Pre-harvest",
+          "minimumDay": null,
+          "maximumDay": null,
+          "expectedWeightRange": {
+            "minimum": {
+              "value": 300,
+              "unit": "G"
+            },
+            "maximum": {
+              "value": 450,
+              "unit": "G"
+            }
+          },
+          "sourceStatus": "DEMO"
+        }
+      ],
+      "feedingRules": [
+        {
+          "id": "feed_carp_growing",
+          "growthStageCode": "GROWING",
+          "growthStage": "Growing",
+          "minimumWeightG": 0,
+          "maximumWeightG": 300,
+          "feedRatePercentRange": {
+            "minimum": 3,
+            "maximum": 3
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        },
+        {
+          "id": "feed_carp_pre_harvest",
+          "growthStageCode": "PRE_HARVEST",
+          "growthStage": "Pre-harvest",
+          "minimumWeightG": 300,
+          "maximumWeightG": null,
+          "feedRatePercentRange": {
+            "minimum": 2.5,
+            "maximum": 2.5
+          },
+          "feedingsPerDay": 2,
+          "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        }
+      ],
+      "waterGuidance": [
+        {
+          "id": "guide_carp_routine",
+          "trigger": "ROUTINE_OBSERVATION",
+          "severity": "INFO",
+          "title": "Continue regular observation",
+          "message": "No unusual change was recorded. Continue observing fish behavior and water condition.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        },
+        {
+          "id": "guide_carp_unusual",
+          "trigger": "UNUSUAL_CHANGE",
+          "severity": "CAUTION",
+          "title": "Review the change promptly",
+          "message": "An unusual change was recorded. Check available water-quality measurements and seek local technical guidance before taking major action.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        }
+      ],
+      "harvestTarget": {
+        "targetMinimumG": 350,
+        "targetMaximumG": 450,
+        "readySoonFromG": 300,
+        "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09"
+      },
+      "waterExchange": [
+        {
+          "id": "water_exchange_carp_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        },
+        {
+          "id": "water_exchange_carp_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        }
+      ],
+      "sources": [
+        {
+          "title": "Gabayan prototype demo profile",
+          "organization": "Gabayan",
+          "url": null,
+          "reviewedAt": null,
+          "reviewedBy": null
+        }
+      ]
     }
   ],
   "stockingEstimates": [],
@@ -457,6 +1593,8 @@
         "status": "RECOMMENDED",
         "differenceToRange": 0,
         "suggestedFingerlings": 500,
+        "requiredSpace": { "value": 27.28, "unit": "M3" },
+        "additionalSpaceNeeded": { "value": 0, "unit": "M3" },
         "basis": {
           "type": "WATER_VOLUME",
           "densityMinimum": 15,
@@ -641,6 +1779,263 @@
       "createdAt": "2026-09-21T22:30:00Z"
     }
   ],
+  "waterParameterLogs": [
+    {
+      "id": "wlog_tilapia_001",
+      "cultivationId": "cul_tilapia_001",
+      "loggedAt": "2026-09-09T23:00:00Z",
+      "readings": {
+        "salinityPpt": 0.5,
+        "ph": 7.4,
+        "ammoniaMgL": 0.2,
+        "nitriteMgL": 0.1,
+        "nitrateMgL": 12,
+        "dissolvedOxygenMgL": 5.8,
+        "temperatureC": 28.5
+      },
+      "results": [
+        {
+          "parameter": "SALINITY",
+          "name": "Salinity",
+          "unit": "PPT",
+          "value": 0.5,
+          "minimum": null,
+          "maximum": 15,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "PH",
+          "name": "pH",
+          "unit": "PH",
+          "value": 7.4,
+          "minimum": 6.5,
+          "maximum": 8.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "AMMONIA",
+          "name": "Ammonia",
+          "unit": "MG_PER_L",
+          "value": 0.2,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRITE",
+          "name": "Nitrite",
+          "unit": "MG_PER_L",
+          "value": 0.1,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRATE",
+          "name": "Nitrate",
+          "unit": "MG_PER_L",
+          "value": 12,
+          "minimum": null,
+          "maximum": 50,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "DISSOLVED_OXYGEN",
+          "name": "Dissolved oxygen",
+          "unit": "MG_PER_L",
+          "value": 5.8,
+          "minimum": 3,
+          "maximum": null,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "WATER_TEMPERATURE",
+          "name": "Water temperature",
+          "unit": "CELSIUS",
+          "value": 28.5,
+          "minimum": 25,
+          "maximum": 32,
+          "status": "WITHIN_RANGE"
+        }
+      ],
+      "notLogged": [],
+      "outOfRangeCount": 0,
+      "notes": "Morning reading with the freshwater test kit.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-09T23:00:00Z",
+      "isDemo": true,
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+    },
+    {
+      "id": "wlog_tilapia_002",
+      "cultivationId": "cul_tilapia_001",
+      "loggedAt": "2026-09-16T23:00:00Z",
+      "readings": {
+        "salinityPpt": null,
+        "ph": 7.8,
+        "ammoniaMgL": 0.8,
+        "nitriteMgL": 0.3,
+        "nitrateMgL": null,
+        "dissolvedOxygenMgL": 4.2,
+        "temperatureC": 29
+      },
+      "results": [
+        {
+          "parameter": "PH",
+          "name": "pH",
+          "unit": "PH",
+          "value": 7.8,
+          "minimum": 6.5,
+          "maximum": 8.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "AMMONIA",
+          "name": "Ammonia",
+          "unit": "MG_PER_L",
+          "value": 0.8,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "ABOVE_RANGE"
+        },
+        {
+          "parameter": "NITRITE",
+          "name": "Nitrite",
+          "unit": "MG_PER_L",
+          "value": 0.3,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "DISSOLVED_OXYGEN",
+          "name": "Dissolved oxygen",
+          "unit": "MG_PER_L",
+          "value": 4.2,
+          "minimum": 3,
+          "maximum": null,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "WATER_TEMPERATURE",
+          "name": "Water temperature",
+          "unit": "CELSIUS",
+          "value": 29,
+          "minimum": 25,
+          "maximum": 32,
+          "status": "WITHIN_RANGE"
+        }
+      ],
+      "notLogged": ["SALINITY", "NITRATE"],
+      "outOfRangeCount": 1,
+      "notes": "Water looked greener than last week.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-16T23:00:00Z",
+      "isDemo": true,
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+    },
+    {
+      "id": "wlog_tilapia_003",
+      "cultivationId": "cul_tilapia_001",
+      "loggedAt": "2026-09-21T22:00:00Z",
+      "readings": {
+        "salinityPpt": 0.5,
+        "ph": 7.6,
+        "ammoniaMgL": 0.4,
+        "nitriteMgL": 0.2,
+        "nitrateMgL": 18,
+        "dissolvedOxygenMgL": 2.6,
+        "temperatureC": 30.5
+      },
+      "results": [
+        {
+          "parameter": "SALINITY",
+          "name": "Salinity",
+          "unit": "PPT",
+          "value": 0.5,
+          "minimum": null,
+          "maximum": 15,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "PH",
+          "name": "pH",
+          "unit": "PH",
+          "value": 7.6,
+          "minimum": 6.5,
+          "maximum": 8.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "AMMONIA",
+          "name": "Ammonia",
+          "unit": "MG_PER_L",
+          "value": 0.4,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRITE",
+          "name": "Nitrite",
+          "unit": "MG_PER_L",
+          "value": 0.2,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRATE",
+          "name": "Nitrate",
+          "unit": "MG_PER_L",
+          "value": 18,
+          "minimum": null,
+          "maximum": 50,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "DISSOLVED_OXYGEN",
+          "name": "Dissolved oxygen",
+          "unit": "MG_PER_L",
+          "value": 2.6,
+          "minimum": 3,
+          "maximum": null,
+          "status": "BELOW_RANGE"
+        },
+        {
+          "parameter": "WATER_TEMPERATURE",
+          "name": "Water temperature",
+          "unit": "CELSIUS",
+          "value": 30.5,
+          "minimum": 25,
+          "maximum": 32,
+          "status": "WITHIN_RANGE"
+        }
+      ],
+      "notLogged": [],
+      "outOfRangeCount": 1,
+      "notes": "Fish were gulping at the surface before sunrise.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-21T22:00:00Z",
+      "isDemo": true,
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+    }
+  ],
   "harvestRecords": [],
   "tasks": [
     {
@@ -705,6 +2100,70 @@
     }
   ],
   "feedingRecords": [
+    {
+      "id": "feed_tilapia_week_1",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-08-28T10:00:00Z",
+      "amount": {
+        "value": 19,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-08-28T10:00:00Z"
+    },
+    {
+      "id": "feed_tilapia_week_2",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-09-05T10:00:00Z",
+      "amount": {
+        "value": 23,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-05T10:00:00Z"
+    },
+    {
+      "id": "feed_tilapia_week_3",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-09-13T10:00:00Z",
+      "amount": {
+        "value": 23.5,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-13T10:00:00Z"
+    },
+    {
+      "id": "feed_tilapia_week_4",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-09-20T10:00:00Z",
+      "amount": {
+        "value": 25,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-20T10:00:00Z"
+    },
     {
       "id": "feed_tilapia_001",
       "cultivationId": "cul_tilapia_001",
@@ -778,7 +2237,8 @@
       },
       "cultivationId": "cul_tilapia_001",
       "orderId": null,
-      "taskId": "task_feed_pm"
+      "taskId": "task_feed_pm",
+      "reminder": null
     },
     {
       "id": "ntf_water_check",
@@ -796,7 +2256,8 @@
       },
       "cultivationId": "cul_tilapia_001",
       "orderId": null,
-      "taskId": "task_water_check"
+      "taskId": "task_water_check",
+      "reminder": null
     },
     {
       "id": "ntf_tip_observation",
@@ -811,7 +2272,8 @@
       "action": null,
       "cultivationId": "cul_tilapia_001",
       "orderId": null,
-      "taskId": null
+      "taskId": null,
+      "reminder": null
     },
     {
       "id": "ntf_order_shipped",
@@ -826,7 +2288,162 @@
       "action": { "label": "Track order", "deepLink": "/app/orders/ord_10245/tracking" },
       "cultivationId": null,
       "orderId": "ord_10245",
-      "taskId": null
+      "taskId": null,
+      "reminder": null
+    },
+    {
+      "id": "ntf_water_change_cul_tilapia_001_6",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "WATER_CHANGE_DUE",
+      "title": "Partial water change due",
+      "message": "Tilapia Batch #001: change about 30% of the water, a little at a time. Keep the rest so conditions stay steady for the fish.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-18T00:30:00Z",
+      "readAt": "2026-09-18T01:00:00Z",
+      "action": {
+        "label": "Open water records",
+        "deepLink": "/app/cultivations/cul_tilapia_001/records?tab=water"
+      },
+      "cultivationId": "cul_tilapia_001",
+      "orderId": null,
+      "taskId": null,
+      "reminder": {
+        "waterChangePercent": 30,
+        "harvestWindowDays": null,
+        "latestAverageWeight": null,
+        "targetWeightRange": null,
+        "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan",
+        "disclaimer": "A demo schedule, not yet reviewed for your farm. Look at the water and the fish first, and change less or wait if local technical guidance says so."
+      }
+    },
+    {
+      "id": "ntf_water_change_cul_tilapia_harvest_21",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "WATER_CHANGE_DUE",
+      "title": "Partial water change due",
+      "message": "Tilapia Harvest Demo: change about 30% of the water, a little at a time. Keep the rest so conditions stay steady for the fish.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-21T00:30:00Z",
+      "readAt": "2026-09-21T02:00:00Z",
+      "action": {
+        "label": "Open water records",
+        "deepLink": "/app/cultivations/cul_tilapia_harvest/records?tab=water"
+      },
+      "cultivationId": "cul_tilapia_harvest",
+      "orderId": null,
+      "taskId": null,
+      "reminder": {
+        "waterChangePercent": 30,
+        "harvestWindowDays": null,
+        "latestAverageWeight": null,
+        "targetWeightRange": null,
+        "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan",
+        "disclaimer": "A demo schedule, not yet reviewed for your farm. Look at the water and the fish first, and change less or wait if local technical guidance says so."
+      }
+    },
+    {
+      "id": "ntf_harvest_cul_tilapia_harvest_grw_tilapia_harvest",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "HARVEST_APPROACHING",
+      "title": "Your fish may be near harvest size",
+      "message": "The latest sample from Tilapia Harvest Demo averages 360 g, which reaches the 350-450 g demo target. You decide when the size is right; weigh a fresh sample before you harvest.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-22T01:05:00Z",
+      "readAt": "2026-09-22T03:00:00Z",
+      "action": {
+        "label": "Check harvest readiness",
+        "deepLink": "/app/cultivations/cul_tilapia_harvest/harvest"
+      },
+      "cultivationId": "cul_tilapia_harvest",
+      "orderId": null,
+      "taskId": null,
+      "reminder": {
+        "waterChangePercent": null,
+        "harvestWindowDays": {
+          "minimum": 120,
+          "maximum": 150
+        },
+        "latestAverageWeight": {
+          "value": 360,
+          "unit": "G"
+        },
+        "targetWeightRange": {
+          "minimum": {
+            "value": 350,
+            "unit": "G"
+          },
+          "maximum": {
+            "value": 450,
+            "unit": "G"
+          }
+        },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan",
+        "disclaimer": "Harvest readiness is an estimate, not a guarantee. Use a current representative sample and local professional judgment."
+      }
+    }
+  ],
+  "reminderSlots": [
+    {
+      "id": "rem_cul_tilapia_001_feeding_20260923morning",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_001",
+      "kind": "FEEDING",
+      "slot": "2026-09-23:MORNING",
+      "taskId": "task_feed_am",
+      "notificationId": null,
+      "decidedAt": "2026-09-23T00:00:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_001_feeding_20260923afternoon",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_001",
+      "kind": "FEEDING",
+      "slot": "2026-09-23:AFTERNOON",
+      "taskId": "task_feed_pm",
+      "notificationId": "ntf_feed_pm",
+      "decidedAt": "2026-09-23T07:45:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_001_water_change_6",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_001",
+      "kind": "WATER_CHANGE",
+      "slot": "6",
+      "taskId": null,
+      "notificationId": "ntf_water_change_cul_tilapia_001_6",
+      "decidedAt": "2026-09-18T00:30:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_harvest_water_change_21",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_harvest",
+      "kind": "WATER_CHANGE",
+      "slot": "21",
+      "taskId": null,
+      "notificationId": "ntf_water_change_cul_tilapia_harvest_21",
+      "decidedAt": "2026-09-21T00:30:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_harvest_harvest_grwtilapiaharvest",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_harvest",
+      "kind": "HARVEST",
+      "slot": "grw_tilapia_harvest",
+      "taskId": null,
+      "notificationId": "ntf_harvest_cul_tilapia_harvest_grw_tilapia_harvest",
+      "decidedAt": "2026-09-22T01:05:00Z"
     }
   ],
   "productCategories": [
@@ -1198,5 +2815,2143 @@
       "current": false
     }
   ],
-  "idempotencyRecords": []
+  "idempotencyRecords": [],
+  "taskReopenings": [],
+  "tierPlans": [
+    {
+      "code": "FREE",
+      "name": "Free",
+      "description": "For a first pond, cage or tank: one culture system with general guidance.",
+      "cultureSystemLimit": 1,
+      "price": {
+        "amountMinor": 0,
+        "currency": "PHP"
+      },
+      "billingPeriod": "MONTH",
+      "entitlements": [
+        {
+          "code": "CULTIVATION_GUIDANCE",
+          "label": "Daily cultivation guidance and farm records"
+        },
+        {
+          "code": "STOCKING_CALCULATOR",
+          "label": "Pond size and stocking calculator"
+        },
+        {
+          "code": "MARKETPLACE",
+          "label": "Marketplace for tools and feeds"
+        },
+        {
+          "code": "WATER_THRESHOLD_GUIDELINES",
+          "label": "Water-quality guideline ranges for your fish"
+        },
+        {
+          "code": "WATER_SAFETY_CHECK",
+          "label": "One-off water safety check"
+        }
+      ]
+    },
+    {
+      "code": "PRO",
+      "name": "Pro",
+      "description": "For growers with several ponds or cages who want to keep their own water readings.",
+      "cultureSystemLimit": 10,
+      "price": null,
+      "billingPeriod": null,
+      "entitlements": [
+        {
+          "code": "CULTIVATION_GUIDANCE",
+          "label": "Daily cultivation guidance and farm records"
+        },
+        {
+          "code": "STOCKING_CALCULATOR",
+          "label": "Pond size and stocking calculator"
+        },
+        {
+          "code": "MARKETPLACE",
+          "label": "Marketplace for tools and feeds"
+        },
+        {
+          "code": "WATER_THRESHOLD_GUIDELINES",
+          "label": "Water-quality guideline ranges for your fish"
+        },
+        {
+          "code": "WATER_SAFETY_CHECK",
+          "label": "One-off water safety check"
+        },
+        {
+          "code": "WATER_PARAMETER_LOGS",
+          "label": "Saved water readings with history"
+        },
+        {
+          "code": "FEED_CONVERSION_TRACKING",
+          "label": "Feed conversion tracking"
+        }
+      ]
+    },
+    {
+      "code": "ORGANIZATION",
+      "name": "Organization",
+      "description": "For cooperatives, companies and government programmes that manage many culture systems.",
+      "cultureSystemLimit": 100,
+      "price": {
+        "amountMinor": 499900,
+        "currency": "PHP"
+      },
+      "billingPeriod": "MONTH",
+      "entitlements": [
+        {
+          "code": "CULTIVATION_GUIDANCE",
+          "label": "Daily cultivation guidance and farm records"
+        },
+        {
+          "code": "STOCKING_CALCULATOR",
+          "label": "Pond size and stocking calculator"
+        },
+        {
+          "code": "MARKETPLACE",
+          "label": "Marketplace for tools and feeds"
+        },
+        {
+          "code": "WATER_THRESHOLD_GUIDELINES",
+          "label": "Water-quality guideline ranges for your fish"
+        },
+        {
+          "code": "WATER_SAFETY_CHECK",
+          "label": "One-off water safety check"
+        },
+        {
+          "code": "WATER_PARAMETER_LOGS",
+          "label": "Saved water readings with history"
+        },
+        {
+          "code": "FEED_CONVERSION_TRACKING",
+          "label": "Feed conversion tracking"
+        }
+      ]
+    }
+  ],
+  "accountTiers": [
+    {
+      "ownerUserId": "usr_juan",
+      "tierCode": "PRO",
+      "updatedAt": "2026-08-06T00:00:00Z"
+    }
+  ],
+  "upgradeRequests": [],
+  "waterParameters": [
+    {
+      "code": "SALINITY",
+      "name": "Salinity",
+      "unit": "PPT",
+      "readingField": "salinityPpt",
+      "inputMinimum": 0,
+      "inputMaximum": 80,
+      "explanation": "How salty the water is, in parts per thousand (ppt). Fresh water is near 0 and sea water is about 35."
+    },
+    {
+      "code": "PH",
+      "name": "pH",
+      "unit": "PH",
+      "readingField": "ph",
+      "inputMinimum": 0,
+      "inputMaximum": 14,
+      "explanation": "How acidic or alkaline the water is, on a scale of 0 to 14 where 7 is neutral. Big swings stress stock."
+    },
+    {
+      "code": "AMMONIA",
+      "name": "Ammonia",
+      "unit": "MG_PER_L",
+      "readingField": "ammoniaMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 50,
+      "explanation": "A waste that builds up from fish droppings and uneaten feed. Even a little can harm gills."
+    },
+    {
+      "code": "NITRITE",
+      "name": "Nitrite",
+      "unit": "MG_PER_L",
+      "readingField": "nitriteMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 50,
+      "explanation": "Forms as ammonia breaks down. It makes it harder for stock to carry oxygen in their blood."
+    },
+    {
+      "code": "NITRATE",
+      "name": "Nitrate",
+      "unit": "MG_PER_L",
+      "readingField": "nitrateMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 1000,
+      "explanation": "The last and mildest stage of waste breakdown. High levels show waste is piling up over time."
+    },
+    {
+      "code": "DISSOLVED_OXYGEN",
+      "name": "Dissolved oxygen",
+      "unit": "MG_PER_L",
+      "readingField": "dissolvedOxygenMgL",
+      "inputMinimum": 0,
+      "inputMaximum": 30,
+      "explanation": "The oxygen in the water that stock breathe. It drops at night, in hot weather and when feed rots."
+    },
+    {
+      "code": "WATER_TEMPERATURE",
+      "name": "Water temperature",
+      "unit": "CELSIUS",
+      "readingField": "temperatureC",
+      "inputMinimum": 0,
+      "inputMaximum": 45,
+      "explanation": "How warm the water is. Warm water holds less oxygen and makes stock eat and breathe faster."
+    }
+  ],
+  "waterThresholds": [
+    {
+      "id": "wt_tilapia_pond_salinity",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 15,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_ph",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_ammonia",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_nitrite",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_nitrate",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_dissolved_oxygen",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_pond_water_temperature",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_salinity",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 15,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_ph",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_ammonia",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_nitrite",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_nitrate",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_dissolved_oxygen",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_tank_water_temperature",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_salinity",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 15,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_ph",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_ammonia",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_nitrite",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_nitrate",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_dissolved_oxygen",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_tilapia_cage_water_temperature",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_salinity",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_ph",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 7,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_ammonia",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_nitrite",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_nitrate",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_dissolved_oxygen",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_pond_water_temperature",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_salinity",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_ph",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "PH",
+      "minimum": 7,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_ammonia",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_nitrite",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_nitrate",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_dissolved_oxygen",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_milkfish_cage_water_temperature",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_salinity",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_ph",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_ammonia",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_nitrite",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_nitrate",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_dissolved_oxygen",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_pond_water_temperature",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_salinity",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_ph",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_ammonia",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_nitrite",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_nitrate",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_dissolved_oxygen",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_catfish_tank_water_temperature",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 25,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_salinity",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": 20,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_ph",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_ammonia",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_nitrite",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_nitrate",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_dissolved_oxygen",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_pond_water_temperature",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_salinity",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": 20,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_ph",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_ammonia",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_nitrite",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_nitrate",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_dissolved_oxygen",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_tank_water_temperature",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_salinity",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "SALINITY",
+      "minimum": 20,
+      "maximum": 35,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_ph",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_ammonia",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_nitrite",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_nitrate",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_dissolved_oxygen",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_grouper_cage_water_temperature",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_salinity",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 25,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_ph",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_ammonia",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_nitrite",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_nitrate",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_dissolved_oxygen",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_pond_water_temperature",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_salinity",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": 10,
+      "maximum": 25,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_ph",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 7.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_ammonia",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_nitrite",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_nitrate",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_dissolved_oxygen",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_shrimp_tank_water_temperature",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 26,
+      "maximum": 32,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_salinity",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_ph",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_ammonia",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_nitrite",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_nitrate",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_dissolved_oxygen",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_pond_water_temperature",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 20,
+      "maximum": 30,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_salinity",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "SALINITY",
+      "minimum": null,
+      "maximum": 5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_ph",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "PH",
+      "minimum": 6.5,
+      "maximum": 8.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_ammonia",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "AMMONIA",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_nitrite",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "NITRITE",
+      "minimum": null,
+      "maximum": 0.5,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_nitrate",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "NITRATE",
+      "minimum": null,
+      "maximum": 50,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_dissolved_oxygen",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "DISSOLVED_OXYGEN",
+      "minimum": 3,
+      "maximum": null,
+      "basis": "Dissolved oxygen under about 2.0-3.0 mg/L is critical for survival (UF/IFAS FA002; Fondriest Environmental, cited in the Gabayan product brief). Demo figure, not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "wt_carp_tank_water_temperature",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "parameter": "WATER_TEMPERATURE",
+      "minimum": 20,
+      "maximum": 30,
+      "basis": "Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    }
+  ],
+  "waterRangeSources": [
+    {
+      "title": "Dissolved Oxygen for Fish Production (FA002)",
+      "organization": "University of Florida IFAS Extension",
+      "url": "https://ask.ifas.ufl.edu/publication/FA002",
+      "reviewedAt": null,
+      "reviewedBy": null
+    },
+    {
+      "title": "Dissolved Oxygen",
+      "organization": "Fondriest Environmental",
+      "url": "https://www.fondriest.com/environmental-measurements/parameters/water-quality/dissolved-oxygen/",
+      "reviewedAt": null,
+      "reviewedBy": null
+    },
+    {
+      "title": "Gabayan placeholder water ranges",
+      "organization": "Gabayan",
+      "url": null,
+      "reviewedAt": null,
+      "reviewedBy": null
+    }
+  ],
+  "waterGuidance": [
+    {
+      "id": "wg_within",
+      "parameter": null,
+      "status": "WITHIN_RANGE",
+      "environmentCode": null,
+      "severity": "INFO",
+      "title": "Within the suggested range",
+      "message": "This reading sits inside the demo range. Keep checking at about the same time of day so changes are easy to spot."
+    },
+    {
+      "id": "wg_below",
+      "parameter": null,
+      "status": "BELOW_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "Lower than suggested",
+      "message": "This reading is below the demo range. Check it again to confirm, watch how your stock behave, and ask a local fisheries technician if it stays low."
+    },
+    {
+      "id": "wg_above",
+      "parameter": null,
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "Higher than suggested",
+      "message": "This reading is above the demo range. Check it again to confirm, watch how your stock behave, and ask a local fisheries technician if it stays high."
+    },
+    {
+      "id": "wg_ammonia_above",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "ACTION",
+      "title": "Ammonia is higher than suggested",
+      "message": "Feed less until it comes down and remove any uneaten feed. If your stock are gasping or not eating, consider changing part of the water where your setup allows it, then check again tomorrow."
+    },
+    {
+      "id": "wg_ammonia_above_cage",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "environmentCode": "FISH_CAGE",
+      "severity": "ACTION",
+      "title": "Ammonia is higher than suggested",
+      "message": "The water in a cage cannot be changed. Feed less until it comes down, clear anything that blocks water flowing through the net, and check again tomorrow."
+    },
+    {
+      "id": "wg_nitrite_above",
+      "parameter": "NITRITE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "ACTION",
+      "title": "Nitrite is higher than suggested",
+      "message": "Feed less for a day or two and remove uneaten feed. If your stock look weak, consider changing part of the water where your setup allows it, then check again."
+    },
+    {
+      "id": "wg_nitrite_above_cage",
+      "parameter": "NITRITE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": "FISH_CAGE",
+      "severity": "ACTION",
+      "title": "Nitrite is higher than suggested",
+      "message": "The water in a cage cannot be changed. Feed less for a day or two, keep the net clean so water flows through, and check again."
+    },
+    {
+      "id": "wg_nitrate_above",
+      "parameter": "NITRATE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "Nitrate is building up",
+      "message": "Waste is collecting over time. Avoid overfeeding, and where your setup allows it, a partial water change may help over the next few days."
+    },
+    {
+      "id": "wg_oxygen_below",
+      "parameter": "DISSOLVED_OXYGEN",
+      "status": "BELOW_RANGE",
+      "environmentCode": null,
+      "severity": "ACTION",
+      "title": "Oxygen is lower than suggested",
+      "message": "Stop feeding until it recovers. If you have an aerator, run it now, especially overnight. If stock gasp at the surface, get help from a local fisheries technician."
+    },
+    {
+      "id": "wg_oxygen_below_cage",
+      "parameter": "DISSOLVED_OXYGEN",
+      "status": "BELOW_RANGE",
+      "environmentCode": "FISH_CAGE",
+      "severity": "ACTION",
+      "title": "Oxygen is lower than suggested",
+      "message": "Stop feeding until it recovers and clear anything that blocks water flowing through the net. If stock gasp at the surface, get help from a local fisheries technician."
+    },
+    {
+      "id": "wg_temperature_above",
+      "parameter": "WATER_TEMPERATURE",
+      "status": "ABOVE_RANGE",
+      "environmentCode": null,
+      "severity": "CAUTION",
+      "title": "The water is warmer than suggested",
+      "message": "Warm water holds less oxygen. Feed smaller amounts in the cooler morning and late afternoon, and keep the water at least 1.0-1.2 m deep where you can."
+    }
+  ],
+  "waterRangeGuidance": [
+    {
+      "environmentCode": null,
+      "message": "Check readings at about the same time each day. If one leaves its range, feed less and check again before making big changes."
+    },
+    {
+      "environmentCode": "FISH_CAGE",
+      "message": "The water in a cage cannot be changed, so feeding and keeping water flowing through the net are the main ways to act on these readings."
+    }
+  ],
+  "sizingGuidance": [
+    {
+      "id": "size_tilapia_pond",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_tilapia_tank",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_tilapia_cage",
+      "speciesId": "sp_tilapia",
+      "environmentId": "env_cage",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_milkfish_pond",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 5000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief's sizing sample: a semi-intensive bangus pond kept at least 1.0-1.2 m deep. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_milkfish_cage",
+      "speciesId": "sp_milkfish",
+      "environmentId": "env_cage",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_catfish_pond",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_catfish_tank",
+      "speciesId": "sp_catfish",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_grouper_pond",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_grouper_tank",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_grouper_cage",
+      "speciesId": "sp_grouper",
+      "environmentId": "env_cage",
+      "exampleFingerlings": 1000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_shrimp_pond",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 10000,
+      "waterDepth": {
+        "minimum": 1.0,
+        "maximum": 1.2,
+        "unit": "M"
+      },
+      "depthBasis": "From the Gabayan brief: keep ponds and cages at least 1.0-1.2 m deep, so the water warms more slowly at midday and holds oxygen better. Not yet reviewed.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_shrimp_tank",
+      "speciesId": "sp_shrimp",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 1000,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for a tank or container yet. The brief's 1.0-1.2 m figure is for ponds and cages.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "size_carp_pond",
+      "speciesId": "sp_carp",
+      "environmentId": "env_pond",
+      "exampleFingerlings": 1000,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for Carp yet. Its prototype profile carries no depth figure.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    },
+    {
+      "id": "size_carp_tank",
+      "speciesId": "sp_carp",
+      "environmentId": "env_tank",
+      "exampleFingerlings": 200,
+      "waterDepth": null,
+      "depthBasis": "No suggested depth for Carp yet. Its prototype profile carries no depth figure.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09"
+    }
+  ],
+  "installationGuides": [
+    {
+      "id": "guide_pond_aerator",
+      "productId": "prd_pond_aerator",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Choose a spot",
+          "instruction": "Place the aerator where the water is deep enough to cover it fully, away from the inlet and from where you feed."
+        },
+        {
+          "order": 2,
+          "title": "Keep the power point dry",
+          "instruction": "Use an outlet sheltered from rain and above flood level. A safety breaker that cuts the power when current leaks into water (RCD or GFCI) is worth adding if you do not have one."
+        },
+        {
+          "order": 3,
+          "title": "Anchor the unit",
+          "instruction": "Tie the aerator to a stake or a float line so it cannot drift or pull on its cable."
+        },
+        {
+          "order": 4,
+          "title": "Run it and watch",
+          "instruction": "Switch it on and check that bubbles rise evenly and the water moves. Watch your stock for a few minutes; calm fish near the surface are a good sign."
+        }
+      ],
+      "cautions": [
+        "Switch off and unplug the aerator before touching it or reaching into the water.",
+        "Keep the cable off paths where people walk and away from anything that could cut it.",
+        "Follow the supplier's manual wherever it differs from these steps."
+      ],
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "guide_water_pump",
+      "productId": "prd_water_pump",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Screen the intake",
+          "instruction": "Fit a mesh screen over the intake so the pump cannot draw in fish or leaves."
+        },
+        {
+          "order": 2,
+          "title": "Set it off the bottom",
+          "instruction": "Rest the pump on a flat stone or brick so it does not suck up mud from the pond or tank floor."
+        },
+        {
+          "order": 3,
+          "title": "Connect the hose",
+          "instruction": "Push the hose fully onto the outlet and tighten the clamp before the pump goes into the water."
+        },
+        {
+          "order": 4,
+          "title": "Submerge, then switch on",
+          "instruction": "Lower the pump until it is fully under water, then plug it into a dry, sheltered outlet and check the flow at the hose end."
+        }
+      ],
+      "cautions": [
+        "Never run the pump out of water; it can overheat within minutes.",
+        "Unplug the pump before lifting it out or clearing the intake.",
+        "Move only part of the water at a time, as your culture system allows."
+      ],
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "guide_pond_filter",
+      "productId": "prd_pond_filter",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Cut to fit",
+          "instruction": "Trim the pad so it sits snugly in the filter housing with no gaps at the edges."
+        },
+        {
+          "order": 2,
+          "title": "Rinse in tank water",
+          "instruction": "Rinse the new pad in a bucket of water taken from the tank before fitting it."
+        },
+        {
+          "order": 3,
+          "title": "Fit and check the flow",
+          "instruction": "Place the pad in the housing, restart the water flow and check that water passes through the pad rather than around it."
+        }
+      ],
+      "cautions": [
+        "Clean a used pad in tank water, not tap water; chlorine in tap water can harm the helpful bacteria living on it.",
+        "Replace the pad when it tears or stays clogged after rinsing."
+      ],
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "guide_water_test_kit",
+      "productId": "prd_water_test_kit",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Take the sample",
+          "instruction": "Fill the test tube from about an arm’s length below the surface, away from the inlet, at the same time of day each time you test."
+        },
+        {
+          "order": 2,
+          "title": "Add the drops in order",
+          "instruction": "Add the reagent drops in the order the kit's card gives and wait the time it says."
+        },
+        {
+          "order": 3,
+          "title": "Read in daylight",
+          "instruction": "Hold the tube against the white side of the colour card in daylight and pick the closest colour."
+        },
+        {
+          "order": 4,
+          "title": "Check your readings",
+          "instruction": "Enter the readings in the water safety check to compare them with the suggested ranges for your fish."
+        }
+      ],
+      "cautions": [
+        "Keep the reagents away from children, and never pour them into the pond or tank.",
+        "Check the expiry date on each bottle; old reagents can give wrong colours."
+      ],
+      "sourceStatus": "DEMO"
+    }
+  ],
+  "waterProblemProducts": [
+    {
+      "id": "wpp_do_low_aerator",
+      "parameter": "DISSOLVED_OXYGEN",
+      "status": "BELOW_RANGE",
+      "productSku": "GBY-AER-001",
+      "whyRelevant": "An aerator adds oxygen to the water and may help while you look for the cause of the low reading.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ammonia_high_filter",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-FLT-009",
+      "whyRelevant": "A filter pad catches uneaten feed and waste before it breaks down into ammonia.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ammonia_high_test_kit",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck ammonia over the next few days to see whether it is coming down.",
+      "suggestedQuantity": 1,
+      "sortOrder": 2
+    },
+    {
+      "id": "wpp_nitrite_high_test_kit",
+      "parameter": "NITRITE",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck nitrite over the next few days to see whether it is coming down.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ph_low_test_kit",
+      "parameter": "PH",
+      "status": "BELOW_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck pH at the same time each day and see whether it settles.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ph_high_test_kit",
+      "parameter": "PH",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck pH at the same time each day and see whether it settles.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    }
+  ],
+  "feedGuides": [
+    {
+      "id": "feedguide_tilapia_growing",
+      "speciesId": "sp_tilapia",
+      "growthStageCode": "GROWING",
+      "feedType": "Tilapia grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 28,
+        "maximum": 32
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 4
+      },
+      "productSkus": ["GBY-FED-020"],
+      "basis": "Typical range printed on commercial tilapia grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_tilapia_pre_harvest",
+      "speciesId": "sp_tilapia",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Tilapia finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 25,
+        "maximum": 28
+      },
+      "pelletSizeMm": {
+        "minimum": 4,
+        "maximum": 6
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial tilapia finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_milkfish_growing",
+      "speciesId": "sp_milkfish",
+      "growthStageCode": "GROWING",
+      "feedType": "Bangus grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 27,
+        "maximum": 31
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 3
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial bangus grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_milkfish_pre_harvest",
+      "speciesId": "sp_milkfish",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Bangus finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 24,
+        "maximum": 27
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 4
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial bangus finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_catfish_growing",
+      "speciesId": "sp_catfish",
+      "growthStageCode": "GROWING",
+      "feedType": "Hito grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 30,
+        "maximum": 35
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 4
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial catfish grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_catfish_pre_harvest",
+      "speciesId": "sp_catfish",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Hito finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 28,
+        "maximum": 30
+      },
+      "pelletSizeMm": {
+        "minimum": 4,
+        "maximum": 6
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial catfish finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_grouper_growing",
+      "speciesId": "sp_grouper",
+      "growthStageCode": "GROWING",
+      "feedType": "Marine fish grower pellets, high protein",
+      "proteinPercent": {
+        "minimum": 42,
+        "maximum": 50
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 5
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial marine fish grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_grouper_pre_harvest",
+      "speciesId": "sp_grouper",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Marine fish finisher pellets, high protein",
+      "proteinPercent": {
+        "minimum": 40,
+        "maximum": 45
+      },
+      "pelletSizeMm": {
+        "minimum": 6,
+        "maximum": 8
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial marine fish finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_shrimp_growing",
+      "speciesId": "sp_shrimp",
+      "growthStageCode": "GROWING",
+      "feedType": "Shrimp grower pellets, sinking",
+      "proteinPercent": {
+        "minimum": 35,
+        "maximum": 40
+      },
+      "pelletSizeMm": {
+        "minimum": 1.5,
+        "maximum": 2
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial shrimp grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_shrimp_pre_harvest",
+      "speciesId": "sp_shrimp",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Shrimp finisher pellets, sinking",
+      "proteinPercent": {
+        "minimum": 32,
+        "maximum": 36
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 2.5
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial shrimp finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_carp_growing",
+      "speciesId": "sp_carp",
+      "growthStageCode": "GROWING",
+      "feedType": "Carp grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 28,
+        "maximum": 32
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 3
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial carp grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_carp_pre_harvest",
+      "speciesId": "sp_carp",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Carp finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 25,
+        "maximum": 28
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 5
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial carp finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    }
+  ],
+  "feedGuideSources": [
+    {
+      "title": "Development of cost-efficient feeds",
+      "organization": "SEAFDEC Aquaculture Department",
+      "url": "https://www.seafdec.org.ph/development-of-cost-efficient-feeds/",
+      "reviewedAt": null,
+      "reviewedBy": null
+    },
+    {
+      "title": "Gabayan placeholder feed profiles",
+      "organization": "Gabayan",
+      "url": null,
+      "reviewedAt": null,
+      "reviewedBy": null
+    }
+  ],
+  "weatherAlertRules": [
+    {
+      "id": "war_high_temperature_2026_09",
+      "kind": "HIGH_TEMPERATURE",
+      "measure": "MAXIMUM_AIR_TEMPERATURE",
+      "advisoryFrom": 34,
+      "warningFrom": 36,
+      "minimumConsecutiveDays": 1,
+      "active": true,
+      "title": "Hot days ahead",
+      "summary": "hot days are forecast",
+      "explanation": "Hot days warm the pond. Warm water holds less oxygen while the fish breathe and digest faster, so they can run short of oxygen, most of all in the afternoon and before dawn.",
+      "actions": [
+        "Feed in the cooler morning and late afternoon, and give less if the fish eat slowly.",
+        "Keep the water level up so the pond stays deeper and cooler, and run aeration if you have it.",
+        "Check the fish at dawn; fish gasping at the surface need oxygen quickly."
+      ],
+      "basis": "Demo thresholds for the day's maximum air temperature in the forecast for the farm's municipality. Air temperature stands in for water temperature, which the forecast does not give.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-weather"
+    },
+    {
+      "id": "war_overcast_spell_2026_09",
+      "kind": "OVERCAST_SPELL",
+      "measure": "MEAN_CLOUD_COVER",
+      "advisoryFrom": 80,
+      "warningFrom": 90,
+      "minimumConsecutiveDays": 2,
+      "active": true,
+      "title": "Cloudy days ahead",
+      "summary": "several cloudy days in a row are forecast",
+      "explanation": "Cloudy days slow the algae that make oxygen in the pond during the day. If a thick bloom dies off, rotting algae can use up the oxygen overnight and the fish may struggle by dawn.",
+      "actions": [
+        "Feed less while it stays cloudy; uneaten feed uses up oxygen as it rots.",
+        "Check the fish at dawn for gasping at the surface, and run aeration at night if you have it.",
+        "Watch the water colour; a quick change from green to brown or clear can mean the algae are dying."
+      ],
+      "basis": "Demo thresholds for the day's mean cloud cover in the forecast for the farm's municipality, over at least two days in a row.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-weather"
+    }
+  ],
+  "weatherForecasts": [
+    {
+      "id": "wfc_san_pablo_city",
+      "municipality": "San Pablo City",
+      "province": "Laguna",
+      "fallback": false,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 45
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 32,
+          "meanCloudCoverPercent": 55
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 60
+        }
+      ]
+    },
+    {
+      "id": "wfc_dagupan_city",
+      "municipality": "Dagupan City",
+      "province": "Pangasinan",
+      "fallback": false,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 33.5,
+          "meanCloudCoverPercent": 30
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 34.6,
+          "meanCloudCoverPercent": 20
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 35.3,
+          "meanCloudCoverPercent": 15
+        }
+      ]
+    },
+    {
+      "id": "wfc_dumangas",
+      "municipality": "Dumangas",
+      "province": "Iloilo",
+      "fallback": false,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 29,
+          "meanCloudCoverPercent": 85
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 28,
+          "meanCloudCoverPercent": 92
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 28,
+          "meanCloudCoverPercent": 88
+        }
+      ]
+    },
+    {
+      "id": "wfc_jomalig",
+      "municipality": "Jomalig",
+      "province": "Quezon",
+      "fallback": false,
+      "unavailable": true,
+      "days": []
+    },
+    {
+      "id": "wfc_fallback",
+      "municipality": null,
+      "province": null,
+      "fallback": true,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 45
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 32,
+          "meanCloudCoverPercent": 55
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 60
+        }
+      ]
+    }
+  ],
+  "weatherAlerts": []
 }

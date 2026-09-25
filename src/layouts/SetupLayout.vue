@@ -4,12 +4,13 @@ import { useRoute } from 'vue-router'
 
 import AppHeader from '@/components/navigation/AppHeader.vue'
 import SetupProgress from '@/components/navigation/SetupProgress.vue'
+import { ROUTE_NAMES } from '@router/route-names'
 
 const route = useRoute()
 
 const title = computed(() => String(route.meta.title ?? 'Set up your cultivation'))
-const backTo = computed(() => String(route.meta.backTo ?? '/setup'))
-const showBack = computed(() => typeof route.meta.backTo === 'string')
+const backTo = computed(() => ({ name: route.meta.backTo ?? ROUTE_NAMES.setupIntro }))
+const showBack = computed(() => Boolean(route.meta.backTo))
 const showProgress = computed(() => typeof route.meta.setupStep === 'number')
 const currentStep = computed(() => Number(route.meta.setupStep ?? 1))
 const totalSteps = computed(() => Number(route.meta.setupTotal ?? 4))

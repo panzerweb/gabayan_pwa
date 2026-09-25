@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import type { AppIconName } from '@/components/ui/AppIcon.vue'
-import AppIcon from '@/components/ui/AppIcon.vue'
-
-interface NavigationItem {
-  label: string
-  to: string
-  icon: AppIconName
-}
-
-const items: NavigationItem[] = [
-  { label: 'Home', to: '/app/home', icon: 'home' },
-  { label: 'Cultivations', to: '/app/cultivations', icon: 'fish' },
-  { label: 'Orders', to: '/app/orders', icon: 'bag' },
-  { label: 'Profile', to: '/app/profile', icon: 'profile' },
-]
+import AppIcon from '@components/ui/AppIcon.vue'
+import { PRIMARY_DESTINATIONS } from '@core/navigation'
 </script>
 
 <template>
   <nav class="bottom-navigation" aria-label="Primary navigation">
-    <RouterLink v-for="item in items" :key="item.to" class="bottom-navigation__item" :to="item.to">
+    <RouterLink
+      v-for="item in PRIMARY_DESTINATIONS"
+      :key="item.routeName"
+      class="bottom-navigation__item"
+      :to="{ name: item.routeName }"
+    >
       <AppIcon :name="item.icon" :size="23" />
       <span>{{ item.label }}</span>
     </RouterLink>

@@ -1,14 +1,31 @@
+import { copyFileSync, existsSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+
+import { addDays, dateInManila, daysBetween } from './dates.mjs'
+import { raiseDueReminders } from './reminders.mjs'
+import { raiseWeatherAlerts } from './weather-alerts.mjs'
+import {
+  WATER_LOG_NOTES_LIMIT,
+  evaluateWaterLog,
+  feedConversionFor,
+  parseWaterReadings,
+  readingStatus,
+} from './water-logs.mjs'
 
 const require = createRequire(import.meta.url)
 const jsonServer = require('json-server')
 
 const defaultDatabasePath = resolve(process.cwd(), 'mock-api', 'db.json')
-const apiVersion = '0.6.0'
+const seedDatabasePath = resolve(process.cwd(), 'mock-api', 'fixtures', 'seed.json')
+const apiVersion = '0.7.0'
 const ruleDisclaimer =
   "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+const feedGuideDisclaimer =
+  'Typical figures from commercial feed labels, not yet reviewed for your farm. Follow the label on the feed you buy and local technical guidance, and watch how your fish eat.'
+const installationDisclaimer =
+  "General steps for this demo listing, not the supplier's manual. Follow the manual that comes with the product and local electrical safety rules."
 
 function parsePositiveInteger(value, fallback, maximum) {
   if (value === undefined) return fallback
@@ -159,16 +176,125 @@ function cultivationSummary(cultivation) {
 }
 
 function publicNotification(notification) {
-  return omitKeys(notification, ['ownerUserId'])
+  return { reminder: null, weatherAlert: null, ...omitKeys(notification, ['ownerUserId']) }
 }
 
-function dateInManila(isoTimestamp) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Manila',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date(isoTimestamp))
+function isCalendarDate(value) {
+  return (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) &&
+    new Date(`${value}T00:00:00Z`).toISOString().startsWith(value)
+  )
+}
+
+// An RFC 3339 time must carry its zone; a bare local time is refused rather than guessed.
+function parseZonedTimestamp(value) {
+  if (typeof value !== 'string') return null
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/i.test(value)) {
+    return null
+  }
+  const moment = Date.parse(value)
+  return Number.isNaN(moment) ? null : new Date(moment).toISOString().replace('.000Z', 'Z')
+}
+
+// Reads `If-Match` as the bare version the contract writes, tolerating the quoted ETag
+// form. Undefined means an unconditional write; null means the header is malformed.
+function parseIfMatch(header) {
+  if (header === undefined || !String(header).trim()) return undefined
+  const text = String(header).trim().replace(/^W\//, '').replace(/^"|"$/g, '')
+  return /^\d+$/.test(text) && Number(text) >= 1 ? Number(text) : null
+}
+
+// Rounds up at `digits` decimals, so a space the fish need is never understated. The small
+// tolerance keeps a product such as 27.28 * 100 from rounding up past itself.
+function roundUp(value, digits) {
+  const scale = 10 ** digits
+  return Math.ceil(value * scale - 1e-9) / scale
+}
+
+// Contract §7: the least area (M2) or volume (M3) in which `fingerlings` stays within a
+// stocking rule's demo range, at the rule's highest density.
+function spaceFor(fingerlings, rule) {
+  return fingerlings / rule.maximumDensity
+}
+
+function spaceUnit(rule) {
+  return rule.basis === 'SURFACE_AREA' ? 'M2' : 'M3'
+}
+
+// Day number, progress and harvest date as FastAPI derives them from the stocking date.
+function stockingSchedule(stockedOn, durationDays, today) {
+  const dayNumber = daysBetween(stockedOn, today) + 1
+  const progressPercent = durationDays
+    ? Math.min(100, Math.max(0, Math.round((dayNumber / durationDays) * 100)))
+    : 0
+  return {
+    dayNumber,
+    progressPercent,
+    estimatedHarvestDate: durationDays ? addDays(stockedOn, durationDays) : null,
+  }
+}
+
+function validateCultivationPatch(body) {
+  const editable = ['name', 'stockedOn', 'notes']
+  const fields = {}
+  const changes = {}
+  for (const key of Object.keys(body)) {
+    if (!editable.includes(key)) fields[key] = ['Extra inputs are not permitted']
+  }
+  if (Object.hasOwn(body, 'name')) {
+    const name = body.name
+    if (name === null || (typeof name === 'string' && !name.trim())) {
+      fields.name = ['This field is required.']
+    } else if (typeof name !== 'string') fields.name = ['Enter text.']
+    else if (name.trim().length > 100) fields.name = ['Use at most 100 characters.']
+    else changes.name = name.trim()
+  }
+  if (Object.hasOwn(body, 'stockedOn')) {
+    if (body.stockedOn === null) fields.stockedOn = ['This field is required.']
+    else if (!isCalendarDate(body.stockedOn)) fields.stockedOn = ['Use a date as YYYY-MM-DD.']
+    else changes.stockedOn = body.stockedOn
+  }
+  if (Object.hasOwn(body, 'notes')) {
+    if (body.notes !== null && typeof body.notes !== 'string') fields.notes = ['Enter text.']
+    else if ((body.notes ?? '').trim().length > 1000) {
+      fields.notes = ['Use at most 1000 characters.']
+    } else changes.notes = (body.notes ?? '').trim() || null
+  }
+  return { fields, changes }
+}
+
+function validateFeedingRecord(body) {
+  const fields = {}
+  const fedAt = parseZonedTimestamp(body.fedAt)
+  if (!fedAt) {
+    fields.fedAt = ['Use an RFC 3339 time with a time zone, such as 2026-09-23T08:00:00Z.']
+  }
+  const amount = body.amount
+  const grams =
+    amount && Number.isFinite(amount.value) && ['G', 'KG'].includes(amount.unit)
+      ? amount.unit === 'KG'
+        ? amount.value * 1000
+        : amount.value
+      : null
+  if (grams === null || grams <= 0) {
+    fields.amount = ['Enter a feeding amount greater than 0 in g or kg.']
+  } else if (grams > 1000000) fields.amount = ['Enter a feeding amount of at most 1,000 kg.']
+  if (body.taskId !== undefined && body.taskId !== null && typeof body.taskId !== 'string') {
+    fields.taskId = ['Enter text.']
+  }
+  if (body.notes !== undefined && body.notes !== null && typeof body.notes !== 'string') {
+    fields.notes = ['Enter text.']
+  } else if (String(body.notes ?? '').trim().length > 1000) {
+    fields.notes = ['Use at most 1000 characters.']
+  }
+  return {
+    fields,
+    fedAt,
+    taskId: body.taskId ?? null,
+    notes: String(body.notes ?? '').trim() || null,
+  }
 }
 
 function validateRegistration(body) {
@@ -196,10 +322,20 @@ function validateRegistration(body) {
   return { fields, fullName, email, mobileNumber, password }
 }
 
-export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = {}) {
+// `now` (or MOCK_API_NOW) pins the clock that decides "today" and which reminders are due, so
+// tests read the seed the same way on any day; unset, the system clock is used. A request may
+// pin it for itself with the test-only `X-Mock-Now` header (contract §15).
+export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now } = {}) {
+  // db.json is an untracked working copy of the seed; start from the seed when it is absent.
+  if (!existsSync(databasePath)) copyFileSync(seedDatabasePath, databasePath)
+
   const app = jsonServer.create()
   const router = jsonServer.router(databasePath)
   const resolvedDelay = delayMs ?? Number(process.env.MOCK_API_DELAY_MS ?? 250)
+  const pinnedNow = now ?? process.env.MOCK_API_NOW ?? null
+  if (pinnedNow !== null && parseZonedTimestamp(pinnedNow) === null) {
+    throw new Error('MOCK_API_NOW must be an RFC 3339 time with a zone.')
+  }
   const accessTokens = new Map()
   const refreshTokens = new Map()
   let requestSequence = 0
@@ -251,6 +387,68 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return { amountMinor, currency: 'PHP' }
   }
 
+  // An account without a tier row is on FREE; only an operator moves it (BLOCKERS D-7).
+  function accountTierCode(userId) {
+    return router.db.get('accountTiers').find({ ownerUserId: userId }).value()?.tierCode ?? 'FREE'
+  }
+
+  function tierPlan(code) {
+    return router.db.get('tierPlans').find({ code }).value()
+  }
+
+  // One active culture system is one cultivation not yet COMPLETED or CANCELLED (D-8).
+  function activeCultureSystems(userId) {
+    return router.db
+      .get('cultivations')
+      .filter(
+        (cultivation) =>
+          cultivation.ownerUserId === userId &&
+          !['COMPLETED', 'CANCELLED'].includes(cultivation.status),
+      )
+      .size()
+      .value()
+  }
+
+  function publicUpgradeRequest(upgradeRequest) {
+    return omitKeys(upgradeRequest, ['ownerUserId'])
+  }
+
+  function accountTier(userId) {
+    const plan = tierPlan(accountTierCode(userId))
+    const active = activeCultureSystems(userId)
+    const pending = router.db
+      .get('upgradeRequests')
+      .find({ ownerUserId: userId, status: 'PENDING' })
+      .value()
+    return {
+      plan,
+      activeCultureSystems: active,
+      remainingCultureSystems: Math.max(0, plan.cultureSystemLimit - active),
+      pendingUpgradeRequest: pending ? publicUpgradeRequest(pending) : null,
+    }
+  }
+
+  // Contract §6 "Plan-gated routes": a signed-in account below `requiredTier` is refused
+  // with 403 FORBIDDEN before the resource is read (BLOCKERS D-54). Returns the user when the
+  // plan is enough, and null once a refusal has been sent.
+  function requireTier(request, response, requiredTier) {
+    const user = requireUser(request, response)
+    if (!user) return null
+    const plans = router.db.get('tierPlans').value()
+    const rankOf = (code) => plans.findIndex((plan) => plan.code === code)
+    const currentTier = accountTierCode(user.id)
+    if (rankOf(currentTier) >= rankOf(requiredTier)) return user
+    sendError(
+      response,
+      403,
+      'FORBIDDEN',
+      `This needs the ${tierPlan(requiredTier).name} plan. See the plans to ask for it.`,
+      null,
+      { requiredTier, currentTier },
+    )
+    return null
+  }
+
   function productSummary(product, userId) {
     const category = router.db.get('productCategories').find({ id: product.categoryId }).value()
     const isFavorite = Boolean(
@@ -285,7 +483,47 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       suitableEnvironmentIds: product.suitableEnvironmentIds,
       recommendation: product.recommendation,
       maximumOrderQuantity: product.maximumOrderQuantity,
+      installationGuide: installationGuideOf(product.id),
     }
+  }
+
+  // The product's installation steps and cautions in step order, or null when it has none.
+  function installationGuideOf(productId) {
+    const guide = router.db.get('installationGuides').find({ productId }).value()
+    if (!guide) return null
+    return {
+      steps: [...guide.steps].sort((left, right) => left.order - right.order),
+      cautions: guide.cautions,
+      isDemo: guide.sourceStatus === 'DEMO',
+      sourceStatus: guide.sourceStatus,
+      disclaimer: installationDisclaimer,
+    }
+  }
+
+  // Products that may address an out-of-range reading, limited to those listed as suitable
+  // for the culture system. A reading within its range recommends nothing.
+  function waterProblemProductsFor(parameterCode, status, environmentId, userId) {
+    if (status === 'WITHIN_RANGE') return []
+    return router.db
+      .get('waterProblemProducts')
+      .filter({ parameter: parameterCode, status })
+      .sortBy('sortOrder')
+      .value()
+      .map((row) => ({
+        row,
+        product: router.db.get('products').find({ sku: row.productSku }).value(),
+      }))
+      .filter(
+        ({ product }) =>
+          product &&
+          (!product.suitableEnvironmentIds.length ||
+            product.suitableEnvironmentIds.includes(environmentId)),
+      )
+      .map(({ row, product }) => ({
+        ...productSummary(product, userId),
+        whyRelevant: row.whyRelevant,
+        suggestedQuantity: row.suggestedQuantity,
+      }))
   }
 
   function getOrCreateCart(user) {
@@ -379,6 +617,59 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         .value()
     }
     return result
+  }
+
+  // Contract §7 SpeciesProfile: the summary row with the species' seeded rule rows. Only an
+  // explicit COMPATIBLE rule lists an environment; a CAUTION pairing is answered by
+  // `GET /compatibility`. Internal seed fields (weights, severity, basis) stay out.
+  function speciesProfile(species) {
+    const rules = router.db.get('speciesProfiles').find({ speciesId: species.id }).value()
+    const activeEnvironmentIds = new Set(
+      router.db
+        .get('cultureEnvironments')
+        .filter({ active: true })
+        .map((environment) => environment.id)
+        .value(),
+    )
+    const compatibleEnvironmentIds = router.db
+      .get('compatibilityRules')
+      .filter({ speciesId: species.id, status: 'COMPATIBLE' })
+      .map((rule) => rule.environmentId)
+      .value()
+      .filter((environmentId) => activeEnvironmentIds.has(environmentId))
+    const stockingRules = router.db
+      .get('stockingRules')
+      .filter({ speciesId: species.id })
+      .map((rule) => omitKeys(rule, ['explanation']))
+      .value()
+    const target = rules?.harvestTarget ?? null
+    return {
+      ...species,
+      compatibleEnvironmentIds,
+      growthStages: rules?.growthStages ?? [],
+      stockingRules,
+      feedingRules: (rules?.feedingRules ?? []).map((rule) => ({
+        id: rule.id,
+        speciesId: species.id,
+        growthStage: rule.growthStage,
+        feedRatePercentRange: rule.feedRatePercentRange,
+        feedingsPerDay: rule.feedingsPerDay,
+        sourceStatus: rule.sourceStatus,
+        ruleVersion: rule.ruleVersion,
+      })),
+      waterGuidance: (rules?.waterGuidance ?? []).map((rule) => ({
+        id: rule.id,
+        title: rule.title,
+        message: rule.message,
+        trigger: rule.trigger,
+        sourceStatus: rule.sourceStatus,
+        ruleVersion: rule.ruleVersion,
+      })),
+      targetHarvestWeight: target ? { value: target.targetMinimumG, unit: 'G' } : null,
+      sources: rules?.sources ?? [],
+      ruleVersion: rules?.ruleVersion ?? 'demo-2026-09',
+      disclaimer: ruleDisclaimer,
+    }
   }
 
   function averageWeightInGrams(cultivation) {
@@ -477,6 +768,115 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     }
   }
 
+  // Earliest scheduled task still ahead; a missed or cancelled task is not work to come.
+  function nextOpenTaskAt(cultivationId) {
+    const next = router.db
+      .get('tasks')
+      .filter(
+        (task) => task.cultivationId === cultivationId && ['UPCOMING', 'DUE'].includes(task.status),
+      )
+      .sortBy('scheduledAt')
+      .first()
+      .value()
+    return next?.scheduledAt ?? null
+  }
+
+  // Moves a task to COMPLETED with its linked record, bumps the cultivation's version and
+  // marks the task's reminders read, each stamped `changedAt` (now by default). Returns the
+  // stored task.
+  function markTaskCompleted(task, cultivation, { completedAt, record, changedAt }) {
+    const now = new Date().toISOString()
+    const completedTask = {
+      ...task,
+      status: 'COMPLETED',
+      completedAt,
+      completionRecordType: record?.type ?? null,
+      completionRecordId: record?.id ?? null,
+      audit: { ...task.audit, updatedAt: changedAt ?? now, version: task.audit.version + 1 },
+    }
+    router.db.get('tasks').find({ id: task.id }).assign(completedTask).write()
+    router.db
+      .get('cultivations')
+      .find({ id: cultivation.id })
+      .assign({
+        nextTaskAt: nextOpenTaskAt(cultivation.id),
+        updatedAt: changedAt ?? now,
+        version: cultivation.version + 1,
+      })
+      .write()
+    router.db
+      .get('notifications')
+      .filter({ ownerUserId: cultivation.ownerUserId, taskId: task.id })
+      .each((notification) => {
+        if (notification.readAt === null) notification.readAt = changedAt ?? now
+      })
+      .write()
+    return completedTask
+  }
+
+  function feedingKilogramsOn(cultivationId, day) {
+    const grams = router.db
+      .get('feedingRecords')
+      .filter((record) => record.cultivationId === cultivationId)
+      .value()
+      .filter((record) => dateInManila(record.fedAt) === day)
+      .reduce(
+        (total, record) =>
+          total + (record.amount.unit === 'KG' ? record.amount.value * 1000 : record.amount.value),
+        0,
+      )
+    return Number((grams / 1000).toFixed(3))
+  }
+
+  // The instant a handler treats as now: the pinned clock when there is one.
+  function currentTime(response) {
+    return response.locals.now ?? new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+  }
+
+  // Contract §6: settings exist from the first read, created with every reminder on.
+  function notificationSettingsFor(user) {
+    const existing = router.db.get('notificationSettings').find({ ownerUserId: user.id }).value()
+    if (existing) return existing
+    const settings = {
+      id: `notification_settings_${user.id}`,
+      ownerUserId: user.id,
+      feedingReminders: true,
+      waterMaintenance: true,
+      growthSampling: true,
+      harvestReminders: true,
+      orderUpdates: true,
+      educationalTips: true,
+      morningFeedingTime: '08:00',
+      afternoonFeedingTime: '16:30',
+      timezone: user.timezone,
+      updatedAt: new Date().toISOString(),
+      version: 1,
+    }
+    router.db.get('notificationSettings').push(settings).write()
+    return settings
+  }
+
+  // Raises the reminders due for the farmer, and the weather alerts the forecast calls for
+  // on their farm, before Home or the notifications answer (BLOCKERS D-22, D-11). A new
+  // feeding task moves `nextTaskAt`, a value the server derives, so the cultivation's version
+  // is left alone. Answers the farm's WeatherAlerts.
+  function raiseReminders(user, response) {
+    const cultivationIds = raiseDueReminders(router.db, {
+      user,
+      settings: notificationSettingsFor(user),
+      now: currentTime(response),
+      feedingPlan: feedingPlanFor,
+    })
+    for (const cultivationId of cultivationIds) {
+      router.db
+        .get('cultivations')
+        .find({ id: cultivationId })
+        .assign({ nextTaskAt: nextOpenTaskAt(cultivationId) })
+        .write()
+    }
+    return raiseWeatherAlerts(router.db, { user, now: currentTime(response) })
+  }
+
   app.disable('x-powered-by')
   app.use((request, response, next) => {
     const origin = request.get('origin')
@@ -487,7 +887,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     }
     response.set(
       'access-control-allow-headers',
-      'Authorization, Content-Type, Idempotency-Key, X-Request-Id',
+      'Authorization, Content-Type, Idempotency-Key, If-Match, X-Request-Id, X-Mock-Now',
     )
     response.set('access-control-allow-methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
     if (request.method === 'OPTIONS') return response.sendStatus(204)
@@ -500,6 +900,12 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const incomingId = request.get('x-request-id')
     response.locals.requestId = incomingId || `req_mock_${String(requestSequence).padStart(6, '0')}`
     response.set('x-request-id', response.locals.requestId)
+    const requestedNow = request.get('x-mock-now')
+    const clock = requestedNow === undefined ? pinnedNow : parseZonedTimestamp(requestedNow)
+    if (clock === null && requestedNow !== undefined) {
+      return sendError(response, 400, 'BAD_REQUEST', 'X-Mock-Now must be an RFC 3339 time.')
+    }
+    response.locals.now = clock ? parseZonedTimestamp(clock) : null
     if (resolvedDelay > 0) return setTimeout(next, resolvedDelay)
     next()
   })
@@ -602,7 +1008,14 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, issueSession(response, user))
   })
 
-  app.post('/api/v1/auth/password/forgot', (_request, response) => {
+  app.post('/api/v1/auth/password/forgot', (request, response) => {
+    // The answer never says whether an account matched; only a missing identifier is refused.
+    const identifier = request.body?.identifier
+    if (typeof identifier !== 'string' || !identifier.trim()) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', {
+        identifier: ['Enter your email or mobile number.'],
+      })
+    }
     return sendData(
       response,
       { message: 'If an account matches, password reset instructions are ready.' },
@@ -745,25 +1158,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/users/me/notification-settings', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
-    let settings = router.db.get('notificationSettings').find({ ownerUserId: user.id }).value()
-    if (!settings) {
-      settings = {
-        id: `notification_settings_${user.id}`,
-        ownerUserId: user.id,
-        feedingReminders: true,
-        waterMaintenance: true,
-        growthSampling: true,
-        harvestReminders: true,
-        orderUpdates: true,
-        educationalTips: true,
-        morningFeedingTime: '08:00',
-        afternoonFeedingTime: '16:30',
-        timezone: user.timezone,
-        updatedAt: new Date().toISOString(),
-        version: 1,
-      }
-      router.db.get('notificationSettings').push(settings).write()
-    }
+    const settings = notificationSettingsFor(user)
     return sendData(response, omitKeys(settings, ['id', 'ownerUserId']))
   })
 
@@ -817,6 +1212,67 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, omitKeys({ ...existing, ...updated }, ['id', 'ownerUserId']))
   })
 
+  app.get('/api/v1/tiers', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    return listCollection(request, response, router.db.get('tierPlans').value())
+  })
+
+  app.get('/api/v1/users/me/tier', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    return sendData(response, accountTier(user.id))
+  })
+
+  app.post('/api/v1/users/me/tier/upgrade-requests', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const body = request.body ?? {}
+    const plans = router.db.get('tierPlans').value()
+    const currentTier = accountTierCode(user.id)
+    const rankOf = (code) => plans.findIndex((plan) => plan.code === code)
+    const fields = {}
+    if (rankOf(body.requestedTier) === -1) {
+      fields.requestedTier = ['Choose Pro or Organization.']
+    } else if (rankOf(body.requestedTier) <= rankOf(currentTier)) {
+      fields.requestedTier = ['Choose a plan above the one you are on.']
+    }
+    const note = body.note == null ? null : String(body.note).trim() || null
+    if (body.note != null && typeof body.note !== 'string') {
+      fields.note = ['Write the note as text.']
+    } else if (note && note.length > 500) {
+      fields.note = ['Keep the note to 500 characters or fewer.']
+    }
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Choose the plan you would like.', fields)
+    }
+    const pending = router.db
+      .get('upgradeRequests')
+      .find({ ownerUserId: user.id, status: 'PENDING' })
+      .value()
+    if (pending) {
+      return sendError(
+        response,
+        409,
+        'CONFLICT',
+        'Your plan request is still being reviewed. We will let you know once it is settled.',
+        null,
+        { pendingRequestId: pending.id, requestedTier: pending.requestedTier },
+      )
+    }
+    const upgradeRequest = {
+      id: `upg_${String(router.db.get('upgradeRequests').size().value() + 1).padStart(4, '0')}`,
+      ownerUserId: user.id,
+      currentTier,
+      requestedTier: body.requestedTier,
+      status: 'PENDING',
+      note,
+      createdAt: new Date().toISOString(),
+    }
+    router.db.get('upgradeRequests').push(upgradeRequest).write()
+    return sendData(response, publicUpgradeRequest(upgradeRequest), 201)
+  })
+
   app.get('/api/v1/species', (request, response) => {
     return listCollection(request, response, router.db.get('species').value())
   })
@@ -825,8 +1281,80 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const species = router.db.get('species').find({ id: request.params.speciesId }).value()
     if (!species)
       return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish profile.')
-    return sendData(response, species)
+    return sendData(response, speciesProfile(species))
   })
+
+  // Contract §7 FeedGuide: the commercial feed profile of each of the species' growth stages, in
+  // the profile's stage order, with the Feeds products each row links by SKU. The feedings a
+  // day and weight band come from the stage's feeding rule, so the guide and the feeding plan
+  // never disagree. Signed in because the products carry the caller's favourites.
+  app.get('/api/v1/species/:speciesId/feed-guide', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const species = router.db
+      .get('species')
+      .find({ id: request.params.speciesId, active: true })
+      .value()
+    if (!species)
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish profile.')
+    const rows = router.db.get('feedGuides').filter({ speciesId: species.id }).value()
+    const profile = router.db.get('speciesProfiles').find({ speciesId: species.id }).value()
+    const stages = (profile?.growthStages ?? [])
+      .map((stage) => {
+        const row = rows.find((candidate) => candidate.growthStageCode === stage.code)
+        return row ? feedGuideStage(stage, row, profile, user.id) : null
+      })
+      .filter(Boolean)
+    if (!stages.length)
+      return sendError(response, 404, 'NOT_FOUND', 'No feed guide is available for this fish yet.')
+    return sendData(response, {
+      species: {
+        id: species.id,
+        commonName: species.commonName,
+        localName: species.localName,
+      },
+      stages,
+      sources: router.db.get('feedGuideSources').value(),
+      isDemo: stages.some((stage) => stage.sourceStatus === 'DEMO'),
+      sourceStatus: stages.every((stage) => stage.sourceStatus === 'VERIFIED')
+        ? 'VERIFIED'
+        : 'DEMO',
+      ruleVersion: rows[0].ruleVersion,
+      disclaimer: feedGuideDisclaimer,
+    })
+  })
+
+  // One growth stage of a feed guide. Only products in the Feeds category are linked, in the
+  // row's SKU order; availability never hides one, so an out-of-stock feed still shows.
+  function feedGuideStage(stage, row, profile, userId) {
+    const rule = (profile.feedingRules ?? []).find(
+      (candidate) => candidate.growthStageCode === stage.code,
+    )
+    const feeds = router.db.get('productCategories').find({ code: 'FEEDS' }).value()
+    const products = row.productSkus
+      .map((sku) => router.db.get('products').find({ sku }).value())
+      .filter((product) => product && product.categoryId === feeds?.id)
+      .map((product) => productSummary(product, userId))
+    return {
+      growthStageCode: stage.code,
+      growthStage: stage.name,
+      weightRange: {
+        minimum: { value: rule?.minimumWeightG ?? 0, unit: 'G' },
+        maximum:
+          rule?.maximumWeightG === null || rule?.maximumWeightG === undefined
+            ? null
+            : { value: rule.maximumWeightG, unit: 'G' },
+      },
+      feedType: row.feedType,
+      proteinPercent: row.proteinPercent,
+      pelletSize: { ...row.pelletSizeMm, unit: 'MM' },
+      feedingsPerDay: rule?.feedingsPerDay ?? null,
+      basis: row.basis,
+      sourceStatus: row.sourceStatus,
+      ruleVersion: row.ruleVersion,
+      products,
+    }
+  }
 
   app.get('/api/v1/culture-environments', (request, response) => {
     return listCollection(request, response, router.db.get('cultureEnvironments').value())
@@ -871,6 +1399,210 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       .filter((alternative) => alternative.environmentId !== environmentId)
     const result = omitKeys(rule, ['id'])
     return sendData(response, { ...result, alternatives })
+  })
+
+  // Contract §7 SizingGuidance: the space a fish needs from the pairing's stocking rule, with
+  // the profile's worked example and suggested depth. Public reference data, like compatibility.
+  app.get('/api/v1/sizing-guidance', (request, response) => {
+    const speciesId = String(request.query.speciesId ?? '')
+    const environmentId = String(request.query.environmentId ?? '')
+    if (!speciesId || !environmentId) {
+      return sendError(response, 400, 'BAD_REQUEST', 'Choose both a species and culture system.')
+    }
+    const profile = waterProfileOf(speciesId, environmentId)
+    if (profile.missing) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish or culture system.')
+    }
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+    const rule = router.db.get('stockingRules').find({ speciesId, environmentId }).value()
+    const sizing = router.db.get('sizingGuidance').find({ speciesId, environmentId }).value()
+    if (!rule || !sizing) {
+      return sendError(response, 404, 'NOT_FOUND', 'No suggested size is available yet.')
+    }
+    const unit = spaceUnit(rule)
+    const sources =
+      router.db.get('speciesProfiles').find({ speciesId }).get('sources').value() ?? []
+    return sendData(response, {
+      speciesId,
+      environmentId,
+      basis: rule.basis,
+      spacePerFish: { value: roundUp(spaceFor(1, rule), 4), unit },
+      exampleFingerlings: sizing.exampleFingerlings,
+      exampleSpace: { value: roundUp(spaceFor(sizing.exampleFingerlings, rule), 2), unit },
+      waterDepth: sizing.waterDepth,
+      spaceBasis: rule.explanation ?? 'Demo density range for this prototype profile.',
+      depthBasis: sizing.depthBasis,
+      sources,
+      isDemo: true,
+      sourceStatus: rule.sourceStatus,
+      ruleVersion: rule.ruleVersion,
+      disclaimer: ruleDisclaimer,
+    })
+  })
+
+  // The species and environment of a water-quality request, or the error to answer: an
+  // unknown id, or a pairing the compatibility profile advises against, has no thresholds.
+  function waterProfileOf(speciesId, environmentId) {
+    const species = router.db.get('species').find({ id: speciesId, active: true }).value()
+    const environment = router.db
+      .get('cultureEnvironments')
+      .find({ id: environmentId, active: true })
+      .value()
+    if (!species || !environment)
+      return { missing: { species: !species, environment: !environment } }
+    const compatibility = router.db
+      .get('compatibilityRules')
+      .find({ speciesId, environmentId })
+      .value()
+    if (!compatibility || compatibility.status === 'NOT_RECOMMENDED') {
+      return {
+        incompatible:
+          compatibility?.message ?? 'No water ranges are available for this combination.',
+      }
+    }
+    return { species, environment }
+  }
+
+  // Each parameter with its threshold row for the pairing, in the contract's parameter order.
+  function waterThresholdsOf(speciesId, environmentId) {
+    const rows = router.db.get('waterThresholds').filter({ speciesId, environmentId }).value()
+    return router.db
+      .get('waterParameters')
+      .value()
+      .map((parameter) => ({
+        parameter,
+        row: rows.find((row) => row.parameter === parameter.code),
+      }))
+      .filter(({ row }) => row)
+  }
+
+  function publicWaterThreshold({ parameter, row }) {
+    return {
+      parameter: parameter.code,
+      name: parameter.name,
+      unit: parameter.unit,
+      minimum: row.minimum,
+      maximum: row.maximum,
+      explanation: parameter.explanation,
+      basis: row.basis,
+      sourceStatus: row.sourceStatus,
+      ruleVersion: row.ruleVersion,
+    }
+  }
+
+  // The most specific guidance row: parameter and environment, then parameter, then status.
+  function waterGuidanceFor(parameterCode, status, environmentCode) {
+    const rows = router.db.get('waterGuidance').filter({ status }).value()
+    return (
+      rows.find(
+        (row) => row.parameter === parameterCode && row.environmentCode === environmentCode,
+      ) ??
+      rows.find((row) => row.parameter === parameterCode && row.environmentCode === null) ??
+      rows.find((row) => row.parameter === null && row.environmentCode === null)
+    )
+  }
+
+  app.get('/api/v1/water-thresholds', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const speciesId = String(request.query.speciesId ?? '')
+    const environmentId = String(request.query.environmentId ?? '')
+    if (!speciesId || !environmentId) {
+      return sendError(response, 400, 'BAD_REQUEST', 'Choose both a species and culture system.')
+    }
+    const profile = waterProfileOf(speciesId, environmentId)
+    if (profile.missing) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish or culture system.')
+    }
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+    const thresholds = waterThresholdsOf(speciesId, environmentId)
+    const guidance = router.db.get('waterRangeGuidance').value()
+    const note =
+      guidance.find((row) => row.environmentCode === profile.environment.code) ??
+      guidance.find((row) => row.environmentCode === null)
+    return sendData(response, {
+      speciesId,
+      environmentId,
+      thresholds: thresholds.map(publicWaterThreshold),
+      guidance: note.message,
+      sources: router.db.get('waterRangeSources').value(),
+      isDemo: true,
+      sourceStatus: 'DEMO',
+      ruleVersion: thresholds[0]?.row.ruleVersion ?? 'demo-2026-09-gabayan',
+      disclaimer: ruleDisclaimer,
+    })
+  })
+
+  // Evaluates the entered readings against the pairing's ranges. Nothing is stored.
+  app.post('/api/v1/water-safety-checks', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const { speciesId, environmentId, readings } = request.body ?? {}
+    const parameters = router.db.get('waterParameters').value()
+    const fields = {}
+    const profile = waterProfileOf(String(speciesId ?? ''), String(environmentId ?? ''))
+    if (profile.missing?.species) fields.speciesId = ['Choose an available fish.']
+    if (profile.missing?.environment) fields.environmentId = ['Choose an available culture system.']
+    const parsed = parseWaterReadings(parameters, readings)
+    const entered = parsed.entered
+    Object.assign(fields, parsed.fields)
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the readings.', fields)
+    }
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+
+    const thresholds = waterThresholdsOf(speciesId, environmentId)
+    const results = []
+    const notChecked = []
+    for (const { parameter, row } of thresholds) {
+      if (!entered.has(parameter.code)) {
+        notChecked.push(parameter.code)
+        continue
+      }
+      const value = entered.get(parameter.code)
+      const status = readingStatus(row, value)
+      const guidance = waterGuidanceFor(parameter.code, status, profile.environment.code)
+      results.push({
+        ...omitKeys(publicWaterThreshold({ parameter, row }), [
+          'basis',
+          'sourceStatus',
+          'ruleVersion',
+        ]),
+        value,
+        status,
+        guidance: {
+          severity: guidance.severity,
+          title: guidance.title,
+          message: guidance.message,
+          sourceStatus: row.sourceStatus,
+          ruleVersion: row.ruleVersion,
+          disclaimer: ruleDisclaimer,
+        },
+        recommendedProducts: waterProblemProductsFor(
+          parameter.code,
+          status,
+          environmentId,
+          user.id,
+        ),
+      })
+    }
+    return sendData(response, {
+      speciesId,
+      environmentId,
+      checkedAt: new Date().toISOString(),
+      results,
+      notChecked,
+      isDemo: true,
+      sourceStatus: 'DEMO',
+      ruleVersion: thresholds[0]?.row.ruleVersion ?? 'demo-2026-09-gabayan',
+      disclaimer: ruleDisclaimer,
+    })
   })
 
   app.post('/api/v1/stocking-estimates', (request, response) => {
@@ -945,6 +1677,10 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         : status === 'ABOVE_RANGE'
           ? plannedFingerlings - recommendedMaximum
           : 0
+    const requiredSpace = spaceFor(plannedFingerlings, rule)
+    const unit = spaceUnit(rule)
+    const additionalSpace =
+      status === 'ABOVE_RANGE' ? roundUp(Math.max(0, requiredSpace - basisValue), 2) : 0
     const estimateId = `est_${String(router.db.get('stockingEstimates').size().value() + 1).padStart(5, '0')}`
     const compatibility = omitKeys(compatibilityRule, ['id'])
     compatibility.alternatives = []
@@ -962,6 +1698,8 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       status,
       differenceToRange,
       suggestedFingerlings: Math.round((recommendedMinimum + recommendedMaximum) / 2),
+      requiredSpace: { value: roundUp(requiredSpace, 2), unit },
+      additionalSpaceNeeded: { value: additionalSpace, unit },
       basis: {
         type: rule.basis,
         densityMinimum: rule.minimumDensity,
@@ -969,7 +1707,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         densityUnit: rule.densityUnit,
         inputAreaM2: surfaceAreaM2,
         inputVolumeM3: estimatedWaterVolumeM3,
-        explanation: 'Demo density range for this prototype profile.',
+        explanation: rule.explanation ?? 'Demo density range for this prototype profile.',
       },
       compatibility,
       isDemo: true,
@@ -1010,6 +1748,24 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const recordKey = `${user.id}:POST:/cultivations:${idempotencyKey}`
     const prior = router.db.get('idempotencyRecords').find({ key: recordKey }).value()
     if (prior) return sendData(response, prior.response, 201)
+
+    const tier = accountTier(user.id)
+    if (tier.remainingCultureSystems === 0) {
+      const { plan, activeCultureSystems: active } = tier
+      const systems = plan.cultureSystemLimit === 1 ? 'culture system' : 'culture systems'
+      return sendError(
+        response,
+        403,
+        'TIER_LIMIT_REACHED',
+        `Your ${plan.name} plan covers ${plan.cultureSystemLimit} active ${systems}. Harvest or close one, or ask for a bigger plan.`,
+        null,
+        {
+          tier: plan.code,
+          cultureSystemLimit: plan.cultureSystemLimit,
+          activeCultureSystems: active,
+        },
+      )
+    }
 
     const body = request.body ?? {}
     const estimate = router.db
@@ -1149,10 +1905,11 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/dashboard/home', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
-    const date = String(request.query.date ?? dateInManila(new Date().toISOString()))
+    const date = String(request.query.date ?? dateInManila(currentTime(response)))
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return sendError(response, 400, 'BAD_REQUEST', 'Date must use YYYY-MM-DD.')
     }
+    raiseReminders(user, response)
     const cultivations = router.db.get('cultivations').filter({ ownerUserId: user.id }).value()
     const primaryCultivation =
       cultivations.find((item) => !['COMPLETED', 'CANCELLED'].includes(item.status)) ?? null
@@ -1225,6 +1982,82 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       return sendError(response, 404, 'NOT_FOUND', 'We could not find that cultivation.')
     }
     return sendData(response, publicCultivationDetail(cultivation))
+  })
+
+  // Edits the name, stocking date or notes. Setting the stocking date on a planning
+  // cultivation makes it ACTIVE; a closed cultivation accepts no edits (BLOCKERS D-30).
+  app.patch('/api/v1/cultivations/:cultivationId', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const expectedVersion = parseIfMatch(request.get('if-match'))
+    if (expectedVersion === null) {
+      return sendError(
+        response,
+        400,
+        'BAD_REQUEST',
+        'If-Match must be the version number you last read.',
+      )
+    }
+    const { fields, changes } = validateCultivationPatch(request.body ?? {})
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', fields)
+    }
+    if (!Object.keys(changes).length) {
+      return sendError(
+        response,
+        422,
+        'VALIDATION_ERROR',
+        'Provide at least one cultivation change.',
+      )
+    }
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that cultivation.')
+    }
+    if (expectedVersion !== undefined && expectedVersion !== cultivation.version) {
+      return sendError(
+        response,
+        409,
+        'CONFLICT',
+        'Your cultivation was changed somewhere else. Reload it and try again.',
+        null,
+        { currentVersion: cultivation.version },
+      )
+    }
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation is closed and can no longer be edited.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    const today = dateInManila(new Date().toISOString())
+    if (changes.stockedOn && changes.stockedOn > today) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the stocking date.', {
+        stockedOn: ['The stocking date cannot be in the future.'],
+      })
+    }
+    const updates = { ...changes }
+    if (changes.stockedOn) {
+      const schedule = stockingSchedule(changes.stockedOn, cultivation.estimatedDurationDays, today)
+      Object.assign(updates, schedule, {
+        harvestSummary: {
+          ...cultivation.harvestSummary,
+          estimatedHarvestDate: schedule.estimatedHarvestDate,
+        },
+      })
+      if (cultivation.status === 'PLANNING') updates.status = 'ACTIVE'
+    }
+    updates.updatedAt = new Date().toISOString()
+    updates.version = cultivation.version + 1
+    router.db.get('cultivations').find({ id: cultivation.id }).assign(updates).write()
+    return sendData(response, publicCultivationDetail({ ...cultivation, ...updates }))
   })
 
   app.get('/api/v1/cultivations/:cultivationId/growth-measurements', (request, response) => {
@@ -1465,6 +2298,144 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return listCollection(request, response, records)
   })
 
+  // Pro: the feed conversion ratio the cultivation's own records imply (BLOCKERS D-23).
+  app.get('/api/v1/cultivations/:cultivationId/feed-conversion', (request, response) => {
+    const user = requireTier(request, response, 'PRO')
+    if (!user) return
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) return sendError(response, 404, 'NOT_FOUND', 'Cultivation not found.')
+    const byCultivation = (collection) =>
+      router.db.get(collection).filter({ cultivationId: cultivation.id }).value()
+    return sendData(
+      response,
+      feedConversionFor({
+        cultivation,
+        samples: byCultivation('growthMeasurements'),
+        mortality: byCultivation('mortalityRecords'),
+        feedings: byCultivation('feedingRecords'),
+      }),
+    )
+  })
+
+  // Records a feeding. A `taskId` names a feeding task of the same cultivation, which the
+  // record completes; without one the record's `taskId` is null (BLOCKERS D-36).
+  app.post('/api/v1/cultivations/:cultivationId/feeding-records', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const idempotencyKey = request.get('idempotency-key')
+    if (!idempotencyKey)
+      return sendError(response, 400, 'BAD_REQUEST', 'An idempotency key is required.')
+    const recordKey = `${user.id}:POST:/cultivations/${request.params.cultivationId}/feeding-records:${idempotencyKey}`
+    const prior = router.db.get('idempotencyRecords').find({ key: recordKey }).value()
+    if (prior) return sendData(response, prior.response, 201)
+    const { fields, fedAt, taskId, notes } = validateFeedingRecord(request.body ?? {})
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', fields)
+    }
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that cultivation.')
+    }
+    let task = null
+    if (taskId !== null) {
+      task = router.db.get('tasks').find({ id: taskId, cultivationId: cultivation.id }).value()
+      if (!task) {
+        return sendError(response, 422, 'VALIDATION_ERROR', 'Review the feeding record.', {
+          taskId: ['Choose a task of this cultivation.'],
+        })
+      }
+      if (task.type !== 'FEEDING') {
+        return sendError(response, 422, 'VALIDATION_ERROR', 'Review the feeding record.', {
+          taskId: ['Only a feeding task can be completed by a feeding record.'],
+        })
+      }
+      if (task.status === 'COMPLETED') {
+        return sendError(response, 409, 'CONFLICT', 'This task is already complete.', null, {
+          status: task.status,
+          completionRecordType: task.completionRecordType,
+        })
+      }
+      if (task.status === 'CANCELLED') {
+        return sendError(
+          response,
+          409,
+          'INVALID_STATE_TRANSITION',
+          'This task was cancelled and can no longer be completed.',
+          null,
+          { status: task.status },
+        )
+      }
+    }
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation no longer accepts feeding records.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    if (!cultivation.stockedOn) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'Set the stocking date before adding feeding records.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    const fedOn = dateInManila(fedAt)
+    const today = dateInManila(new Date().toISOString())
+    const dateProblem =
+      fedOn > today
+        ? 'The date cannot be in the future.'
+        : fedOn < cultivation.stockedOn
+          ? 'The date cannot be before the stocking date.'
+          : null
+    if (dateProblem) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the feeding record.', {
+        fedAt: [dateProblem],
+      })
+    }
+    const now = new Date().toISOString()
+    const record = {
+      id: `feed_${String(router.db.get('feedingRecords').size().value() + 1).padStart(5, '0')}`,
+      cultivationId: cultivation.id,
+      taskId: task?.id ?? null,
+      fedAt,
+      amount: request.body.amount,
+      notes,
+      recordedBy: { id: user.id, fullName: user.fullName },
+      createdAt: now,
+    }
+    router.db.get('feedingRecords').push(record).write()
+    const completedTask = task
+      ? markTaskCompleted(task, cultivation, {
+          completedAt: fedAt,
+          record: { type: 'FEEDING_RECORD', id: record.id },
+          changedAt: now,
+        })
+      : null
+    const result = {
+      record,
+      completedTask,
+      dailyProgress: {
+        recorded: { value: feedingKilogramsOn(cultivation.id, fedOn), unit: 'KG' },
+        planned: feedingPlanFor(cultivation, fedOn).dailyTotal,
+      },
+    }
+    router.db.get('idempotencyRecords').push({ key: recordKey, response: result }).write()
+    return sendData(response, result, 201)
+  })
+
   app.get('/api/v1/cultivations/:cultivationId/water-checks', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
@@ -1574,6 +2545,109 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const result = { record, generatedTasks, guidance }
     router.db.get('idempotencyRecords').push({ key: recordKey, response: result }).write()
     return sendData(response, result, 201)
+  })
+
+  // Pro: the cultivation's saved water-parameter logs, newest first (contract §9).
+  app.get('/api/v1/cultivations/:cultivationId/water-parameter-logs', (request, response) => {
+    const user = requireTier(request, response, 'PRO')
+    if (!user) return
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) return sendError(response, 404, 'NOT_FOUND', 'Cultivation not found.')
+    const logs = router.db
+      .get('waterParameterLogs')
+      .filter({ cultivationId: cultivation.id })
+      .value()
+      .sort((left, right) => right.loggedAt.localeCompare(left.loggedAt))
+    return listCollection(request, response, logs)
+  })
+
+  // Pro: saves one set of readings, each evaluated against the cultivation's water ranges
+  // as they stand now and kept with that evaluation. One log per Idempotency-Key; the same
+  // key with another body is refused.
+  app.post('/api/v1/cultivations/:cultivationId/water-parameter-logs', (request, response) => {
+    const user = requireTier(request, response, 'PRO')
+    if (!user) return
+    const idempotencyKey = request.get('idempotency-key')
+    if (!idempotencyKey)
+      return sendError(response, 400, 'BAD_REQUEST', 'An idempotency key is required.')
+    const body = request.body ?? {}
+    const recordKey = `${user.id}:POST:/cultivations/${request.params.cultivationId}/water-parameter-logs:${idempotencyKey}`
+    const requestBody = JSON.stringify(body)
+    const prior = router.db.get('idempotencyRecords').find({ key: recordKey }).value()
+    if (prior && prior.requestBody !== requestBody) {
+      return sendError(
+        response,
+        409,
+        'IDEMPOTENCY_CONFLICT',
+        'This reading was already sent with different values. Start a new reading instead.',
+      )
+    }
+    if (prior) return sendData(response, prior.response, 201)
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) return sendError(response, 404, 'NOT_FOUND', 'Cultivation not found.')
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation no longer accepts water readings.',
+      )
+    }
+    const now = currentTime(response)
+    const parameters = router.db.get('waterParameters').value()
+    const { entered, fields } = parseWaterReadings(parameters, body.readings)
+    let loggedAt = now
+    if (body.loggedAt !== undefined && body.loggedAt !== null) {
+      const parsed = parseZonedTimestamp(body.loggedAt)
+      // A device clock a few minutes ahead of the server is not a reading from the future.
+      if (parsed === null) fields.loggedAt = ['Enter the time the reading was taken.']
+      else if (Date.parse(parsed) > Date.parse(now) + 5 * 60 * 1000)
+        fields.loggedAt = ['The reading time cannot be later than now.']
+      else loggedAt = parsed
+    }
+    const notes = body.notes == null ? null : String(body.notes).trim() || null
+    if (body.notes != null && typeof body.notes !== 'string') {
+      fields.notes = ['Write the notes as text.']
+    } else if (notes && notes.length > WATER_LOG_NOTES_LIMIT) {
+      fields.notes = [`Keep the notes to ${WATER_LOG_NOTES_LIMIT} characters or fewer.`]
+    }
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the readings.', fields)
+    }
+    const profile = waterProfileOf(cultivation.species.id, cultivation.environment.id)
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+    const evaluation = evaluateWaterLog(
+      parameters,
+      waterThresholdsOf(cultivation.species.id, cultivation.environment.id),
+      entered,
+    )
+    const log = {
+      id: `wlog_${String(router.db.get('waterParameterLogs').size().value() + 1).padStart(5, '0')}`,
+      cultivationId: cultivation.id,
+      loggedAt,
+      readings: evaluation.readings,
+      results: evaluation.results,
+      notLogged: evaluation.notLogged,
+      outOfRangeCount: evaluation.outOfRangeCount,
+      notes,
+      recordedBy: { id: user.id, fullName: user.fullName },
+      createdAt: now,
+      isDemo: true,
+      sourceStatus: 'DEMO',
+      ruleVersion: evaluation.ruleVersion,
+      disclaimer: ruleDisclaimer,
+    }
+    router.db.get('waterParameterLogs').push(log).write()
+    router.db.get('idempotencyRecords').push({ key: recordKey, requestBody, response: log }).write()
+    return sendData(response, log, 201)
   })
 
   app.get('/api/v1/cultivations/:cultivationId/harvest-readiness', (request, response) => {
@@ -1809,44 +2883,11 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       }
       router.db.get('feedingRecords').push(linkedRecord).write()
     }
-    const completedTask = {
-      ...task,
-      status: 'COMPLETED',
+    const completedTask = markTaskCompleted(task, cultivation, {
       completedAt,
-      completionRecordType: linkedRecord ? 'FEEDING_RECORD' : null,
-      completionRecordId: linkedRecord?.id ?? null,
-      audit: {
-        ...task.audit,
-        updatedAt: completedAt,
-        version: task.audit.version + 1,
-      },
-    }
-    router.db.get('tasks').find({ id: task.id }).assign(completedTask).write()
-    const nextTask = router.db
-      .get('tasks')
-      .filter(
-        (candidate) =>
-          candidate.cultivationId === cultivation.id && candidate.status !== 'COMPLETED',
-      )
-      .sortBy('scheduledAt')
-      .first()
-      .value()
-    router.db
-      .get('cultivations')
-      .find({ id: cultivation.id })
-      .assign({
-        nextTaskAt: nextTask?.scheduledAt ?? null,
-        updatedAt: completedAt,
-        version: cultivation.version + 1,
-      })
-      .write()
-    router.db
-      .get('notifications')
-      .filter({ ownerUserId: user.id, taskId: task.id })
-      .each((notification) => {
-        if (notification.readAt === null) notification.readAt = completedAt
-      })
-      .write()
+      record: linkedRecord ? { type: 'FEEDING_RECORD', id: linkedRecord.id } : null,
+      changedAt: completedAt,
+    })
     const refreshedCultivation = router.db.get('cultivations').find({ id: cultivation.id }).value()
     const result = {
       task: completedTask,
@@ -1857,9 +2898,101 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return sendData(response, result)
   })
 
+  // Returns a completed task to DUE and keeps the reason as an audit entry. No record type is
+  // reversible yet, so a completion that created a farm record is refused (BLOCKERS D-21).
+  app.post('/api/v1/tasks/:taskId/reopen', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const reason = request.body?.reason
+    if (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 500) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the highlighted fields.', {
+        reason: [
+          typeof reason === 'string' && reason.trim().length > 500
+            ? 'Use at most 500 characters.'
+            : 'Say why the task is being reopened.',
+        ],
+      })
+    }
+    const task = router.db.get('tasks').find({ id: request.params.taskId }).value()
+    const cultivation = task
+      ? router.db.get('cultivations').find({ id: task.cultivationId, ownerUserId: user.id }).value()
+      : null
+    if (!task || !cultivation) {
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that task.')
+    }
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation is closed and its tasks can no longer change.',
+        null,
+        { status: cultivation.status },
+      )
+    }
+    if (task.status !== 'COMPLETED') {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'Only a completed task can be reopened.',
+        null,
+        { status: task.status },
+      )
+    }
+    if (task.completionRecordType !== null) {
+      return sendError(
+        response,
+        409,
+        'CONFLICT',
+        'This task created a farm record that cannot be reversed, so it cannot be reopened.',
+        null,
+        { status: task.status, completionRecordType: task.completionRecordType },
+      )
+    }
+    const now = new Date().toISOString()
+    router.db
+      .get('taskReopenings')
+      .push({
+        id: `reopen_${String(router.db.get('taskReopenings').size().value() + 1).padStart(5, '0')}`,
+        taskId: task.id,
+        reopenedBy: { id: user.id, fullName: user.fullName },
+        reason: reason.trim(),
+        previousCompletedAt: task.completedAt,
+        createdAt: now,
+      })
+      .write()
+    const reopened = {
+      ...task,
+      status: 'DUE',
+      completedAt: null,
+      completionRecordType: null,
+      completionRecordId: null,
+      audit: { ...task.audit, updatedAt: now, version: task.audit.version + 1 },
+    }
+    router.db.get('tasks').find({ id: task.id }).assign(reopened).write()
+    router.db
+      .get('cultivations')
+      .find({ id: cultivation.id })
+      .assign({
+        nextTaskAt: nextOpenTaskAt(cultivation.id),
+        updatedAt: now,
+        version: cultivation.version + 1,
+      })
+      .write()
+    return sendData(response, reopened)
+  })
+
+  app.get('/api/v1/weather-alerts', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    return sendData(response, raiseReminders(user, response))
+  })
+
   app.get('/api/v1/notifications/unread-count', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
+    raiseReminders(user, response)
     const count = router.db
       .get('notifications')
       .filter((item) => item.ownerUserId === user.id && item.readAt === null)
@@ -1871,6 +3004,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/notifications', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
+    raiseReminders(user, response)
     let notifications = router.db.get('notifications').filter({ ownerUserId: user.id }).value()
     if (request.query.category) {
       const categories = Array.isArray(request.query.category)
@@ -2445,6 +3579,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         cultivationId: null,
         orderId: order.id,
         taskId: null,
+        reminder: null,
       })
       .write()
     const result = publicOrder(order)
