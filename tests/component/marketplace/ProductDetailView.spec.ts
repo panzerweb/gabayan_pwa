@@ -4,7 +4,7 @@ import ProductDetailView from '@pages/marketplace/presentation/views/ProductDeta
 import { ROUTE_NAMES } from '@router/route-names'
 
 import { cart } from '../../unit/cart/fixtures'
-import { aeratorDetail, envelope } from '../../unit/marketplace/fixtures'
+import { aeratorDetail, aeratorDetailWithGuide, envelope } from '../../unit/marketplace/fixtures'
 import { goOffline, mountInApp, refusingRepository } from '../support/app'
 
 const repositories = vi.hoisted(() => ({
@@ -106,5 +106,47 @@ describe('ProductDetailView', () => {
     const { wrapper } = await open()
 
     expect(button(wrapper, 'Out of stock').attributes('disabled')).toBeDefined()
+  })
+
+  it('shows the installation guide when the product has one', async () => {
+    repositories.marketplace.getProduct!.mockResolvedValue(envelope(aeratorDetailWithGuide))
+    const { wrapper } = await open()
+
+    expect(wrapper.text()).toContain('How to install')
+    expect(wrapper.get('ol[aria-label="Installation steps"]').findAll('li')).toHaveLength(2)
+  })
+
+  it('leaves the installation guide out when the product has none', async () => {
+    repositories.marketplace.getProduct!.mockResolvedValue(
+      envelope({ ...aeratorDetail, installationGuide: null }),
+    )
+    const { wrapper } = await open()
+
+    expect(wrapper.text()).not.toContain('How to install')
+  })
+
+  it('presets the quantity a Buy now link suggested and says it can be changed', async () => {
+    const { wrapper } = await mountInApp(ProductDetailView, {
+      name: ROUTE_NAMES.productDetail,
+      params: { productId: 'prd_pond_aerator' },
+      query: { quantity: '3' },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe('3')
+    expect(button(wrapper, 'Add to cart').text()).toContain('₱3,897.00')
+    expect(wrapper.text()).toContain('Suggested quantity for your need: 3. You can change it.')
+  })
+
+  it('keeps a preset quantity within what one order may hold', async () => {
+    const { wrapper } = await mountInApp(ProductDetailView, {
+      name: ROUTE_NAMES.productDetail,
+      params: { productId: 'prd_pond_aerator' },
+      query: { quantity: '9' },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe('4')
+    expect(wrapper.text()).toContain('Suggested quantity for your need: 4.')
   })
 })

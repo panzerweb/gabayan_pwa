@@ -12,6 +12,7 @@ import { registerSpeciesContract } from './scenarios/species.scenarios.mjs'
 import { registerSystemAndAuthContract } from './scenarios/system-auth.scenarios.mjs'
 import { registerTaskAndRecordContract } from './scenarios/tasks-records.scenarios.mjs'
 import { registerTierContract } from './scenarios/tiers.scenarios.mjs'
+import { registerToolsContract } from './scenarios/tools.scenarios.mjs'
 import { registerWaterQualityContract } from './scenarios/water-quality.scenarios.mjs'
 import {
   bearer,
@@ -554,6 +555,7 @@ registerCommerceContract(client)
 registerNotificationContract(client)
 registerTierContract(client)
 registerWaterQualityContract(client)
+registerToolsContract(client)
 
 describe('endpoint catalog coverage', () => {
   it('reads every method-and-path row of the contract endpoint catalog', () => {

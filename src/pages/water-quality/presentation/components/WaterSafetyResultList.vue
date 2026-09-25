@@ -10,9 +10,11 @@ import {
   readingStatusPresentation,
   type WaterSafetyCheck,
 } from '../../domain/water-quality.model'
+import WaterProblemProducts from './WaterProblemProducts.vue'
 
 // The server's answer for each entered reading: its status as label, icon and colour, the
-// suggested range, what the parameter means and what to do. Readings left blank are named.
+// suggested range, what the parameter means and what to do, with any products that may help
+// an out-of-range reading. Readings left blank are named.
 const props = defineProps<{ check: WaterSafetyCheck }>()
 
 const notChecked = computed(() =>
@@ -43,6 +45,11 @@ const notChecked = computed(() =>
           <strong>{{ result.guidance.title }}</strong>
           <span>{{ result.guidance.message }}</span>
         </div>
+        <WaterProblemProducts
+          v-if="result.recommendedProducts?.length"
+          :parameter-name="result.name"
+          :products="result.recommendedProducts"
+        />
       </li>
     </ul>
     <p v-if="check.notChecked.length" class="safety-results__skipped">

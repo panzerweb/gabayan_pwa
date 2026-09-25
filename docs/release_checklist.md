@@ -7,9 +7,9 @@ Last verified: 2026-09-25
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 625 tests.
-- [x] Mock API contract suite passes: 76 tests, and its coverage check exercises all 74 method-and-path rows of contract §5.
-- [x] Mobile Playwright suite passes: 20 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Unit and component suite passes: 647 tests.
+- [x] Mock API contract suite passes: 80 tests, and its coverage check exercises all 74 method-and-path rows of contract §5.
+- [x] Mobile Playwright suite passes: 22 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -87,3 +87,5 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [ ] `GET /water-thresholds` and `POST /water-safety-checks` pass against FastAPI. Waits for aqua-lens-api Phase 30; until then a FastAPI contract run fails the water-quality scenarios (`tests/contract/scenarios/water-quality.scenarios.mjs`) and `tests/e2e/water-quality.spec.ts` cannot pass there. The setup journeys still pass: the ranges step shows its retry state and never blocks Continue.
 - [x] The dimensions step opens the suggested pond or cage size and depth for the chosen species and culture system from `GET /sizing-guidance`, with its basis, sources and demo label, and can reopen it; an above-range stocking result names the extra area or volume the planned count needs from `additionalSpaceNeeded` (`tests/component/setup/SizingGuidancePanel.spec.ts`, `tests/e2e/pond-sizing.spec.ts`).
 - [ ] `GET /sizing-guidance` and the `requiredSpace` and `additionalSpaceNeeded` estimate fields pass against FastAPI. Waits for aqua-lens-api Phase 32; until then a FastAPI contract run fails the sizing scenarios (`tests/contract/scenarios/sizing.scenarios.mjs`) and `tests/e2e/pond-sizing.spec.ts` cannot pass there. The other setup journeys still pass: the dialog shows its retry state, and a result without the space fields leaves the shortfall out.
+- [x] "Buy now" on each recommended setup tool and on each product a safety check names for an out-of-range reading opens the product with the suggested quantity preset (`?quantity=`, kept within `maximumOrderQuantity`); the product shows its installation guide (cautions, numbered steps, demo disclaimer) when `installationGuide` is not null; the shop stays a header link and the bottom navigation keeps four items (`tests/component/marketplace/BuyNowButton.spec.ts`, `ProductInstallationGuide.spec.ts`, `tests/e2e/buy-now.spec.ts`).
+- [ ] `ProductDetail.installationGuide` and `WaterReadingResult.recommendedProducts` pass against FastAPI. Waits for aqua-lens-api Phase 34; until then a FastAPI contract run fails the tools scenarios (`tests/contract/scenarios/tools.scenarios.mjs`) and `tests/e2e/buy-now.spec.ts` cannot pass there. Other screens are unaffected: both fields are optional in the PWA's schemas, so a product without a guide and a result without products render as before.

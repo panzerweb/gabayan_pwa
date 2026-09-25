@@ -4,6 +4,8 @@ import type {
   WaterThresholdSet,
 } from '@pages/water-quality/domain/water-quality.model'
 
+import { aerator } from '../marketplace/fixtures'
+
 const PLACEHOLDER =
   'Placeholder demo range, not taken from a reviewed source. Replace it before relying on it.'
 
@@ -133,4 +135,38 @@ export const highAmmoniaCheck: WaterSafetyCheck = {
   sourceStatus: 'DEMO',
   ruleVersion: 'demo-2026-09-gabayan',
   disclaimer,
+}
+
+// Low dissolved oxygen in a pond: the server names the aerator that may help.
+export const lowOxygenCheck: WaterSafetyCheck = {
+  ...highAmmoniaCheck,
+  results: [
+    {
+      parameter: 'DISSOLVED_OXYGEN',
+      name: 'Dissolved oxygen',
+      unit: 'MG_PER_L',
+      value: 1.5,
+      minimum: 3,
+      maximum: null,
+      status: 'BELOW_RANGE',
+      explanation: 'The oxygen in the water that your stock breathe.',
+      guidance: {
+        severity: 'ACTION',
+        title: 'Oxygen is lower than suggested',
+        message: 'Watch for fish gasping at the surface and consider adding aeration.',
+        sourceStatus: 'DEMO',
+        ruleVersion: 'demo-2026-09-gabayan',
+        disclaimer,
+      },
+      recommendedProducts: [
+        {
+          ...aerator,
+          whyRelevant:
+            'An aerator adds oxygen to the water and may help while you look for the cause of the low reading.',
+          suggestedQuantity: 1,
+        },
+      ],
+    },
+  ],
+  notChecked: ['SALINITY', 'PH', 'AMMONIA', 'NITRITE', 'NITRATE', 'WATER_TEMPERATURE'],
 }

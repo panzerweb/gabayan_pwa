@@ -7,7 +7,7 @@ import {
   waterThresholdSetSchema,
 } from '@pages/water-quality/domain/water-quality.model'
 
-import { highAmmoniaCheck, tilapiaPondThresholds } from './fixtures'
+import { highAmmoniaCheck, lowOxygenCheck, tilapiaPondThresholds } from './fixtures'
 
 describe('water-quality model', () => {
   it('parses a threshold set and a safety check as the contract describes them', () => {
@@ -70,5 +70,21 @@ describe('water-quality model', () => {
       'readings.ammoniaMgL': 'Enter a number from 0 to 50.',
       'readings.nitrateMgL': 'Enter a number from 0 to 1000.',
     })
+  })
+
+  it('parses the products named for an out-of-range reading with their suggested quantity', () => {
+    const [oxygen] = waterSafetyCheckSchema.parse(lowOxygenCheck).results
+    expect(oxygen?.recommendedProducts?.[0]).toMatchObject({
+      sku: 'GBY-AER-001',
+      suggestedQuantity: 1,
+      whyRelevant: expect.stringContaining('adds oxygen'),
+    })
+  })
+
+  it('refuses a recommended product without a quantity to preset', () => {
+    const [oxygen] = lowOxygenCheck.results
+    const product = { ...oxygen!.recommendedProducts![0]!, suggestedQuantity: 0 }
+    const broken = { ...lowOxygenCheck, results: [{ ...oxygen, recommendedProducts: [product] }] }
+    expect(waterSafetyCheckSchema.safeParse(broken).success).toBe(false)
   })
 })

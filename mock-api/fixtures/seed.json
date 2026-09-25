@@ -3780,5 +3780,184 @@
       "sourceStatus": "DEMO",
       "ruleVersion": "demo-2026-09"
     }
+  ],
+  "installationGuides": [
+    {
+      "id": "guide_pond_aerator",
+      "productId": "prd_pond_aerator",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Choose a spot",
+          "instruction": "Place the aerator where the water is deep enough to cover it fully, away from the inlet and from where you feed."
+        },
+        {
+          "order": 2,
+          "title": "Keep the power point dry",
+          "instruction": "Use an outlet sheltered from rain and above flood level. A safety breaker that cuts the power when current leaks into water (RCD or GFCI) is worth adding if you do not have one."
+        },
+        {
+          "order": 3,
+          "title": "Anchor the unit",
+          "instruction": "Tie the aerator to a stake or a float line so it cannot drift or pull on its cable."
+        },
+        {
+          "order": 4,
+          "title": "Run it and watch",
+          "instruction": "Switch it on and check that bubbles rise evenly and the water moves. Watch your stock for a few minutes; calm fish near the surface are a good sign."
+        }
+      ],
+      "cautions": [
+        "Switch off and unplug the aerator before touching it or reaching into the water.",
+        "Keep the cable off paths where people walk and away from anything that could cut it.",
+        "Follow the supplier's manual wherever it differs from these steps."
+      ],
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "guide_water_pump",
+      "productId": "prd_water_pump",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Screen the intake",
+          "instruction": "Fit a mesh screen over the intake so the pump cannot draw in fish or leaves."
+        },
+        {
+          "order": 2,
+          "title": "Set it off the bottom",
+          "instruction": "Rest the pump on a flat stone or brick so it does not suck up mud from the pond or tank floor."
+        },
+        {
+          "order": 3,
+          "title": "Connect the hose",
+          "instruction": "Push the hose fully onto the outlet and tighten the clamp before the pump goes into the water."
+        },
+        {
+          "order": 4,
+          "title": "Submerge, then switch on",
+          "instruction": "Lower the pump until it is fully under water, then plug it into a dry, sheltered outlet and check the flow at the hose end."
+        }
+      ],
+      "cautions": [
+        "Never run the pump out of water; it can overheat within minutes.",
+        "Unplug the pump before lifting it out or clearing the intake.",
+        "Move only part of the water at a time, as your culture system allows."
+      ],
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "guide_pond_filter",
+      "productId": "prd_pond_filter",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Cut to fit",
+          "instruction": "Trim the pad so it sits snugly in the filter housing with no gaps at the edges."
+        },
+        {
+          "order": 2,
+          "title": "Rinse in tank water",
+          "instruction": "Rinse the new pad in a bucket of water taken from the tank before fitting it."
+        },
+        {
+          "order": 3,
+          "title": "Fit and check the flow",
+          "instruction": "Place the pad in the housing, restart the water flow and check that water passes through the pad rather than around it."
+        }
+      ],
+      "cautions": [
+        "Clean a used pad in tank water, not tap water; chlorine in tap water can harm the helpful bacteria living on it.",
+        "Replace the pad when it tears or stays clogged after rinsing."
+      ],
+      "sourceStatus": "DEMO"
+    },
+    {
+      "id": "guide_water_test_kit",
+      "productId": "prd_water_test_kit",
+      "steps": [
+        {
+          "order": 1,
+          "title": "Take the sample",
+          "instruction": "Fill the test tube from about an arm’s length below the surface, away from the inlet, at the same time of day each time you test."
+        },
+        {
+          "order": 2,
+          "title": "Add the drops in order",
+          "instruction": "Add the reagent drops in the order the kit's card gives and wait the time it says."
+        },
+        {
+          "order": 3,
+          "title": "Read in daylight",
+          "instruction": "Hold the tube against the white side of the colour card in daylight and pick the closest colour."
+        },
+        {
+          "order": 4,
+          "title": "Check your readings",
+          "instruction": "Enter the readings in the water safety check to compare them with the suggested ranges for your fish."
+        }
+      ],
+      "cautions": [
+        "Keep the reagents away from children, and never pour them into the pond or tank.",
+        "Check the expiry date on each bottle; old reagents can give wrong colours."
+      ],
+      "sourceStatus": "DEMO"
+    }
+  ],
+  "waterProblemProducts": [
+    {
+      "id": "wpp_do_low_aerator",
+      "parameter": "DISSOLVED_OXYGEN",
+      "status": "BELOW_RANGE",
+      "productSku": "GBY-AER-001",
+      "whyRelevant": "An aerator adds oxygen to the water and may help while you look for the cause of the low reading.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ammonia_high_filter",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-FLT-009",
+      "whyRelevant": "A filter pad catches uneaten feed and waste before it breaks down into ammonia.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ammonia_high_test_kit",
+      "parameter": "AMMONIA",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck ammonia over the next few days to see whether it is coming down.",
+      "suggestedQuantity": 1,
+      "sortOrder": 2
+    },
+    {
+      "id": "wpp_nitrite_high_test_kit",
+      "parameter": "NITRITE",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck nitrite over the next few days to see whether it is coming down.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ph_low_test_kit",
+      "parameter": "PH",
+      "status": "BELOW_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck pH at the same time each day and see whether it settles.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    },
+    {
+      "id": "wpp_ph_high_test_kit",
+      "parameter": "PH",
+      "status": "ABOVE_RANGE",
+      "productSku": "GBY-TST-004",
+      "whyRelevant": "A test kit lets you recheck pH at the same time each day and see whether it settles.",
+      "suggestedQuantity": 1,
+      "sortOrder": 1
+    }
   ]
 }

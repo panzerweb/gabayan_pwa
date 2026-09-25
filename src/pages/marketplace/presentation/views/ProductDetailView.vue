@@ -13,12 +13,14 @@ import { ROUTE_NAMES } from '@router/route-names'
 import { CART_OFFLINE_MESSAGE } from '../../domain/marketplace.model'
 import ProductGallery from '../components/ProductGallery.vue'
 import ProductInfo from '../components/ProductInfo.vue'
+import ProductInstallationGuide from '../components/ProductInstallationGuide.vue'
 import ProductQuantity from '../components/ProductQuantity.vue'
 import ProductRecommendation from '../components/ProductRecommendation.vue'
 import ProductSpecifications from '../components/ProductSpecifications.vue'
 import { useAddToCart } from '../composables/useAddToCart'
 import { useFavoriteToggle } from '../composables/useFavoriteToggle'
 import { useProductDetail } from '../composables/useProductDetail'
+import { useQuantityPreset } from '../composables/useQuantityPreset'
 
 const route = useRoute()
 const productId = computed(() => String(route.params.productId))
@@ -26,6 +28,10 @@ const productId = computed(() => String(route.params.productId))
 const { product, loading, loadFailed, refetch } = useProductDetail(productId)
 const { toggle: toggleFavorite, pending: favoritePending } = useFavoriteToggle(productId)
 const { quantity, isOnline, adding, add } = useAddToCart(productId)
+const { presetQuantity } = useQuantityPreset(
+  quantity,
+  computed(() => product.value?.maximumOrderQuantity),
+)
 
 const outOfStock = computed(() => product.value?.availability === 'OUT_OF_STOCK')
 </script>
@@ -47,9 +53,16 @@ const outOfStock = computed(() => product.value?.availability === 'OUT_OF_STOCK'
         />
         <ProductRecommendation v-if="product.recommendation" :why="product.recommendation.why" />
         <ProductSpecifications :specifications="product.specifications" />
+        <ProductInstallationGuide
+          v-if="product.installationGuide"
+          :guide="product.installationGuide"
+        />
 
         <section class="purchase-panel" aria-label="Purchase options">
           <ProductQuantity v-model="quantity" :maximum="product.maximumOrderQuantity" />
+          <p v-if="presetQuantity !== null" class="preset-note">
+            Suggested quantity for your need: {{ presetQuantity }}. You can change it.
+          </p>
           <p v-if="!isOnline" class="offline-note">{{ CART_OFFLINE_MESSAGE }}</p>
           <BaseButton :disabled="!isOnline || outOfStock" :loading="adding" @click="add">
             {{
@@ -74,6 +87,11 @@ const outOfStock = computed(() => product.value?.availability === 'OUT_OF_STOCK'
   display: grid;
   gap: var(--space-3);
   padding-top: var(--space-2);
+}
+.preset-note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
 }
 .offline-note {
   margin: 0;

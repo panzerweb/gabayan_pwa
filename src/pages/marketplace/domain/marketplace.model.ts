@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { mediaAssetSchema } from '@core/http'
+import { mediaAssetSchema, sourceStatusSchema } from '@core/http'
 
 export const moneySchema = z.object({
   amountMinor: z.number().int().nonnegative(),
@@ -34,6 +34,20 @@ export const productSummarySchema = z.object({
   isFavorite: z.boolean(),
 })
 
+export const installationStepSchema = z.object({
+  order: z.number().int().positive(),
+  title: z.string(),
+  instruction: z.string(),
+})
+
+export const installationGuideSchema = z.object({
+  steps: z.array(installationStepSchema).min(1),
+  cautions: z.array(z.string()),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  disclaimer: z.string(),
+})
+
 export const productDetailSchema = productSummarySchema.extend({
   images: z.array(mediaAssetSchema),
   description: z.string(),
@@ -42,6 +56,8 @@ export const productDetailSchema = productSummarySchema.extend({
   suitableEnvironmentIds: z.array(z.string()),
   recommendation: z.object({ cultivationId: z.string(), why: z.string() }).nullable(),
   maximumOrderQuantity: z.number().int().positive(),
+  // Optional until every API serving the catalog answers it; absent reads as no guide.
+  installationGuide: installationGuideSchema.nullable().optional(),
 })
 
 export const favoriteResultSchema = z.object({ productId: z.string(), isFavorite: z.boolean() })
@@ -50,6 +66,8 @@ export type Money = z.infer<typeof moneySchema>
 export type ProductAvailability = z.infer<typeof productAvailabilitySchema>
 export type ProductCategory = z.infer<typeof productCategorySchema>
 export type ProductSummary = z.infer<typeof productSummarySchema>
+export type InstallationStep = z.infer<typeof installationStepSchema>
+export type InstallationGuide = z.infer<typeof installationGuideSchema>
 export type ProductDetail = z.infer<typeof productDetailSchema>
 export type FavoriteResult = z.infer<typeof favoriteResultSchema>
 
@@ -147,4 +165,21 @@ export function availabilityStatus(availability: ProductAvailability) {
 export function clampQuantity(quantity: number, maximum: number) {
   if (!Number.isFinite(quantity)) return 1
   return Math.min(Math.max(Math.trunc(quantity), 1), Math.max(maximum, 1))
+}
+
+// The route query "Buy now" opens a product with: the suggested quantity, and the
+// cultivation it was recommended for when there is one.
+export function buyNowQuery(quantity: number, cultivationId?: string): Record<string, string> {
+  return {
+    quantity: String(clampQuantity(quantity, Number.MAX_SAFE_INTEGER)),
+    ...(cultivationId ? { cultivationId } : {}),
+  }
+}
+
+// The quantity a "Buy now" link preset, or null when the query holds no whole number above zero.
+export function presetQuantityFrom(query: Record<string, unknown>): number | null {
+  const value = firstValue(query.quantity)
+  if (!/^\d+$/.test(value)) return null
+  const quantity = Number(value)
+  return quantity >= 1 ? quantity : null
 }

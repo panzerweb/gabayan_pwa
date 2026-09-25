@@ -1,8 +1,19 @@
 import { mount } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 
+import type { WaterSafetyCheck } from '@pages/water-quality/domain/water-quality.model'
 import WaterSafetyResultList from '@pages/water-quality/presentation/components/WaterSafetyResultList.vue'
+import { ROUTE_NAMES } from '@router/route-names'
 
-import { highAmmoniaCheck } from '../../unit/water-quality/fixtures'
+import { highAmmoniaCheck, lowOxygenCheck } from '../../unit/water-quality/fixtures'
+import { mountInApp } from '../support/app'
+
+// Products carry a "Buy now" link, so a result that names any needs a router.
+async function mountWithRouter(check: WaterSafetyCheck) {
+  const host = defineComponent({ render: () => h(WaterSafetyResultList, { check }) })
+  const { wrapper } = await mountInApp(host, { name: ROUTE_NAMES.home })
+  return wrapper
+}
 
 describe('WaterSafetyResultList', () => {
   it('lists each entered reading with its value, unit and suggested range', () => {
@@ -44,5 +55,32 @@ describe('WaterSafetyResultList', () => {
     expect(wrapper.get('.safety-results__skipped').text()).toBe(
       'Not checked: Salinity, Nitrite, Nitrate, Dissolved oxygen, Water temperature.',
     )
+  })
+
+  it('offers Buy now on each product the server names for an out-of-range reading', async () => {
+    const wrapper = await mountWithRouter(lowOxygenCheck)
+
+    const products = wrapper.get('[aria-label="Products that may help with Dissolved oxygen"]')
+    expect(products.text()).toContain('Compact Pond Aerator')
+    expect(products.text()).toContain('₱1,299.00')
+    expect(products.text()).toContain('adds oxygen to the water')
+    expect(products.text()).toContain('Check what your own setup needs before buying.')
+    const buy = products.get('a[aria-label="Buy now: Compact Pond Aerator"]')
+    expect(buy.attributes('href')).toBe('/app/products/prd_pond_aerator?quantity=1')
+  })
+
+  it('names no products for readings the server recommends nothing for', () => {
+    const wrapper = mount(WaterSafetyResultList, { props: { check: highAmmoniaCheck } })
+
+    expect(wrapper.text()).not.toContain('Products that may help')
+  })
+
+  it('says when a suggested product is out of stock', async () => {
+    const [oxygen] = lowOxygenCheck.results
+    const product = { ...oxygen!.recommendedProducts![0]!, availability: 'OUT_OF_STOCK' as const }
+    const check = { ...lowOxygenCheck, results: [{ ...oxygen!, recommendedProducts: [product] }] }
+    const wrapper = await mountWithRouter(check)
+
+    expect(wrapper.get('.problem-product .status-chip').text()).toBe('Out of stock')
   })
 })
