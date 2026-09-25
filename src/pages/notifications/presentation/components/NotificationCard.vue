@@ -5,12 +5,14 @@ import BaseButton from '@components/ui/BaseButton.vue'
 import BaseCard from '@components/ui/BaseCard.vue'
 import StatusChip from '@components/ui/StatusChip.vue'
 import { formatManilaTime, formatQuantity } from '@core/utils/format'
+import WeatherAlertDetail from '@pages/weather-alerts/presentation/components/WeatherAlertDetail.vue'
 
 import { notificationCategoryDisplay, type Notification } from '../../domain/notifications.model'
 import NotificationReminderDetail from './NotificationReminderDetail.vue'
 
 // One notification. Unread ones say so in words as well as with the accent, and offer
-// either their action or "Mark as read". A reminder the server raised also shows its figures.
+// either their action or "Mark as read". A reminder the server raised also shows its figures,
+// and a weather alert its explanation and steps.
 const props = defineProps<{ notification: Notification }>()
 const emit = defineEmits<{
   open: [notification: Notification]
@@ -44,6 +46,11 @@ const unread = computed(() => !props.notification.readAt)
       v-if="notification.reminder"
       :type="notification.type"
       :reminder="notification.reminder"
+    />
+    <WeatherAlertDetail
+      v-if="notification.weatherAlert"
+      :alert="notification.weatherAlert"
+      :show-title="false"
     />
     <BaseButton v-if="notification.action" variant="secondary" @click="emit('open', notification)">
       {{ notification.action.label }}

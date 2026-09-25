@@ -17,6 +17,7 @@ import { registerTaskAndRecordContract } from './scenarios/tasks-records.scenari
 import { registerTierContract } from './scenarios/tiers.scenarios.mjs'
 import { registerToolsContract } from './scenarios/tools.scenarios.mjs'
 import { registerWaterQualityContract } from './scenarios/water-quality.scenarios.mjs'
+import { registerWeatherAlertContract } from './scenarios/weather-alerts.scenarios.mjs'
 import {
   bearer,
   idempotencyKey,
@@ -562,6 +563,7 @@ registerWaterQualityContract(client)
 registerToolsContract(client)
 registerReminderContract(client)
 registerProLogsContract(client)
+registerWeatherAlertContract(client)
 
 describe('endpoint catalog coverage', () => {
   it('reads every method-and-path row of the contract endpoint catalog', () => {

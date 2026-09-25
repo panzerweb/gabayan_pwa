@@ -58,7 +58,7 @@ export default defineConfig({
           },
           {
             urlPattern:
-              /^https?:\/\/[^/]+\/api\/v1\/(?:dashboard|cultivations|tasks|notifications|products|product-categories|orders)(?:\/[^?]*)?(?:\?.*)?$/,
+              /^https?:\/\/[^/]+\/api\/v1\/(?:dashboard|cultivations|tasks|notifications|weather-alerts|products|product-categories|orders)(?:\/[^?]*)?(?:\?.*)?$/,
             method: 'GET',
             handler: 'NetworkFirst',
             options: {

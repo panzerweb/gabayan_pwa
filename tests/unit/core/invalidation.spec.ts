@@ -65,6 +65,7 @@ const contractRows: Array<[InvalidatingMutation, string[][]]> = [
     ],
   ],
   ['upgradeRequest', [['tiers']]],
+  ['farmUpdate', [['weather-alerts'], ['notifications'], ['home']]],
 ]
 
 describe('invalidation map', () => {

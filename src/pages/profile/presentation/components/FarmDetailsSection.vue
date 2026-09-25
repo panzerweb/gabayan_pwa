@@ -43,7 +43,7 @@ const experienceOptions = EXPERIENCE_LEVELS.map((level) => ({
 </script>
 
 <template>
-  <section class="profile-section">
+  <section id="farm-profile" class="profile-section">
     <ProfileSectionHeading eyebrow="Farm" title="Farm profile">
       <template #action>
         <BaseButton variant="text" :disabled="loading || loadFailed" @click="open">{{
@@ -77,6 +77,7 @@ const experienceOptions = EXPERIENCE_LEVELS.map((level) => ({
           v-model="form.municipality"
           name="municipality"
           label="City or municipality"
+          hint="With the province, this is where weather alerts are read for."
           :error="fieldErrors.municipality"
         />
         <BaseInput

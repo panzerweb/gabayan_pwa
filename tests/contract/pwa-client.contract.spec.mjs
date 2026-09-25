@@ -2,7 +2,7 @@
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { DEMO_EMAIL, DEMO_PASSWORD } from './support/accounts.mjs'
+import { DEMO_EMAIL, DEMO_PASSWORD, registrationBody } from './support/accounts.mjs'
 import { listenOnFreshMock } from './support/client.mjs'
 import {
   AERATOR_SKU,
@@ -15,8 +15,9 @@ import {
 // The PWA's own data layer - the functions its screens call, with their query strings and
 // Zod schemas - reading the demo farmer's resources from the server the suite targets. A
 // schema stricter than the contract, or a query key the server refuses, fails here with the
-// Zod issue or the error envelope, before any screen does. Reads only, so it can run beside
-// the main suite on one live server.
+// Zod issue or the error envelope, before any screen does. It reads the demo farmer's data and
+// writes only to fresh accounts of its own, so it can run beside the main suite on one live
+// server.
 let mock
 let api
 let accessToken
@@ -35,6 +36,7 @@ async function loadDataLayer() {
     import('@pages/orders/data/orders.api'),
     import('@pages/tiers/data/tiers.api'),
     import('@pages/water-quality/data/water-quality.api'),
+    import('@pages/weather-alerts/data/weather-alerts.api'),
   ])
   return Object.assign({}, ...modules)
 }
@@ -189,5 +191,29 @@ describe('the PWA data layer against the contract server', () => {
     const conversion = (await api.getFeedConversionApi(id, accessToken)).data
     expect(conversion).toMatchObject({ status: 'CALCULATED', isDemo: true })
     expect(conversion.ratio).toEqual(expect.any(Number))
+  })
+
+  it('reads weather alerts and the notification a heat alert raises through the PWA schemas', async () => {
+    const calm = (await api.getWeatherAlertsApi(accessToken)).data
+    expect(calm.status).toBe('AVAILABLE')
+
+    const session = await api.registerApi(registrationBody('Weather Client Farmer'))
+    const farmerToken = session.data.accessToken
+    await api.upsertFarmProfileApi(
+      {
+        name: 'Weather Client Farm',
+        region: null,
+        province: 'Pangasinan',
+        municipality: 'Dagupan City',
+        experienceLevel: 'BEGINNER',
+        notes: null,
+      },
+      farmerToken,
+    )
+    const weather = (await api.getWeatherAlertsApi(farmerToken)).data
+    expect(weather.alerts.map((alert) => alert.kind)).toEqual(['HIGH_TEMPERATURE'])
+    const notifications = (await api.listNotificationsApi(farmerToken)).data
+    const raised = notifications.find((item) => item.type === 'WEATHER_ALERT')
+    expect(raised?.weatherAlert?.id).toBe(weather.alerts[0].id)
   })
 })

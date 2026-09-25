@@ -11,6 +11,13 @@ const repository = vi.hoisted(() => ({ getHomeDashboard: vi.fn() }))
 
 vi.mock('@pages/home/data/home.repository', () => ({ homeRepository: repository }))
 
+// Home also holds the weather card; its own spec covers it, so here it reads a calm forecast.
+vi.mock('@pages/weather-alerts/data/weather-alerts.repository', async () => {
+  const { calmForecast } = await import('../../unit/weather-alerts/fixtures')
+  const { envelope: wrap } = await import('../../unit/marketplace/fixtures')
+  return { weatherAlertsRepository: { getWeatherAlerts: async () => wrap(calmForecast) } }
+})
+
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date('2026-09-23T08:00:00+08:00'))

@@ -59,7 +59,7 @@ The primary outcome is not “buy equipment.” It is “know what to do next in
 
 - Real payments, courier integrations, inventory reservation, refunds, and seller tools.
 - Real Google OAuth, SMS/email verification, password reset delivery, and push notifications.
-- GPS, sensor/IoT integrations, weather feeds, disease diagnosis, image recognition, and community/social features.
+- GPS, sensor/IoT integrations, weather feeds beyond the in-app weather alerts read from a daily forecast for the farm's municipality and province (contract §12 "Weather alerts"), disease diagnosis, image recognition, and community/social features.
 - Scientific validation of stocking/feed/water/harvest rules.
 - Multiple currencies, imperial units, localization beyond an English-first Philippines experience.
 - Full offline write synchronization and conflict resolution.

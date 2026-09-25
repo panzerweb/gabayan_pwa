@@ -13,7 +13,8 @@ export { ROUTE_NAMES, type RouteName } from './route-names'
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [...publicRoutes, ...setupRoutes, ...appRoutes],
-  scrollBehavior: () => ({ top: 0 }),
+  // A link to a section of a page (Home's weather card to the farm profile) lands on it.
+  scrollBehavior: (to) => (to.hash ? { el: to.hash, top: 16 } : { top: 0 }),
 })
 
 router.beforeEach(sessionGuard)

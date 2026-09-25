@@ -127,6 +127,7 @@ erDiagram
     USER ||--|| CART : owns
     USER ||--o{ ORDER : places
     USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ WEATHER_ALERT : receives
     SPECIES ||--o{ CULTIVATION : configures
     CULTURE_ENVIRONMENT ||--o{ CULTIVATION : configures
     CULTIVATION ||--o{ FARM_TASK : schedules
@@ -188,7 +189,7 @@ erDiagram
 | `PaymentMethodType`      | `CASH_ON_DELIVERY`, `GCASH`, `CARD`                                                                                                                                  |
 | `ProductAvailability`    | `AVAILABLE`, `LOW_STOCK`, `OUT_OF_STOCK`                                                                                                                             |
 | `NotificationCategory`   | `CULTIVATION`, `ORDER`, `EDUCATION`, `SYSTEM`                                                                                                                        |
-| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `WATER_CHANGE_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`                        |
+| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `WATER_CHANGE_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `WEATHER_ALERT`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`       |
 | `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                                       |
 | `TierCode`               | `FREE`, `PRO`, `ORGANIZATION`                                                                                                                                        |
 | `TierEntitlement`        | `CULTIVATION_GUIDANCE`, `STOCKING_CALCULATOR`, `MARKETPLACE`, `WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`, `WATER_PARAMETER_LOGS`, `FEED_CONVERSION_TRACKING` |
@@ -197,6 +198,9 @@ erDiagram
 | `WaterParameter`         | `SALINITY`, `PH`, `AMMONIA`, `NITRITE`, `NITRATE`, `DISSOLVED_OXYGEN`, `WATER_TEMPERATURE`                                                                           |
 | `WaterParameterUnit`     | `PPT`, `PH`, `MG_PER_L`, `CELSIUS`                                                                                                                                   |
 | `WaterReadingStatus`     | `BELOW_RANGE`, `WITHIN_RANGE`, `ABOVE_RANGE`                                                                                                                         |
+| `WeatherAlertKind`       | `HIGH_TEMPERATURE`, `OVERCAST_SPELL`                                                                                                                                 |
+| `WeatherAlertSeverity`   | `ADVISORY`, `WARNING`                                                                                                                                                |
+| `WeatherAlertsStatus`    | `AVAILABLE`, `LOCATION_MISSING`, `FORECAST_UNAVAILABLE`                                                                                                              |
 
 ## 5. Endpoint Catalog
 
@@ -366,7 +370,21 @@ Cancellation is allowed only in server-defined states. Invalid cancellation retu
 | `POST /notifications/read-all`              | optional `ReadAllNotificationsRequest`                               | `200 Envelope<UnreadCount>`  |
 
 `GET /dashboard/home`, `GET /notifications` and `GET /notifications/unread-count` first raise the
-reminders that have fallen due for the account (§12 Reminders), so the answer already holds them.
+reminders that have fallen due for the account (§12 Reminders) and its weather alerts (§12 Weather
+alerts), so the answer already holds them.
+
+### Weather alerts
+
+| Method and path       | Query/body | Success response              |
+| --------------------- | ---------- | ----------------------------- |
+| `GET /weather-alerts` | none       | `200 Envelope<WeatherAlerts>` |
+
+Signed in and part of every plan. The alerts are for the farm's municipality and province from
+`FarmProfile`; the read raises any alert the current forecast calls for, as Home and the
+notifications do, then answers the alerts still current. A farm without both a municipality and a
+province - or an account with no farm profile yet - answers `200` with status `LOCATION_MISSING`
+rather than an error, and a forecast that cannot be read answers `200` with status
+`FORECAST_UNAVAILABLE`, so Home never fails because of the weather.
 
 ## 6. Identity and User Schemas
 
@@ -1241,8 +1259,10 @@ Representative order creation request:
 | `action`                             | `{ label, deepLink } \| null` |
 | `cultivationId`, `orderId`, `taskId` | string or null                |
 | `reminder`                           | `ReminderDetail \| null`      |
+| `weatherAlert`                       | `WeatherAlert \| null`        |
 
-`reminder` is set on the reminders below and null on every other notification.
+`reminder` is set on the reminders below and null on every other notification. `weatherAlert` is
+set on a `WEATHER_ALERT` notification (§12 Weather alerts) and null on every other.
 
 #### ReminderDetail
 
@@ -1282,6 +1302,78 @@ off; only its notification follows the switch. Days since stocking never raise a
 cultivation without a current sample gets none however long it has run. No reminder asks for a
 full water replacement; the message and `waterChangePercent` describe a partial change.
 Completing a feeding task marks its reminder read (§9).
+
+### Weather alerts
+
+Weather alerts warn the farmer ahead of weather that GABAYAN.md ties to fish losses: hot days,
+when warm water holds less oxygen while the fish need more, and runs of overcast days, when the
+algae stop making oxygen and a dying bloom can use it up overnight. They come from a daily forecast
+for the farm's `municipality` and `province` (matched ignoring case and surrounding spaces); there
+is no GPS location in v1. Nothing runs in the background: `GET /weather-alerts`, `GET
+/dashboard/home`, `GET /notifications` and `GET /notifications/unread-count` first read the
+forecast for today and the following days (`forecastDays`, 3 in v1, today included) and raise the
+alerts it calls for.
+
+An alert is a run of consecutive forecast days on which a rule's measure reaches its demo
+threshold, lasting at least the rule's minimum run. It is keyed per farm, location, kind and first
+day, so it is raised once however often those reads repeat, and it keeps the period and figures of
+the forecast that raised it. Raising one also raises a notification - `category` `CULTIVATION`,
+`type` `WEATHER_ALERT`, `action` null, `cultivationId`/`orderId`/`taskId` null, `weatherAlert` the
+alert - once, with no settings switch. Alerts are for the farm, so they are raised whether or not a
+cultivation is running. A farm without a location, and a forecast that cannot be read, raise
+nothing.
+
+| Rule (DEMO, `demo-2026-09-weather`) | Measure                           | A day counts from | `WARNING` when a day reaches | Minimum run |
+| ----------------------------------- | --------------------------------- | ----------------- | ---------------------------- | ----------- |
+| `HIGH_TEMPERATURE`                  | the day's maximum air temperature | 34 °C             | 36 °C                        | 1 day       |
+| `OVERCAST_SPELL`                    | the day's mean cloud cover        | 80 %              | 90 %                         | 2 days      |
+
+Every other alert is `ADVISORY`. The thresholds are rule data held by revision, not constants,
+and are demo values not yet reviewed for Philippine farms; an alert never tells the farmer to
+replace the pond water.
+
+#### WeatherAlerts
+
+| Field          | Type                                 | Notes                                                                                                                           |
+| -------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `status`       | `WeatherAlertsStatus`                | `LOCATION_MISSING` without a farm profile, or with no `municipality` or no `province`                                           |
+| `location`     | `{ municipality, province } \| null` | the farm's place as saved; null when `LOCATION_MISSING`                                                                         |
+| `forecastDays` | integer                              | days the forecast covers from today, today included                                                                             |
+| `checkedAt`    | timestamp or null                    | when the forecast was read; null unless `AVAILABLE`                                                                             |
+| `alerts`       | `WeatherAlert[]`                     | alerts raised for this location whose `periodEnd` is today or later, by `periodStart` then kind                                 |
+| `message`      | string                               | one plain sentence for the state: no alerts in the coming days, how to add the location, or that the forecast could not be read |
+
+`alerts` is empty when `LOCATION_MISSING`. With `FORECAST_UNAVAILABLE` it still lists the current
+alerts raised from an earlier forecast.
+
+#### WeatherAlert
+
+| Field                                                          | Type                         | Notes                                                                           |
+| -------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| `id`                                                           | string                       |                                                                                 |
+| `kind`                                                         | `WeatherAlertKind`           |                                                                                 |
+| `severity`                                                     | `WeatherAlertSeverity`       |                                                                                 |
+| `location`                                                     | `{ municipality, province }` | the place the forecast was read for                                             |
+| `periodStart`, `periodEnd`                                     | date                         | first and last forecast day of the run, Asia/Manila; equal for a single day     |
+| `peak`                                                         | `Quantity`                   | highest value in the period: `CELSIUS` air temperature or `PERCENT` cloud cover |
+| `threshold`                                                    | `Quantity`                   | the rule's "a day counts from" value, in the same unit                          |
+| `title`, `message`                                             | string                       | short heading and one-line summary, as on the notification                      |
+| `explanation`                                                  | string                       | the risk to the fish in plain words                                             |
+| `actions`                                                      | string[]                     | a few practical steps; never a full water replacement                           |
+| `raisedAt`                                                     | timestamp                    |                                                                                 |
+| `basis`, `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                   | Required; shown when `isDemo`                                                   |
+
+#### Fixture forecast
+
+The development mock, and the fake weather adapter the backend's tests select, answer from this
+fixture, with days counted from the server's today. Every other location reads as San Pablo City.
+
+| Municipality, province   | Day 0 / 1 / 2: maximum air temperature; mean cloud cover | Answer                                                                 |
+| ------------------------ | -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| San Pablo City, Laguna   | 31 / 32 / 31 °C; 45 / 55 / 60 %                          | `AVAILABLE`, no alerts                                                 |
+| Dagupan City, Pangasinan | 33.5 / 34.6 / 35.3 °C; 30 / 20 / 15 %                    | `AVAILABLE`, one `HIGH_TEMPERATURE` `ADVISORY`, days 1-2, peak 35.3 °C |
+| Dumangas, Iloilo         | 29 / 28 / 28 °C; 85 / 92 / 88 %                          | `AVAILABLE`, one `OVERCAST_SPELL` `WARNING`, days 0-2, peak 92 %       |
+| Jomalig, Quezon          | cannot be read                                           | `FORECAST_UNAVAILABLE`                                                 |
 
 ## 13. State Transition Rules
 
@@ -1333,6 +1425,7 @@ Mock tracking advancement may be fixture-driven; the frontend must not manufactu
 | Upgrade request    | pending request                                      | Account tier                                              |
 | Water safety check | per-reading result; stores nothing                   | nothing                                                   |
 | Water log create   | per-reading status against the ranges                | Water-parameter logs                                      |
+| Farm update        | location the weather alerts are read for             | Weather alerts, notifications, Home                       |
 
 Client-side optimistic updates are acceptable for notification read state and favorites. Use pessimistic updates for biological records, checkout, order placement, and harvest completion.
 
@@ -1350,7 +1443,8 @@ species, cultureEnvironments, compatibilityRules, stockingRules,
 cultivations, tasks, growthMeasurements, mortalityRecords,
 feedingPlans, feedingRecords, waterChecks, waterParameterLogs, harvestRecords,
 productCategories, products, favorites, carts, cartItems,
-orders, orderItems, trackingEvents, notifications, idempotencyRecords
+orders, orderItems, trackingEvents, notifications, idempotencyRecords,
+weatherAlertRules, weatherForecasts, weatherAlerts
 ```
 
 ### Parity checklist
