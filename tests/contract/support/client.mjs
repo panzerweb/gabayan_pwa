@@ -10,12 +10,19 @@ import { createMockApi } from '../../../mock-api/server.mjs'
 const seedPath = fileURLToPath(new URL('../../../mock-api/fixtures/seed.json', import.meta.url))
 const methods = ['get', 'post', 'put', 'patch', 'delete']
 
+// The in-process mock's clock: the seed day, before its first feeding time, so no reminder
+// falls due that the seed does not already hold (contract §15). A live server keeps its own.
+export const MOCK_CLOCK = '2026-09-23T07:30:00+08:00'
+
 // The in-process mock runs on its own copy of the seed, so the suite never depends on
 // `mock-api/db.json` or on a reset having been run first.
 function inProcessMock() {
   const databasePath = join(mkdtempSync(join(tmpdir(), 'gabayan-contract-')), 'db.json')
   copyFileSync(seedPath, databasePath)
-  return { target: createMockApi({ databasePath, delayMs: 0 }), root: '/api/v1' }
+  return {
+    target: createMockApi({ databasePath, delayMs: 0, now: MOCK_CLOCK }),
+    root: '/api/v1',
+  }
 }
 
 function liveServer(baseUrl) {

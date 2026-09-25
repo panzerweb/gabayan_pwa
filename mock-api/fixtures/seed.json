@@ -644,10 +644,32 @@
         "targetMaximumG": 450,
         "readySoonFromG": 300,
         "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
         "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
         "sourceStatus": "DEMO",
         "ruleVersion": "demo-2026-09-gabayan"
       },
+      "waterExchange": [
+        {
+          "id": "water_exchange_tilapia_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_tilapia_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
       "sources": [
         {
           "title": "Dissolved Oxygen for Fish Production (FA002)",
@@ -789,10 +811,32 @@
         "targetMaximumG": 450,
         "readySoonFromG": 300,
         "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
         "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
         "sourceStatus": "DEMO",
         "ruleVersion": "demo-2026-09-gabayan"
       },
+      "waterExchange": [
+        {
+          "id": "water_exchange_milkfish_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_milkfish_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
       "sources": [
         {
           "title": "Gabayan product brief: semi-intensive bangus pond sizing sample",
@@ -941,10 +985,32 @@
         "targetMaximumG": 450,
         "readySoonFromG": 300,
         "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
         "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
         "sourceStatus": "DEMO",
         "ruleVersion": "demo-2026-09-gabayan"
       },
+      "waterExchange": [
+        {
+          "id": "water_exchange_catfish_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_catfish_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
       "sources": [
         {
           "title": "Dissolved Oxygen for Fish Production (FA002)",
@@ -1086,10 +1152,32 @@
         "targetMaximumG": 450,
         "readySoonFromG": 300,
         "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
         "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
         "sourceStatus": "DEMO",
         "ruleVersion": "demo-2026-09-gabayan"
       },
+      "waterExchange": [
+        {
+          "id": "water_exchange_grouper_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_grouper_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
       "sources": [
         {
           "title": "Dissolved Oxygen for Fish Production (FA002)",
@@ -1231,10 +1319,32 @@
         "targetMaximumG": 450,
         "readySoonFromG": 300,
         "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
         "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
         "sourceStatus": "DEMO",
         "ruleVersion": "demo-2026-09-gabayan"
       },
+      "waterExchange": [
+        {
+          "id": "water_exchange_shrimp_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        },
+        {
+          "id": "water_exchange_shrimp_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09-gabayan"
+        }
+      ],
       "sources": [
         {
           "title": "Dissolved Oxygen for Fish Production (FA002)",
@@ -1358,10 +1468,32 @@
         "targetMaximumG": 450,
         "readySoonFromG": 300,
         "potentiallyReadyFromG": 350,
+        "measurementFreshDays": 14,
+        "harvestWindowDays": { "minimum": 120, "maximum": 150 },
         "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
         "sourceStatus": "DEMO",
         "ruleVersion": "demo-2026-09"
       },
+      "waterExchange": [
+        {
+          "id": "water_exchange_carp_pond",
+          "environmentId": "env_pond",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        },
+        {
+          "id": "water_exchange_carp_tank",
+          "environmentId": "env_tank",
+          "percentOfVolume": 30,
+          "intervalDays": 7,
+          "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+          "sourceStatus": "DEMO",
+          "ruleVersion": "demo-2026-09"
+        }
+      ],
       "sources": [
         {
           "title": "Gabayan prototype demo profile",
@@ -1784,7 +1916,8 @@
       },
       "cultivationId": "cul_tilapia_001",
       "orderId": null,
-      "taskId": "task_feed_pm"
+      "taskId": "task_feed_pm",
+      "reminder": null
     },
     {
       "id": "ntf_water_check",
@@ -1802,7 +1935,8 @@
       },
       "cultivationId": "cul_tilapia_001",
       "orderId": null,
-      "taskId": "task_water_check"
+      "taskId": "task_water_check",
+      "reminder": null
     },
     {
       "id": "ntf_tip_observation",
@@ -1817,7 +1951,8 @@
       "action": null,
       "cultivationId": "cul_tilapia_001",
       "orderId": null,
-      "taskId": null
+      "taskId": null,
+      "reminder": null
     },
     {
       "id": "ntf_order_shipped",
@@ -1832,7 +1967,162 @@
       "action": { "label": "Track order", "deepLink": "/app/orders/ord_10245/tracking" },
       "cultivationId": null,
       "orderId": "ord_10245",
-      "taskId": null
+      "taskId": null,
+      "reminder": null
+    },
+    {
+      "id": "ntf_water_change_cul_tilapia_001_6",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "WATER_CHANGE_DUE",
+      "title": "Partial water change due",
+      "message": "Tilapia Batch #001: change about 30% of the water, a little at a time. Keep the rest so conditions stay steady for the fish.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-18T00:30:00Z",
+      "readAt": "2026-09-18T01:00:00Z",
+      "action": {
+        "label": "Open water records",
+        "deepLink": "/app/cultivations/cul_tilapia_001/records?tab=water"
+      },
+      "cultivationId": "cul_tilapia_001",
+      "orderId": null,
+      "taskId": null,
+      "reminder": {
+        "waterChangePercent": 30,
+        "harvestWindowDays": null,
+        "latestAverageWeight": null,
+        "targetWeightRange": null,
+        "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan",
+        "disclaimer": "A demo schedule, not yet reviewed for your farm. Look at the water and the fish first, and change less or wait if local technical guidance says so."
+      }
+    },
+    {
+      "id": "ntf_water_change_cul_tilapia_harvest_21",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "WATER_CHANGE_DUE",
+      "title": "Partial water change due",
+      "message": "Tilapia Harvest Demo: change about 30% of the water, a little at a time. Keep the rest so conditions stay steady for the fish.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-21T00:30:00Z",
+      "readAt": "2026-09-21T02:00:00Z",
+      "action": {
+        "label": "Open water records",
+        "deepLink": "/app/cultivations/cul_tilapia_harvest/records?tab=water"
+      },
+      "cultivationId": "cul_tilapia_harvest",
+      "orderId": null,
+      "taskId": null,
+      "reminder": {
+        "waterChangePercent": 30,
+        "harvestWindowDays": null,
+        "latestAverageWeight": null,
+        "targetWeightRange": null,
+        "basis": "The 30% partial change is the product brief's figure; the weekly interval is a placeholder. Neither has been reviewed for this species or culture system.",
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan",
+        "disclaimer": "A demo schedule, not yet reviewed for your farm. Look at the water and the fish first, and change less or wait if local technical guidance says so."
+      }
+    },
+    {
+      "id": "ntf_harvest_cul_tilapia_harvest_grw_tilapia_harvest",
+      "ownerUserId": "usr_juan",
+      "category": "CULTIVATION",
+      "type": "HARVEST_APPROACHING",
+      "title": "Your fish may be near harvest size",
+      "message": "The latest sample from Tilapia Harvest Demo averages 360 g, which reaches the 350-450 g demo target. You decide when the size is right; weigh a fresh sample before you harvest.",
+      "recommendedAmount": null,
+      "occurredAt": "2026-09-22T01:05:00Z",
+      "readAt": "2026-09-22T03:00:00Z",
+      "action": {
+        "label": "Check harvest readiness",
+        "deepLink": "/app/cultivations/cul_tilapia_harvest/harvest"
+      },
+      "cultivationId": "cul_tilapia_harvest",
+      "orderId": null,
+      "taskId": null,
+      "reminder": {
+        "waterChangePercent": null,
+        "harvestWindowDays": {
+          "minimum": 120,
+          "maximum": 150
+        },
+        "latestAverageWeight": {
+          "value": 360,
+          "unit": "G"
+        },
+        "targetWeightRange": {
+          "minimum": {
+            "value": 350,
+            "unit": "G"
+          },
+          "maximum": {
+            "value": 450,
+            "unit": "G"
+          }
+        },
+        "basis": "Prototype demo figure applied to every species until a reviewed profile replaces it; not specific to this species.",
+        "isDemo": true,
+        "sourceStatus": "DEMO",
+        "ruleVersion": "demo-2026-09-gabayan",
+        "disclaimer": "Harvest readiness is an estimate, not a guarantee. Use a current representative sample and local professional judgment."
+      }
+    }
+  ],
+  "reminderSlots": [
+    {
+      "id": "rem_cul_tilapia_001_feeding_20260923morning",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_001",
+      "kind": "FEEDING",
+      "slot": "2026-09-23:MORNING",
+      "taskId": "task_feed_am",
+      "notificationId": null,
+      "decidedAt": "2026-09-23T00:00:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_001_feeding_20260923afternoon",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_001",
+      "kind": "FEEDING",
+      "slot": "2026-09-23:AFTERNOON",
+      "taskId": "task_feed_pm",
+      "notificationId": "ntf_feed_pm",
+      "decidedAt": "2026-09-23T07:45:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_001_water_change_6",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_001",
+      "kind": "WATER_CHANGE",
+      "slot": "6",
+      "taskId": null,
+      "notificationId": "ntf_water_change_cul_tilapia_001_6",
+      "decidedAt": "2026-09-18T00:30:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_harvest_water_change_21",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_harvest",
+      "kind": "WATER_CHANGE",
+      "slot": "21",
+      "taskId": null,
+      "notificationId": "ntf_water_change_cul_tilapia_harvest_21",
+      "decidedAt": "2026-09-21T00:30:00Z"
+    },
+    {
+      "id": "rem_cul_tilapia_harvest_harvest_grwtilapiaharvest",
+      "ownerUserId": "usr_juan",
+      "cultivationId": "cul_tilapia_harvest",
+      "kind": "HARVEST",
+      "slot": "grw_tilapia_harvest",
+      "taskId": null,
+      "notificationId": "ntf_harvest_cul_tilapia_harvest_grw_tilapia_harvest",
+      "decidedAt": "2026-09-22T01:05:00Z"
     }
   ],
   "productCategories": [

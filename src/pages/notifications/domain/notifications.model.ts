@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { formatManilaDate, manilaDateOf } from '@core/utils/format'
+import { sourceStatusSchema } from '@core/http'
+import { formatManilaDate, formatQuantity, manilaDateOf } from '@core/utils/format'
 import { quantitySchema, type StatusDisplay } from '@pages/cultivations/domain/cultivations.model'
 
 export const notificationCategorySchema = z.enum(['CULTIVATION', 'ORDER', 'EDUCATION', 'SYSTEM'])
@@ -8,12 +9,29 @@ export const notificationCategorySchema = z.enum(['CULTIVATION', 'ORDER', 'EDUCA
 export const notificationTypeSchema = z.enum([
   'FEEDING_DUE',
   'WATER_CHECK_DUE',
+  'WATER_CHANGE_DUE',
   'GROWTH_SAMPLE_DUE',
   'HARVEST_APPROACHING',
   'ORDER_UPDATE',
   'EDUCATIONAL_TIP',
   'SYSTEM',
 ])
+
+// Contract §12 ReminderDetail: the figures behind a reminder the server raised, with their
+// provenance. The water-change percentage and harvest fields are set only on their own type.
+export const reminderDetailSchema = z.object({
+  waterChangePercent: z.number().positive().max(100).nullable(),
+  harvestWindowDays: z
+    .object({ minimum: z.number().int().positive(), maximum: z.number().int().positive() })
+    .nullable(),
+  latestAverageWeight: quantitySchema.nullable(),
+  targetWeightRange: z.object({ minimum: quantitySchema, maximum: quantitySchema }).nullable(),
+  basis: z.string(),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string(),
+  disclaimer: z.string(),
+})
 
 export const notificationSchema = z.object({
   id: z.string(),
@@ -28,14 +46,39 @@ export const notificationSchema = z.object({
   cultivationId: z.string().nullable(),
   orderId: z.string().nullable(),
   taskId: z.string().nullable(),
+  // Absent on servers that predate reminders; null on every notification that is not one.
+  reminder: reminderDetailSchema.nullable().optional(),
 })
 
 export const unreadCountSchema = z.object({ count: z.number().int().nonnegative() })
 
 export type NotificationCategory = z.infer<typeof notificationCategorySchema>
 export type NotificationType = z.infer<typeof notificationTypeSchema>
+export type ReminderDetail = z.infer<typeof reminderDetailSchema>
 export type Notification = z.infer<typeof notificationSchema>
 export type UnreadCount = z.infer<typeof unreadCountSchema>
+
+// --- Reminder wording. The server raises reminders; these lines explain them plainly.
+
+export const HARVEST_DECISION_NOTE =
+  'You decide when the size is right for your buyers. Weigh a fresh sample before you harvest.'
+
+// A water change is always described as part of the water, with the rest kept in place.
+export function waterChangeLine(percent: number): string {
+  return `Change about ${formatQuantity(percent, 'PERCENT')} of the water, a little at a time, and keep the rest in place.`
+}
+
+export function harvestWindowHint(window: NonNullable<ReminderDetail['harvestWindowDays']>) {
+  return `Many growers harvest around ${window.minimum}–${window.maximum} days after stocking. Use that only as a rough guide; the size of your fish decides.`
+}
+
+export function harvestSampleLine(reminder: ReminderDetail): string | null {
+  const { latestAverageWeight: weight, targetWeightRange: target } = reminder
+  if (!weight || !target) return null
+  const sample = formatQuantity(weight.value, weight.unit)
+  const band = `${formatQuantity(target.minimum.value, 'COUNT')}–${formatQuantity(target.maximum.value, target.maximum.unit)}`
+  return `Latest sample: ${sample}. Demo target: ${band}.`
+}
 
 export interface ReadAllNotificationsRequest {
   category?: NotificationCategory | null

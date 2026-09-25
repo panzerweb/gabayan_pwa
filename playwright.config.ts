@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
-import { journeyServers } from './tests/e2e/support/api-target.js'
+import { JOURNEY_MOCK_CLOCK, journeyServers } from './tests/e2e/support/api-target.js'
 
 const servers = journeyServers(process.env)
 
@@ -13,7 +13,7 @@ const servers = journeyServers(process.env)
 const mockApiServer = (port: string) => ({
   command: 'node mock-api/reset.mjs && node mock-api/server.mjs',
   url: `http://localhost:${port}/api/v1/health`,
-  env: { MOCK_API_PORT: port },
+  env: { MOCK_API_PORT: port, MOCK_API_NOW: JOURNEY_MOCK_CLOCK },
   reuseExistingServer: false,
 })
 

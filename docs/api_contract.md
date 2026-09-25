@@ -187,7 +187,7 @@ erDiagram
 | `PaymentMethodType`      | `CASH_ON_DELIVERY`, `GCASH`, `CARD`                                                                                                                                  |
 | `ProductAvailability`    | `AVAILABLE`, `LOW_STOCK`, `OUT_OF_STOCK`                                                                                                                             |
 | `NotificationCategory`   | `CULTIVATION`, `ORDER`, `EDUCATION`, `SYSTEM`                                                                                                                        |
-| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`                                            |
+| `NotificationType`       | `FEEDING_DUE`, `WATER_CHECK_DUE`, `WATER_CHANGE_DUE`, `GROWTH_SAMPLE_DUE`, `HARVEST_APPROACHING`, `ORDER_UPDATE`, `EDUCATIONAL_TIP`, `SYSTEM`                        |
 | `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                                       |
 | `TierCode`               | `FREE`, `PRO`, `ORGANIZATION`                                                                                                                                        |
 | `TierEntitlement`        | `CULTIVATION_GUIDANCE`, `STOCKING_CALCULATOR`, `MARKETPLACE`, `WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`, `WATER_PARAMETER_LOGS`, `FEED_CONVERSION_TRACKING` |
@@ -358,6 +358,9 @@ Cancellation is allowed only in server-defined states. Invalid cancellation retu
 | `POST /notifications/{notificationId}/read` | none                                                                 | `200 Envelope<Notification>` |
 | `POST /notifications/read-all`              | optional `ReadAllNotificationsRequest`                               | `200 Envelope<UnreadCount>`  |
 
+`GET /dashboard/home`, `GET /notifications` and `GET /notifications/unread-count` first raise the
+reminders that have fallen due for the account (§12 Reminders), so the answer already holds them.
+
 ## 6. Identity and User Schemas
 
 ### Health and API metadata
@@ -473,6 +476,11 @@ with the selected identity provider and must not accept these fixture tokens.
 
 `NotificationSettingsPatch` permits any non-empty subset and validates feeding times when reminders are enabled.
 
+The reminder switches govern the notifications of §12 Reminders: `feedingReminders` the
+`FEEDING_DUE` notification at `morningFeedingTime` and `afternoonFeedingTime` (a null time has no
+feeding slot), `waterMaintenance` the `WATER_CHANGE_DUE` partial water-change reminder, and
+`harvestReminders` the `HARVEST_APPROACHING` harvest alert. Feeding times are read in Asia/Manila.
+
 ### Tier schemas
 
 #### TierPlan
@@ -567,6 +575,8 @@ Initial mock environments: Pond, Tank/Container, and Fish Cage. The rectangular 
 - `StockingRule`: `{ id, speciesId, environmentId, basis: "SURFACE_AREA" | "WATER_VOLUME", minimumDensity, maximumDensity, densityUnit: "FISH_PER_M2" | "FISH_PER_M3", sourceStatus, ruleVersion }`.
 - `FeedingRule`: `{ id, speciesId, growthStage, feedRatePercentRange, feedingsPerDay, sourceStatus, ruleVersion }`.
 - `GuidanceRule`: `{ id, title, message, trigger, sourceStatus, ruleVersion }`. Seeded triggers: `ROUTINE_OBSERVATION` and `UNUSUAL_CHANGE` (answered by a water check), and `LOW_DISSOLVED_OXYGEN` and `WATER_DEPTH` (reference guidance shown with the profile).
+- `WaterExchangeRule`: `{ id, environmentId, percentOfVolume, intervalDays, basis, sourceStatus, ruleVersion }`, one per species and culture environment where a partial water change applies; it drives the §12 water-change reminder and is not yet part of the `SpeciesProfile` payload. Seeded for Pond and Tank/Container at 30 % every 7 days, `DEMO`, for every species; Fish Cage has none, since a cage in open water is not drained.
+- `HarvestTarget` (held with the profile, drives the §10 readiness and §12 harvest alert): target band `350-450 g`, a sample counts as current for `measurementFreshDays` (14), and `harvestWindowDays` `{ minimum: 120, maximum: 150 }` is the brief's typical culture length, shown only as a hint. All `DEMO`.
 - `RuleSource`: `{ title, organization, url: string | null, reviewedAt: string | null, reviewedBy: string | null }`.
 
 ### CompatibilityResult
@@ -1140,12 +1150,48 @@ Representative order creation request:
 | `readAt`                             | timestamp or null             |
 | `action`                             | `{ label, deepLink } \| null` |
 | `cultivationId`, `orderId`, `taskId` | string or null                |
+| `reminder`                           | `ReminderDetail \| null`      |
+
+`reminder` is set on the reminders below and null on every other notification.
+
+#### ReminderDetail
+
+| Field                                                          | Type                                               | Notes                            |
+| -------------------------------------------------------------- | -------------------------------------------------- | -------------------------------- |
+| `waterChangePercent`                                           | number or null                                     | `WATER_CHANGE_DUE` only          |
+| `harvestWindowDays`                                            | `{ minimum, maximum }` or null                     | `HARVEST_APPROACHING` only; hint |
+| `latestAverageWeight`                                          | `Quantity \| null`                                 | `HARVEST_APPROACHING` only       |
+| `targetWeightRange`                                            | `{ minimum: Quantity, maximum: Quantity } \| null` | `HARVEST_APPROACHING` only       |
+| `basis`, `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                                         | Required; shown when `isDemo`    |
 
 `UnreadCount`: `{ count: integer }`.
 
 `ReadAllNotificationsRequest`: optional `{ category: NotificationCategory | null, through: timestamp | null }`.
 
 Notifications are grouped by localized date on the client. The API returns precise timestamps, not labels such as “Yesterday.”
+
+### Reminders
+
+There is no background scheduler and no push. When the signed-in account reads Home, the
+notification list or the unread count, the server first raises the reminders that have fallen
+due for each of its cultivations that is `ACTIVE`, `GROWING` or `PRE_HARVEST` with a `stockedOn`
+on or before today (Asia/Manila). Each reminder is keyed per cultivation, kind and slot, so it
+appears once however often those reads repeat. A slot is decided when it falls due: raised while
+its `NotificationSettings` switch is on, skipped for good while it is off, and never raised later
+when the switch comes back on. Only today's slots are raised; days the farmer did not open the app
+are not back-filled. All reminders are `category` `CULTIVATION`.
+
+| Reminder     | Slot                                                  | Raises                                                                                                                                                                                                                                                     | Switch             |
+| ------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| Feeding      | today at `morningFeedingTime`, `afternoonFeedingTime` | once the time has passed: a `FEEDING` task (`DUE`, `dueAt` one hour later, `recommendedAmount` the day's feeding-plan portion once a growth sample exists, else null) and a `FEEDING_DUE` notification for it, `occurredAt` the feeding time, `taskId` set | `feedingReminders` |
+| Water change | each `intervalDays` since `stockedOn`, from the first | a `WATER_CHANGE_DUE` notification naming the species/environment `percentOfVolume` (30 % by default, `isDemo` true) as a partial change; `waterChangePercent` carries it. No row for the environment, no reminder                                          | `waterMaintenance` |
+| Harvest      | each growth sample                                    | a `HARVEST_APPROACHING` alert once the latest sample reaches the target band's minimum and is no older than `measurementFreshDays`; it says the grower decides when the size is right, and `harvestWindowDays` (120-150) is only a hint                    | `harvestReminders` |
+
+The feeding task is part of the day's schedule, so it is created even while `feedingReminders` is
+off; only its notification follows the switch. Days since stocking never raise a harvest alert: a
+cultivation without a current sample gets none however long it has run. No reminder asks for a
+full water replacement; the message and `waterChangePercent` describe a partial change.
+Completing a feeding task marks its reminder read (§9).
 
 ## 13. State Transition Rules
 
@@ -1227,7 +1273,7 @@ orders, orderItems, trackingEvents, notifications, idempotencyRecords
 - Snapshot rule version, product price, address, and estimate data where specified.
 - Return `camelCase` exactly.
 - Implement `Idempotency-Key` storage and replay for protected mutations.
-- Support deterministic clock/ID hooks in automated tests.
+- Support deterministic clock/ID hooks in automated tests. The mock takes its clock - which day is today and which reminders are due - from `createMockApi({ now })` or `MOCK_API_NOW`, and a request may pin it for itself with the test-only `X-Mock-Now: <RFC 3339 time>` header, which the app never sends. The contract and E2E suites pin the mock to `2026-09-23T07:30:00+08:00`, before the seed day's first feeding time.
 - Add configurable latency; disable it in contract/E2E tests.
 - Add explicit seeded error users/scenarios rather than frontend-only failures.
 - Reset from immutable fixtures through `npm run mock:reset` (final script name may vary but must be documented).

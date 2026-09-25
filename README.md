@@ -23,6 +23,11 @@ pnpm dev:all
 
 `VITE_API_BASE_URL` is the only frontend server-location setting. Keep it pointed at a server that implements [the v1 contract](docs/api_contract.md).
 
+The mock raises feeding, water-change and harvest reminders when Home or the notifications are
+read, at the system time. `MOCK_API_NOW=2026-09-23T07:30:00+08:00` pins its clock instead - the
+contract and journey suites run on that instant - and a single request can name its own time with
+the test-only `X-Mock-Now` header (contract §12 Reminders, §15).
+
 ## Mock or FastAPI
 
 The two servers differ in that one value and nothing else; no code in `src/` asks which one
