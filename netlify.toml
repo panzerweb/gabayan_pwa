@@ -1,0 +1,32 @@
+# Netlify: builds the PWA and serves it with the Gabayan API on the same origin.
+# Before the first deploy, replace YOUR-API-HOST below with the API's host, e.g.
+# gabayan-api.onrender.com. See docs/guides/setup_guide.md, section 7.
+
+[build]
+  # The app calls the API through this site's own /api/v1, so the refresh cookie stays
+  # first-party. URL is the site's main address; a VITE_API_BASE_URL set in the Netlify UI wins.
+  command = "VITE_API_BASE_URL=${VITE_API_BASE_URL:-$URL/api/v1} pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Deploy previews and branch deploys call the API through their own address.
+[context.deploy-preview]
+  command = "VITE_API_BASE_URL=${VITE_API_BASE_URL:-$DEPLOY_PRIME_URL/api/v1} pnpm build"
+
+[context.branch-deploy]
+  command = "VITE_API_BASE_URL=${VITE_API_BASE_URL:-$DEPLOY_PRIME_URL/api/v1} pnpm build"
+
+# Forwards API calls to the Gabayan API.
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR-API-HOST/api/:splat"
+  status = 200
+  force = true
+
+# History-mode routes such as /app/home all load the app.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
