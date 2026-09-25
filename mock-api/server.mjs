@@ -11,6 +11,8 @@ const seedDatabasePath = resolve(process.cwd(), 'mock-api', 'fixtures', 'seed.js
 const apiVersion = '0.7.0'
 const ruleDisclaimer =
   "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+const feedGuideDisclaimer =
+  'Typical figures from commercial feed labels, not yet reviewed for your farm. Follow the label on the feed you buy and local technical guidance, and watch how your fish eat.'
 const installationDisclaimer =
   "General steps for this demo listing, not the supplier's manual. Follow the manual that comes with the product and local electrical safety rules."
 
@@ -1226,6 +1228,78 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
       return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish profile.')
     return sendData(response, speciesProfile(species))
   })
+
+  // Contract §7 FeedGuide: the commercial feed profile of each of the species' growth stages, in
+  // the profile's stage order, with the Feeds products each row links by SKU. The feedings a
+  // day and weight band come from the stage's feeding rule, so the guide and the feeding plan
+  // never disagree. Signed in because the products carry the caller's favourites.
+  app.get('/api/v1/species/:speciesId/feed-guide', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    const species = router.db
+      .get('species')
+      .find({ id: request.params.speciesId, active: true })
+      .value()
+    if (!species)
+      return sendError(response, 404, 'NOT_FOUND', 'We could not find that fish profile.')
+    const rows = router.db.get('feedGuides').filter({ speciesId: species.id }).value()
+    const profile = router.db.get('speciesProfiles').find({ speciesId: species.id }).value()
+    const stages = (profile?.growthStages ?? [])
+      .map((stage) => {
+        const row = rows.find((candidate) => candidate.growthStageCode === stage.code)
+        return row ? feedGuideStage(stage, row, profile, user.id) : null
+      })
+      .filter(Boolean)
+    if (!stages.length)
+      return sendError(response, 404, 'NOT_FOUND', 'No feed guide is available for this fish yet.')
+    return sendData(response, {
+      species: {
+        id: species.id,
+        commonName: species.commonName,
+        localName: species.localName,
+      },
+      stages,
+      sources: router.db.get('feedGuideSources').value(),
+      isDemo: stages.some((stage) => stage.sourceStatus === 'DEMO'),
+      sourceStatus: stages.every((stage) => stage.sourceStatus === 'VERIFIED')
+        ? 'VERIFIED'
+        : 'DEMO',
+      ruleVersion: rows[0].ruleVersion,
+      disclaimer: feedGuideDisclaimer,
+    })
+  })
+
+  // One growth stage of a feed guide. Only products in the Feeds category are linked, in the
+  // row's SKU order; availability never hides one, so an out-of-stock feed still shows.
+  function feedGuideStage(stage, row, profile, userId) {
+    const rule = (profile.feedingRules ?? []).find(
+      (candidate) => candidate.growthStageCode === stage.code,
+    )
+    const feeds = router.db.get('productCategories').find({ code: 'FEEDS' }).value()
+    const products = row.productSkus
+      .map((sku) => router.db.get('products').find({ sku }).value())
+      .filter((product) => product && product.categoryId === feeds?.id)
+      .map((product) => productSummary(product, userId))
+    return {
+      growthStageCode: stage.code,
+      growthStage: stage.name,
+      weightRange: {
+        minimum: { value: rule?.minimumWeightG ?? 0, unit: 'G' },
+        maximum:
+          rule?.maximumWeightG === null || rule?.maximumWeightG === undefined
+            ? null
+            : { value: rule.maximumWeightG, unit: 'G' },
+      },
+      feedType: row.feedType,
+      proteinPercent: row.proteinPercent,
+      pelletSize: { ...row.pelletSizeMm, unit: 'MM' },
+      feedingsPerDay: rule?.feedingsPerDay ?? null,
+      basis: row.basis,
+      sourceStatus: row.sourceStatus,
+      ruleVersion: row.ruleVersion,
+      products,
+    }
+  }
 
   app.get('/api/v1/culture-environments', (request, response) => {
     return listCollection(request, response, router.db.get('cultureEnvironments').value())

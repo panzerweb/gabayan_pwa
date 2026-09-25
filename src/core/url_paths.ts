@@ -37,6 +37,7 @@ export const ENDPOINTS = {
   species: {
     root: '/species',
     detail: (speciesId: Id) => `/species/${segment(speciesId)}` as const,
+    feedGuide: (speciesId: Id) => `/species/${segment(speciesId)}/feed-guide` as const,
   },
   cultureEnvironments: {
     root: '/culture-environments',

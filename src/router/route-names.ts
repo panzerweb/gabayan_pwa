@@ -24,6 +24,7 @@ export const ROUTE_NAMES = {
   cultivationRecords: 'cultivation-records',
   cultivationHarvest: 'cultivation-harvest',
   cultivationWaterSafety: 'cultivation-water-safety',
+  feedGuide: 'feed-guide',
   marketplace: 'marketplace',
   productDetail: 'product-detail',
   cart: 'cart',

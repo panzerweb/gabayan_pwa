@@ -3959,5 +3959,239 @@
       "suggestedQuantity": 1,
       "sortOrder": 1
     }
+  ],
+  "feedGuides": [
+    {
+      "id": "feedguide_tilapia_growing",
+      "speciesId": "sp_tilapia",
+      "growthStageCode": "GROWING",
+      "feedType": "Tilapia grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 28,
+        "maximum": 32
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 4
+      },
+      "productSkus": ["GBY-FED-020"],
+      "basis": "Typical range printed on commercial tilapia grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_tilapia_pre_harvest",
+      "speciesId": "sp_tilapia",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Tilapia finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 25,
+        "maximum": 28
+      },
+      "pelletSizeMm": {
+        "minimum": 4,
+        "maximum": 6
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial tilapia finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_milkfish_growing",
+      "speciesId": "sp_milkfish",
+      "growthStageCode": "GROWING",
+      "feedType": "Bangus grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 27,
+        "maximum": 31
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 3
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial bangus grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_milkfish_pre_harvest",
+      "speciesId": "sp_milkfish",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Bangus finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 24,
+        "maximum": 27
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 4
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial bangus finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_catfish_growing",
+      "speciesId": "sp_catfish",
+      "growthStageCode": "GROWING",
+      "feedType": "Hito grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 30,
+        "maximum": 35
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 4
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial catfish grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_catfish_pre_harvest",
+      "speciesId": "sp_catfish",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Hito finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 28,
+        "maximum": 30
+      },
+      "pelletSizeMm": {
+        "minimum": 4,
+        "maximum": 6
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial catfish finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_grouper_growing",
+      "speciesId": "sp_grouper",
+      "growthStageCode": "GROWING",
+      "feedType": "Marine fish grower pellets, high protein",
+      "proteinPercent": {
+        "minimum": 42,
+        "maximum": 50
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 5
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial marine fish grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_grouper_pre_harvest",
+      "speciesId": "sp_grouper",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Marine fish finisher pellets, high protein",
+      "proteinPercent": {
+        "minimum": 40,
+        "maximum": 45
+      },
+      "pelletSizeMm": {
+        "minimum": 6,
+        "maximum": 8
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial marine fish finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_shrimp_growing",
+      "speciesId": "sp_shrimp",
+      "growthStageCode": "GROWING",
+      "feedType": "Shrimp grower pellets, sinking",
+      "proteinPercent": {
+        "minimum": 35,
+        "maximum": 40
+      },
+      "pelletSizeMm": {
+        "minimum": 1.5,
+        "maximum": 2
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial shrimp grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_shrimp_pre_harvest",
+      "speciesId": "sp_shrimp",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Shrimp finisher pellets, sinking",
+      "proteinPercent": {
+        "minimum": 32,
+        "maximum": 36
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 2.5
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial shrimp finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_carp_growing",
+      "speciesId": "sp_carp",
+      "growthStageCode": "GROWING",
+      "feedType": "Carp grower pellets, floating",
+      "proteinPercent": {
+        "minimum": 28,
+        "maximum": 32
+      },
+      "pelletSizeMm": {
+        "minimum": 2,
+        "maximum": 3
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial carp grower feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    },
+    {
+      "id": "feedguide_carp_pre_harvest",
+      "speciesId": "sp_carp",
+      "growthStageCode": "PRE_HARVEST",
+      "feedType": "Carp finisher pellets, floating",
+      "proteinPercent": {
+        "minimum": 25,
+        "maximum": 28
+      },
+      "pelletSizeMm": {
+        "minimum": 3,
+        "maximum": 5
+      },
+      "productSkus": [],
+      "basis": "Typical range printed on commercial carp finisher feed labels, entered as a demo placeholder. Not yet reviewed against SEAFDEC/AQD or by a feed specialist.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan"
+    }
+  ],
+  "feedGuideSources": [
+    {
+      "title": "Development of cost-efficient feeds",
+      "organization": "SEAFDEC Aquaculture Department",
+      "url": "https://www.seafdec.org.ph/development-of-cost-efficient-feeds/",
+      "reviewedAt": null,
+      "reviewedBy": null
+    },
+    {
+      "title": "Gabayan placeholder feed profiles",
+      "organization": "Gabayan",
+      "url": null,
+      "reviewedAt": null,
+      "reviewedBy": null
+    }
   ]
 }

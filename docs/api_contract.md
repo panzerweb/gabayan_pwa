@@ -252,13 +252,14 @@ Every account starts on `FREE`. There is no in-app purchase in v1: a farmer reco
 | ------------------------------------------- | -----: | ------------------------------------- | ----------------------------------- |
 | `GET /species`                              | Public | `active=true`; `cursor`, `limit`      | `200 Page<SpeciesSummary>`          |
 | `GET /species/{speciesId}`                  | Public | none                                  | `200 Envelope<SpeciesProfile>`      |
+| `GET /species/{speciesId}/feed-guide`       |    yes | none                                  | `200 Envelope<FeedGuide>`           |
 | `GET /culture-environments`                 | Public | `active=true`; pagination             | `200 Page<CultureEnvironment>`      |
 | `GET /culture-environments/{environmentId}` | Public | none                                  | `200 Envelope<CultureEnvironment>`  |
 | `GET /compatibility`                        | Public | required `speciesId`, `environmentId` | `200 Envelope<CompatibilityResult>` |
 | `GET /sizing-guidance`                      | Public | required `speciesId`, `environmentId` | `200 Envelope<SizingGuidance>`      |
 | `POST /stocking-estimates`                  |    yes | `StockingEstimateRequest`             | `200 Envelope<StockingEstimate>`    |
 
-The reference reads are Public: they hold shared profile data and no account's records, and the setup wizard reads them before the farmer signs up.
+The reference reads are Public: they hold shared profile data and no account's records, and the setup wizard reads them before the farmer signs up. The feed guide is the exception: it is signed in, because the Feeds products it links carry the caller's `isFavorite`.
 
 ### Water quality
 
@@ -690,6 +691,44 @@ The pond or cage size and water depth suggested for one species in one culture s
 | Unknown or inactive species or environment        | `404 NOT_FOUND`                               |
 | Compatibility of the pairing is `NOT_RECOMMENDED` | `400 INCOMPATIBLE_SELECTION` with its message |
 | No stocking rule or sizing row for the pairing    | `404 NOT_FOUND`                               |
+
+### FeedGuide
+
+Which commercial feed suits each growth stage of one species: the feed type, its protein percentage and pellet size, how many feedings a day, and the Feeds products in the shop that fit. One row per species and growth stage, linked to products by SKU. Every row is demo data under rule version `demo-2026-09-gabayan`: the product brief asks for "data on which feeds to use, depending on the fish" and "standard commercial feed brand profiles" but gives no figure, so each range is a placeholder taken from typical commercial feed labels, whose `basis` says so, with SEAFDEC/AQD's feed-efficiency work (cited in the brief) as the reference it is to be reviewed against. The guide names feed types, not brands.
+
+| Field          | Type                            | Notes                                                        |
+| -------------- | ------------------------------- | ------------------------------------------------------------ |
+| `species`      | `{ id, commonName, localName }` |                                                              |
+| `stages`       | `FeedGuideStage[]`              | In the species profile's growth-stage order; at least one    |
+| `sources`      | `RuleSource[]`                  |                                                              |
+| `isDemo`       | boolean                         | `true` while any stage is `DEMO`                             |
+| `sourceStatus` | `SourceStatus`                  | `VERIFIED` only when every stage is                          |
+| `ruleVersion`  | string                          |                                                              |
+| `disclaimer`   | string                          | Shown with the guide and with any one stage shown on its own |
+
+#### FeedGuideStage
+
+| Field             | Type                                               | Notes                                                                                               |
+| ----------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `growthStageCode` | string                                             | A `GrowthStageRule` code of the profile; matches `CultivationDetail.growthStage.code`               |
+| `growthStage`     | string                                             | The stage's name, e.g. `Growing`                                                                    |
+| `weightRange`     | `{ minimum: Quantity, maximum: Quantity \| null }` | The stage's feeding-rule weight band in `G`; `maximum` is `null` for the last band                  |
+| `feedType`        | string                                             | Plain description, e.g. `Tilapia grower pellets, floating`                                          |
+| `proteinPercent`  | `{ minimum, maximum }`                             | Crude protein, percent of the feed                                                                  |
+| `pelletSize`      | `{ minimum, maximum, unit: "MM" }`                 | Pellet diameter                                                                                     |
+| `feedingsPerDay`  | integer \| null                                    | The stage's `FeedingRule.feedingsPerDay`, so the guide matches the feeding plan; `null` without one |
+| `basis`           | string                                             | Where the figures come from, or that they are placeholders                                          |
+| `sourceStatus`    | `SourceStatus`                                     |                                                                                                     |
+| `ruleVersion`     | string                                             |                                                                                                     |
+| `products`        | `ProductSummary[]`                                 | Feeds-category products the row links by SKU, in the row's order; may be empty                      |
+
+A linked product outside the Feeds category is left out; availability never hides one, so an out-of-stock feed is listed with its `availability`. Only Tilapia's growing stage links a product in the seed (`GBY-FED-020`, Tilapia Grower Feed 20 kg); every other stage answers `products: []` until feed listings exist for it. Disclaimer: "Typical figures from commercial feed labels, not yet reviewed for your farm. Follow the label on the feed you buy and local technical guidance, and watch how your fish eat."
+
+| Case                              | Answer              |
+| --------------------------------- | ------------------- |
+| No access token                   | `401 AUTH_REQUIRED` |
+| Unknown or inactive species       | `404 NOT_FOUND`     |
+| A species with no feed-guide rows | `404 NOT_FOUND`     |
 
 ### Water-quality thresholds and safety check
 
