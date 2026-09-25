@@ -74,6 +74,18 @@ describe('CultivationDetailView', () => {
     }
   })
 
+  it('links the Pro water log and feed conversion, saying they are Pro', async () => {
+    const { wrapper } = await open()
+
+    for (const [path, label] of [
+      ['water-log', 'Water log · Pro'],
+      ['feed-conversion', 'Feed conversion · Pro'],
+    ]) {
+      const link = wrapper.get(`a[href="/app/cultivations/cul_tilapia_001/${path}"]`)
+      expect(link.text()).toContain(label)
+    }
+  })
+
   it('fetches the timeline only once its section is chosen, and keeps that choice in the query', async () => {
     const { wrapper, router } = await open()
     expect(repositories.cultivations.getCultivationTimeline).not.toHaveBeenCalled()

@@ -16,6 +16,7 @@ const contractRows: Array<[InvalidatingMutation, string[][]]> = [
       ['cultivations', 'detail'],
       ['cultivations', 'timeline'],
       ['notifications'],
+      ['cultivations', 'feed-conversion'],
     ],
   ],
   [
@@ -26,6 +27,7 @@ const contractRows: Array<[InvalidatingMutation, string[][]]> = [
       ['cultivations', 'feeding-plan'],
       ['cultivations', 'harvest-readiness'],
       ['home'],
+      ['cultivations', 'feed-conversion'],
     ],
   ],
   [
@@ -36,10 +38,20 @@ const contractRows: Array<[InvalidatingMutation, string[][]]> = [
       ['cultivations', 'feeding-plan'],
       ['cultivations', 'harvest-readiness'],
       ['home'],
+      ['cultivations', 'feed-conversion'],
     ],
   ],
-  ['feedingCreate', [['cultivations', 'tasks'], ['cultivations', 'feeding-records'], ['home']]],
+  [
+    'feedingCreate',
+    [
+      ['cultivations', 'tasks'],
+      ['cultivations', 'feeding-records'],
+      ['home'],
+      ['cultivations', 'feed-conversion'],
+    ],
+  ],
   ['waterCheckCreate', [['cultivations', 'tasks'], ['cultivations', 'water-checks'], ['home']]],
+  ['waterLogCreate', [['water-quality', 'logs']]],
   ['cartChange', [['cart']]],
   ['orderCreate', [['orders'], ['cart'], ['home'], ['notifications']]],
   [

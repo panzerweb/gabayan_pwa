@@ -33,6 +33,8 @@ const appRoutes = [
   ['/app/cultivations/:cultivationId/records', ROUTE_NAMES.cultivationRecords],
   ['/app/cultivations/:cultivationId/harvest', ROUTE_NAMES.cultivationHarvest],
   ['/app/cultivations/:cultivationId/water-safety', ROUTE_NAMES.cultivationWaterSafety],
+  ['/app/cultivations/:cultivationId/water-log', ROUTE_NAMES.cultivationWaterLog],
+  ['/app/cultivations/:cultivationId/feed-conversion', ROUTE_NAMES.cultivationFeedConversion],
   ['/app/species/:speciesId/feed-guide', ROUTE_NAMES.feedGuide],
   ['/app/marketplace', ROUTE_NAMES.marketplace],
   ['/app/products/:productId', ROUTE_NAMES.productDetail],

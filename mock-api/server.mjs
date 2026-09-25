@@ -5,6 +5,13 @@ import { pathToFileURL } from 'node:url'
 
 import { addDays, dateInManila, daysBetween } from './dates.mjs'
 import { raiseDueReminders } from './reminders.mjs'
+import {
+  WATER_LOG_NOTES_LIMIT,
+  evaluateWaterLog,
+  feedConversionFor,
+  parseWaterReadings,
+  readingStatus,
+} from './water-logs.mjs'
 
 const require = createRequire(import.meta.url)
 const jsonServer = require('json-server')
@@ -418,6 +425,27 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
       remainingCultureSystems: Math.max(0, plan.cultureSystemLimit - active),
       pendingUpgradeRequest: pending ? publicUpgradeRequest(pending) : null,
     }
+  }
+
+  // Contract §6 "Plan-gated routes": a signed-in account below `requiredTier` is refused
+  // with 403 FORBIDDEN before the resource is read (BLOCKERS D-54). Returns the user when the
+  // plan is enough, and null once a refusal has been sent.
+  function requireTier(request, response, requiredTier) {
+    const user = requireUser(request, response)
+    if (!user) return null
+    const plans = router.db.get('tierPlans').value()
+    const rankOf = (code) => plans.findIndex((plan) => plan.code === code)
+    const currentTier = accountTierCode(user.id)
+    if (rankOf(currentTier) >= rankOf(requiredTier)) return user
+    sendError(
+      response,
+      403,
+      'FORBIDDEN',
+      `This needs the ${tierPlan(requiredTier).name} plan. See the plans to ask for it.`,
+      null,
+      { requiredTier, currentTier },
+    )
+    return null
   }
 
   function productSummary(product, userId) {
@@ -1516,26 +1544,9 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
     const profile = waterProfileOf(String(speciesId ?? ''), String(environmentId ?? ''))
     if (profile.missing?.species) fields.speciesId = ['Choose an available fish.']
     if (profile.missing?.environment) fields.environmentId = ['Choose an available culture system.']
-    const entered = new Map()
-    const values = readings && typeof readings === 'object' ? readings : {}
-    for (const parameter of parameters) {
-      const value = values[parameter.readingField]
-      if (value === undefined || value === null) continue
-      if (
-        typeof value !== 'number' ||
-        !Number.isFinite(value) ||
-        value < parameter.inputMinimum ||
-        value > parameter.inputMaximum
-      ) {
-        fields[`readings.${parameter.readingField}`] = [
-          `Enter a number from ${parameter.inputMinimum} to ${parameter.inputMaximum}.`,
-        ]
-        continue
-      }
-      entered.set(parameter.code, value)
-    }
-    const invalidReadings = Object.keys(fields).some((key) => key.startsWith('readings.'))
-    if (!entered.size && !invalidReadings) fields.readings = ['Enter at least one reading.']
+    const parsed = parseWaterReadings(parameters, readings)
+    const entered = parsed.entered
+    Object.assign(fields, parsed.fields)
     if (Object.keys(fields).length) {
       return sendError(response, 422, 'VALIDATION_ERROR', 'Review the readings.', fields)
     }
@@ -1552,12 +1563,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
         continue
       }
       const value = entered.get(parameter.code)
-      const status =
-        row.minimum !== null && value < row.minimum
-          ? 'BELOW_RANGE'
-          : row.maximum !== null && value > row.maximum
-            ? 'ABOVE_RANGE'
-            : 'WITHIN_RANGE'
+      const status = readingStatus(row, value)
       const guidance = waterGuidanceFor(parameter.code, status, profile.environment.code)
       results.push({
         ...omitKeys(publicWaterThreshold({ parameter, row }), [
@@ -2289,6 +2295,28 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
     return listCollection(request, response, records)
   })
 
+  // Pro: the feed conversion ratio the cultivation's own records imply (BLOCKERS D-23).
+  app.get('/api/v1/cultivations/:cultivationId/feed-conversion', (request, response) => {
+    const user = requireTier(request, response, 'PRO')
+    if (!user) return
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) return sendError(response, 404, 'NOT_FOUND', 'Cultivation not found.')
+    const byCultivation = (collection) =>
+      router.db.get(collection).filter({ cultivationId: cultivation.id }).value()
+    return sendData(
+      response,
+      feedConversionFor({
+        cultivation,
+        samples: byCultivation('growthMeasurements'),
+        mortality: byCultivation('mortalityRecords'),
+        feedings: byCultivation('feedingRecords'),
+      }),
+    )
+  })
+
   // Records a feeding. A `taskId` names a feeding task of the same cultivation, which the
   // record completes; without one the record's `taskId` is null (BLOCKERS D-36).
   app.post('/api/v1/cultivations/:cultivationId/feeding-records', (request, response) => {
@@ -2514,6 +2542,109 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
     const result = { record, generatedTasks, guidance }
     router.db.get('idempotencyRecords').push({ key: recordKey, response: result }).write()
     return sendData(response, result, 201)
+  })
+
+  // Pro: the cultivation's saved water-parameter logs, newest first (contract §9).
+  app.get('/api/v1/cultivations/:cultivationId/water-parameter-logs', (request, response) => {
+    const user = requireTier(request, response, 'PRO')
+    if (!user) return
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) return sendError(response, 404, 'NOT_FOUND', 'Cultivation not found.')
+    const logs = router.db
+      .get('waterParameterLogs')
+      .filter({ cultivationId: cultivation.id })
+      .value()
+      .sort((left, right) => right.loggedAt.localeCompare(left.loggedAt))
+    return listCollection(request, response, logs)
+  })
+
+  // Pro: saves one set of readings, each evaluated against the cultivation's water ranges
+  // as they stand now and kept with that evaluation. One log per Idempotency-Key; the same
+  // key with another body is refused.
+  app.post('/api/v1/cultivations/:cultivationId/water-parameter-logs', (request, response) => {
+    const user = requireTier(request, response, 'PRO')
+    if (!user) return
+    const idempotencyKey = request.get('idempotency-key')
+    if (!idempotencyKey)
+      return sendError(response, 400, 'BAD_REQUEST', 'An idempotency key is required.')
+    const body = request.body ?? {}
+    const recordKey = `${user.id}:POST:/cultivations/${request.params.cultivationId}/water-parameter-logs:${idempotencyKey}`
+    const requestBody = JSON.stringify(body)
+    const prior = router.db.get('idempotencyRecords').find({ key: recordKey }).value()
+    if (prior && prior.requestBody !== requestBody) {
+      return sendError(
+        response,
+        409,
+        'IDEMPOTENCY_CONFLICT',
+        'This reading was already sent with different values. Start a new reading instead.',
+      )
+    }
+    if (prior) return sendData(response, prior.response, 201)
+    const cultivation = router.db
+      .get('cultivations')
+      .find({ id: request.params.cultivationId, ownerUserId: user.id })
+      .value()
+    if (!cultivation) return sendError(response, 404, 'NOT_FOUND', 'Cultivation not found.')
+    if (['COMPLETED', 'CANCELLED'].includes(cultivation.status)) {
+      return sendError(
+        response,
+        409,
+        'INVALID_STATE_TRANSITION',
+        'This cultivation no longer accepts water readings.',
+      )
+    }
+    const now = currentTime(response)
+    const parameters = router.db.get('waterParameters').value()
+    const { entered, fields } = parseWaterReadings(parameters, body.readings)
+    let loggedAt = now
+    if (body.loggedAt !== undefined && body.loggedAt !== null) {
+      const parsed = parseZonedTimestamp(body.loggedAt)
+      // A device clock a few minutes ahead of the server is not a reading from the future.
+      if (parsed === null) fields.loggedAt = ['Enter the time the reading was taken.']
+      else if (Date.parse(parsed) > Date.parse(now) + 5 * 60 * 1000)
+        fields.loggedAt = ['The reading time cannot be later than now.']
+      else loggedAt = parsed
+    }
+    const notes = body.notes == null ? null : String(body.notes).trim() || null
+    if (body.notes != null && typeof body.notes !== 'string') {
+      fields.notes = ['Write the notes as text.']
+    } else if (notes && notes.length > WATER_LOG_NOTES_LIMIT) {
+      fields.notes = [`Keep the notes to ${WATER_LOG_NOTES_LIMIT} characters or fewer.`]
+    }
+    if (Object.keys(fields).length) {
+      return sendError(response, 422, 'VALIDATION_ERROR', 'Review the readings.', fields)
+    }
+    const profile = waterProfileOf(cultivation.species.id, cultivation.environment.id)
+    if (profile.incompatible) {
+      return sendError(response, 400, 'INCOMPATIBLE_SELECTION', profile.incompatible)
+    }
+    const evaluation = evaluateWaterLog(
+      parameters,
+      waterThresholdsOf(cultivation.species.id, cultivation.environment.id),
+      entered,
+    )
+    const log = {
+      id: `wlog_${String(router.db.get('waterParameterLogs').size().value() + 1).padStart(5, '0')}`,
+      cultivationId: cultivation.id,
+      loggedAt,
+      readings: evaluation.readings,
+      results: evaluation.results,
+      notLogged: evaluation.notLogged,
+      outOfRangeCount: evaluation.outOfRangeCount,
+      notes,
+      recordedBy: { id: user.id, fullName: user.fullName },
+      createdAt: now,
+      isDemo: true,
+      sourceStatus: 'DEMO',
+      ruleVersion: evaluation.ruleVersion,
+      disclaimer: ruleDisclaimer,
+    }
+    router.db.get('waterParameterLogs').push(log).write()
+    router.db.get('idempotencyRecords').push({ key: recordKey, requestBody, response: log }).write()
+    return sendData(response, log, 201)
   })
 
   app.get('/api/v1/cultivations/:cultivationId/harvest-readiness', (request, response) => {

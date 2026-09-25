@@ -178,4 +178,16 @@ describe('the PWA data layer against the contract server', () => {
     )
     expect(check.data.results.map((result) => result.status)).toEqual(['ABOVE_RANGE'])
   })
+
+  it("reads the Pro farmer's saved water logs and the feed conversion ratio", async () => {
+    const cultivations = (await api.listCultivationsApi(accessToken)).data
+    const { id } = byName(cultivations, 'name', DEMO_CULTIVATION)
+
+    const logs = (await api.listWaterParameterLogsApi(id, accessToken)).data
+    expect(logs.length).toBeGreaterThan(0)
+    expect(logs.some((log) => log.outOfRangeCount > 0)).toBe(true)
+    const conversion = (await api.getFeedConversionApi(id, accessToken)).data
+    expect(conversion).toMatchObject({ status: 'CALCULATED', isDemo: true })
+    expect(conversion.ratio).toEqual(expect.any(Number))
+  })
 })

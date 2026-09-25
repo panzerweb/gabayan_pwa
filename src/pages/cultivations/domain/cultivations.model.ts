@@ -718,3 +718,46 @@ export function harvestRequest(form: HarvestForm): CreateHarvestRequest {
     notes: notesOrNull(form.notes),
   }
 }
+
+// Contract §9 "Feed conversion" (Pro): the ratio the server derives from the feeding, growth
+// and mortality records. The client shows it with its basis and never works it out itself.
+export const feedConversionStatusSchema = z.enum(['CALCULATED', 'INSUFFICIENT_DATA'])
+
+export const feedConversionIntervalSchema = z.object({
+  periodStart: z.string(),
+  periodEnd: z.string(),
+  feedGiven: quantitySchema,
+  biomassGain: quantitySchema,
+  ratio: z.number().nullable(),
+})
+
+export const feedConversionSchema = z.object({
+  cultivationId: z.string(),
+  status: feedConversionStatusSchema,
+  ratio: z.number().nullable(),
+  periodStart: z.string().nullable(),
+  periodEnd: z.string().nullable(),
+  feedGiven: quantitySchema.nullable(),
+  startBiomass: quantitySchema.nullable(),
+  endBiomass: quantitySchema.nullable(),
+  biomassGain: quantitySchema.nullable(),
+  feedingRecordCount: z.number().int().nonnegative(),
+  growthSampleCount: z.number().int().nonnegative(),
+  intervals: z.array(feedConversionIntervalSchema),
+  basis: z.array(z.string()),
+  message: z.string(),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string(),
+  disclaimer: z.string(),
+})
+
+export type FeedConversionStatus = z.infer<typeof feedConversionStatusSchema>
+export type FeedConversionInterval = z.infer<typeof feedConversionIntervalSchema>
+export type FeedConversion = z.infer<typeof feedConversionSchema>
+
+// "1.37 kg of feed for each kg gained": the ratio read out with its units.
+export function feedConversionLine(ratio: number): string {
+  const value = new Intl.NumberFormat('en-PH', { maximumFractionDigits: 2 }).format(ratio)
+  return `${value} kg of feed for each kg gained`
+}

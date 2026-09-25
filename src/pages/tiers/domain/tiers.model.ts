@@ -55,6 +55,22 @@ export const tierLimitDetailsSchema = z.object({
   activeCultureSystems: z.number().int().nonnegative(),
 })
 
+// `details` of the 403 FORBIDDEN a plan-gated route answers an account below its plan
+// (contract §6 "Plan-gated routes").
+export const tierRequiredDetailsSchema = z.object({
+  requiredTier: tierCodeSchema,
+  currentTier: tierCodeSchema,
+})
+
+// The plan a failed request needed, or null when the failure was not a plan refusal.
+export function requiredTierOf(failure: unknown): TierCode | null {
+  if (typeof failure !== 'object' || failure === null) return null
+  const { status, code, details } = failure as Record<string, unknown>
+  if (status !== 403 || code !== 'FORBIDDEN') return null
+  const parsed = tierRequiredDetailsSchema.safeParse(details)
+  return parsed.success ? parsed.data.requiredTier : null
+}
+
 export type TierCode = z.infer<typeof tierCodeSchema>
 export type TierEntitlement = z.infer<typeof tierEntitlementSchema>
 export type TierPlan = z.infer<typeof tierPlanSchema>

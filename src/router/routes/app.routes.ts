@@ -62,6 +62,20 @@ export const appRoutes: RouteRecordRaw[] = [
         meta: { title: 'Water safety check' },
       },
       {
+        path: 'cultivations/:cultivationId/water-log',
+        name: ROUTE_NAMES.cultivationWaterLog,
+        component: () =>
+          import('@pages/cultivations/presentation/views/CultivationWaterLogView.vue'),
+        meta: { title: 'Water log', tier: 'PRO' },
+      },
+      {
+        path: 'cultivations/:cultivationId/feed-conversion',
+        name: ROUTE_NAMES.cultivationFeedConversion,
+        component: () =>
+          import('@pages/cultivations/presentation/views/CultivationFeedConversionView.vue'),
+        meta: { title: 'Feed conversion', tier: 'PRO' },
+      },
+      {
         path: 'species/:speciesId/feed-guide',
         name: ROUTE_NAMES.feedGuide,
         component: () => import('@pages/feeds/presentation/views/FeedGuideView.vue'),

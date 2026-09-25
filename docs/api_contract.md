@@ -134,6 +134,7 @@ erDiagram
     CULTIVATION ||--o{ MORTALITY_RECORD : records
     CULTIVATION ||--o{ FEEDING_RECORD : records
     CULTIVATION ||--o{ WATER_CHECK : records
+    CULTIVATION ||--o{ WATER_PARAMETER_LOG : records
     CULTIVATION ||--o| HARVEST_RECORD : completes
     PRODUCT ||--o{ CART_ITEM : selected
     PRODUCT ||--o{ ORDER_ITEM : snapshots
@@ -191,6 +192,7 @@ erDiagram
 | `HarvestReadinessStatus` | `NOT_READY`, `MONITOR`, `READY_SOON`, `POTENTIALLY_READY`, `INSUFFICIENT_DATA`                                                                                       |
 | `TierCode`               | `FREE`, `PRO`, `ORGANIZATION`                                                                                                                                        |
 | `TierEntitlement`        | `CULTIVATION_GUIDANCE`, `STOCKING_CALCULATOR`, `MARKETPLACE`, `WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`, `WATER_PARAMETER_LOGS`, `FEED_CONVERSION_TRACKING` |
+| `FeedConversionStatus`   | `CALCULATED`, `INSUFFICIENT_DATA`                                                                                                                                    |
 | `UpgradeRequestStatus`   | `PENDING`, `APPROVED`, `DECLINED`                                                                                                                                    |
 | `WaterParameter`         | `SALINITY`, `PH`, `AMMONIA`, `NITRITE`, `NITRATE`, `DISSOLVED_OXYGEN`, `WATER_TEMPERATURE`                                                                           |
 | `WaterParameterUnit`     | `PPT`, `PH`, `MG_PER_L`, `CELSIUS`                                                                                                                                   |
@@ -263,12 +265,14 @@ The reference reads are Public: they hold shared profile data and no account's r
 
 ### Water quality
 
-| Method and path             | Query/body                            | Success response                  |
-| --------------------------- | ------------------------------------- | --------------------------------- |
-| `GET /water-thresholds`     | required `speciesId`, `environmentId` | `200 Envelope<WaterThresholdSet>` |
-| `POST /water-safety-checks` | `WaterSafetyCheckRequest`             | `200 Envelope<WaterSafetyCheck>`  |
+| Method and path                                | Query/body                                           | Success response                  |
+| ---------------------------------------------- | ---------------------------------------------------- | --------------------------------- |
+| `GET /water-thresholds`                        | required `speciesId`, `environmentId`                | `200 Envelope<WaterThresholdSet>` |
+| `POST /water-safety-checks`                    | `WaterSafetyCheckRequest`                            | `200 Envelope<WaterSafetyCheck>`  |
+| `GET /cultivations/{id}/water-parameter-logs`  | `cursor`, `limit`                                    | `200 Page<WaterParameterLog>`     |
+| `POST /cultivations/{id}/water-parameter-logs` | `CreateWaterParameterLogRequest` + `Idempotency-Key` | `201 Envelope<WaterParameterLog>` |
 
-Both are signed in and part of every plan (`WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`). A safety check is a one-off evaluation: it stores nothing, needs no `Idempotency-Key`, and answers `200`. Saved water-parameter logs with history are the Pro entitlement `WATER_PARAMETER_LOGS` and are not part of the check.
+The first two are signed in and part of every plan (`WATER_THRESHOLD_GUIDELINES`, `WATER_SAFETY_CHECK`). A safety check is a one-off evaluation: it stores nothing, needs no `Idempotency-Key`, and answers `200`. Saved water-parameter logs with their history are the Pro entitlement `WATER_PARAMETER_LOGS`: both log rows need the `PRO` plan or above and refuse a Free account as [Plan-gated routes](#plan-gated-routes) describes. The history is the log list, newest first; a client draws a parameter's trend from it and never re-evaluates a reading.
 
 ### Dashboard and cultivations
 
@@ -301,10 +305,13 @@ Both are signed in and part of every plan (`WATER_THRESHOLD_GUIDELINES`, `WATER_
 | `GET /cultivations/{id}/feeding-plan`         | optional `date`                                                 | `200 Envelope<FeedingPlan>`              |
 | `GET /cultivations/{id}/feeding-records`      | pagination/date filters                                         | `200 Page<FeedingRecord>`                |
 | `POST /cultivations/{id}/feeding-records`     | `CreateFeedingRecordRequest` + idempotency                      | `201 Envelope<FeedingMutationResult>`    |
+| `GET /cultivations/{id}/feed-conversion`      | none                                                            | `200 Envelope<FeedConversion>`           |
 | `GET /cultivations/{id}/water-checks`         | pagination/date filters                                         | `200 Page<WaterCheck>`                   |
 | `POST /cultivations/{id}/water-checks`        | `CreateWaterCheckRequest` + idempotency                         | `201 Envelope<WaterCheckMutationResult>` |
 
 Task completion is atomic. For a feeding task, it updates the task and creates exactly one linked feeding record. Retrying with the same idempotency key returns the original response.
+
+The feed conversion read is the Pro entitlement `FEED_CONVERSION_TRACKING`: it needs the `PRO` plan or above and refuses a Free account as [Plan-gated routes](#plan-gated-routes) describes. The server derives it from the feeding, growth and mortality records; the farmer never types a ratio.
 
 ### Harvest
 
@@ -538,6 +545,24 @@ A request stays `PENDING` until an operator changes the tier; it never charges t
 ```
 
 `message` is written for the farmer; `details` lets a client explain the limit and offer the plans.
+
+#### Plan-gated routes
+
+A route that needs a plan above `FREE` names it in its catalog note: today the water-parameter logs (`PRO`) and the feed conversion read (`PRO`). `ORGANIZATION` includes everything `PRO` does. Authentication is checked first, so a signed-out call still answers `401 AUTH_REQUIRED`; then the plan, before the resource is read or the request body validated, so a Free account is refused the same way whichever cultivation it names:
+
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "This needs the Pro plan. See the plans to ask for it.",
+    "fields": null,
+    "details": { "requiredTier": "PRO", "currentTier": "FREE" },
+    "requestId": "req_01K..."
+  }
+}
+```
+
+`details.requiredTier` and `details.currentTier` are `TierCode` values. The client hides and explains Pro screens and sends the farmer to the plans, but the API is what enforces the plan.
 
 ## 7. Reference, Rules, and Estimate Schemas
 
@@ -990,6 +1015,71 @@ The server rejects mortality that would make estimated live fish negative.
 
 `GuidanceMessage`: `{ severity: "INFO" | "CAUTION" | "ACTION", title, message, sourceStatus, ruleVersion, disclaimer }`. Guidance must use conditional language; never universally instruct full water replacement.
 
+### Water-parameter logs
+
+A Pro farmer's saved readings of the seven water parameters for one cultivation. Each reading is evaluated when the log is saved, against the cultivation's species and culture-system ranges as they stand then (see [Water-quality thresholds and safety check](#water-quality-thresholds-and-safety-check)), and the log keeps that evaluation with its `ruleVersion`, so the history reads as it did when each log was saved.
+
+`CreateWaterParameterLogRequest`: `{ readings: WaterReadings, loggedAt?: timestamp | null, notes?: string | null }`. `readings` takes the fields and accepted values of the safety check; an omitted or `null` field is a parameter not measured. `loggedAt` is when the reading was taken, and the server's current time when omitted. `notes` is at most 500 trimmed characters.
+
+`WaterParameterLog`:
+
+| Field                                                 | Type                | Notes                                                               |
+| ----------------------------------------------------- | ------------------- | ------------------------------------------------------------------- |
+| `id`, `cultivationId`                                 | string              |                                                                     |
+| `loggedAt`                                            | timestamp           | When the reading was taken; the list is ordered by it, newest first |
+| `readings`                                            | `WaterReadings`     | All seven fields, `null` for a parameter not measured               |
+| `results`                                             | `WaterLogReading[]` | One per entered reading, in parameter order                         |
+| `notLogged`                                           | `WaterParameter[]`  | The parameters not measured, in parameter order                     |
+| `outOfRangeCount`                                     | integer             | Results whose `status` is not `WITHIN_RANGE`                        |
+| `notes`                                               | string or null      |                                                                     |
+| `recordedBy`                                          | compact user        |                                                                     |
+| `createdAt`                                           | timestamp           |                                                                     |
+| `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance          | Of the ranges the readings were evaluated against                   |
+
+`WaterLogReading`: `{ parameter, name, unit, value, minimum, maximum, status: WaterReadingStatus }`, with `minimum` and `maximum` the bounds the value was evaluated against and `status` worked out as in the safety check (a value equal to a bound is within the range). A log carries no guidance or products; the safety check gives those.
+
+| Case                                                           | Answer                                                            |
+| -------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Signed out                                                     | `401 AUTH_REQUIRED`                                               |
+| Account below `PRO`                                            | `403 FORBIDDEN` (see [Plan-gated routes](#plan-gated-routes))     |
+| `Idempotency-Key` missing on the create                        | `400 BAD_REQUEST`                                                 |
+| A key already used with another body                           | `409 IDEMPOTENCY_CONFLICT`; the same body replays the first `201` |
+| Cultivation missing or another account's                       | `404 NOT_FOUND`                                                   |
+| Create on a `COMPLETED` or `CANCELLED` cultivation             | `409 INVALID_STATE_TRANSITION`; its history stays readable        |
+| No reading entered                                             | `422 VALIDATION_ERROR` with `fields.readings`                     |
+| A reading that is not a number, or outside its accepted values | `422 VALIDATION_ERROR` with `fields["readings.<field>"]`          |
+| `loggedAt` not a timestamp, or more than 5 minutes after now   | `422 VALIDATION_ERROR` with `fields.loggedAt`                     |
+| `notes` longer than 500 characters                             | `422 VALIDATION_ERROR` with `fields.notes`                        |
+| The cultivation's pairing is `NOT_RECOMMENDED`                 | `400 INCOMPATIBLE_SELECTION` with its message                     |
+
+The demo seed holds three logs for Tilapia Batch #001: 10 September (all seven readings, all within range), 17 September (five readings, ammonia above range) and 22 September (all seven, dissolved oxygen below range).
+
+### Feed conversion
+
+`FeedConversion` is the feed conversion ratio (FCR) the cultivation's own records imply: the feed given over the weight the stock gained. It is calculated by the server and never typed in.
+
+- The period runs from the earliest growth sample to the latest. Feed given is the sum of the feeding records dated (Asia/Manila) from the earliest sample's day up to the day before the latest sample's.
+- Stock weight at a sample is its average weight times the estimated live fish that day: `initialFingerlings` less the mortality recorded on or before it. The gain is the latest stock weight less the earliest; fish that died are not counted as gain.
+- `ratio` is feed given over gain, to two decimals. It is `null`, with `status` `INSUFFICIENT_DATA`, when there are fewer than two samples, no feeding record in the period, or no gain.
+- `intervals` is the history: one entry per pair of consecutive samples, oldest first, worked out the same way.
+
+| Field                                                 | Type                       | Notes                                                                   |
+| ----------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------- |
+| `cultivationId`                                       | string                     |                                                                         |
+| `status`                                              | `FeedConversionStatus`     |                                                                         |
+| `ratio`                                               | number or null             | kg of feed per kg gained                                                |
+| `periodStart`, `periodEnd`                            | date or null               | The earliest and latest sample days; `null` with fewer than two samples |
+| `feedGiven`                                           | `Quantity` (`KG`) or null  | `null` with fewer than two samples                                      |
+| `startBiomass`, `endBiomass`, `biomassGain`           | `Quantity` (`KG`) or null  | `null` with fewer than two samples                                      |
+| `feedingRecordCount`                                  | integer                    | Feeding records counted in the period                                   |
+| `growthSampleCount`                                   | integer                    | All the cultivation's growth samples                                    |
+| `intervals`                                           | `FeedConversionInterval[]` | `{ periodStart, periodEnd, feedGiven, biomassGain, ratio }`             |
+| `basis`                                               | string[]                   | Plain sentences on how the figure was worked out                        |
+| `message`                                             | string                     | One sentence for the farmer on the result or on what is missing         |
+| `isDemo`, `sourceStatus`, `ruleVersion`, `disclaimer` | provenance                 | The method is unreviewed demo logic (`demo-2026-09-fcr`)                |
+
+A signed-out call answers `401 AUTH_REQUIRED`, an account below `PRO` `403 FORBIDDEN`, and a missing or another account's cultivation `404 NOT_FOUND`. With the demo seed, Tilapia Batch #001 reads 90.5 kg of feed over a 66.3 kg gain (21.0 kg to 87.3 kg) from 21 August to 21 September: a ratio of 1.37.
+
 ## 10. Harvest Schemas
 
 ### HarvestReadiness
@@ -1229,19 +1319,20 @@ Mock tracking advancement may be fixture-driven; the frontend must not manufactu
 
 ## 14. Derived-Data Ownership and Invalidation
 
-| Mutation           | Server recalculates/returns                          | Client invalidates                           |
-| ------------------ | ---------------------------------------------------- | -------------------------------------------- |
-| Cultivation create | status, dates, tasks, recommendation context         | Home, cultivation lists/detail, account tier |
-| Task complete      | task, linked record, task progress                   | Home, tasks, detail, notifications           |
-| Growth create      | latest weight, growth stage, feeding plan, readiness | Detail, growth, feed, readiness, Home        |
-| Mortality create   | mortality total, live fish, feeding plan             | Detail, mortality, feed, readiness, Home     |
-| Feeding create     | daily recorded/planned progress                      | Tasks, records, Home                         |
-| Water check create | guidance and generated tasks                         | Tasks, water checks, Home                    |
-| Cart change        | line totals and all cart totals                      | Cart/badge/checkout quote                    |
-| Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications             |
-| Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness, account tier     |
-| Upgrade request    | pending request                                      | Account tier                                 |
-| Water safety check | per-reading result; stores nothing                   | nothing                                      |
+| Mutation           | Server recalculates/returns                          | Client invalidates                                        |
+| ------------------ | ---------------------------------------------------- | --------------------------------------------------------- |
+| Cultivation create | status, dates, tasks, recommendation context         | Home, cultivation lists/detail, account tier              |
+| Task complete      | task, linked record, task progress                   | Home, tasks, detail, notifications, feed conversion       |
+| Growth create      | latest weight, growth stage, feeding plan, readiness | Detail, growth, feed, readiness, Home, feed conversion    |
+| Mortality create   | mortality total, live fish, feeding plan             | Detail, mortality, feed, readiness, Home, feed conversion |
+| Feeding create     | daily recorded/planned progress                      | Tasks, records, Home, feed conversion                     |
+| Water check create | guidance and generated tasks                         | Tasks, water checks, Home                                 |
+| Cart change        | line totals and all cart totals                      | Cart/badge/checkout quote                                 |
+| Order create       | order snapshot and tracking seed; clears cart        | Orders, cart, Home notifications                          |
+| Harvest create     | revenue, summary, completed status                   | Detail/list/Home/readiness, account tier                  |
+| Upgrade request    | pending request                                      | Account tier                                              |
+| Water safety check | per-reading result; stores nothing                   | nothing                                                   |
+| Water log create   | per-reading status against the ranges                | Water-parameter logs                                      |
 
 Client-side optimistic updates are acceptable for notification read state and favorites. Use pessimistic updates for biological records, checkout, order placement, and harvest completion.
 
@@ -1257,7 +1348,7 @@ Suggested persisted collections:
 users, farms, addresses, notificationSettings,
 species, cultureEnvironments, compatibilityRules, stockingRules,
 cultivations, tasks, growthMeasurements, mortalityRecords,
-feedingPlans, feedingRecords, waterChecks, harvestRecords,
+feedingPlans, feedingRecords, waterChecks, waterParameterLogs, harvestRecords,
 productCategories, products, favorites, carts, cartItems,
 orders, orderItems, trackingEvents, notifications, idempotencyRecords
 ```

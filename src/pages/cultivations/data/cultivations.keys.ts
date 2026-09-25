@@ -17,4 +17,6 @@ export const cultivationsKeys = {
   waterChecks: (cultivationId: string) => ['cultivations', 'water-checks', cultivationId] as const,
   harvestReadiness: (cultivationId: string) =>
     ['cultivations', 'harvest-readiness', cultivationId] as const,
+  feedConversion: (cultivationId: string) =>
+    ['cultivations', 'feed-conversion', cultivationId] as const,
 }

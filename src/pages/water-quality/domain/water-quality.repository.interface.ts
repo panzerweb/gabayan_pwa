@@ -1,6 +1,8 @@
-import type { Envelope } from '@core/http'
+import type { Envelope, Page } from '@core/http'
 
 import type {
+  CreateWaterParameterLogRequest,
+  WaterParameterLog,
   WaterSafetyCheck,
   WaterSafetyCheckRequest,
   WaterThresholdSet,
@@ -16,4 +18,14 @@ export interface WaterQualityRepository {
     body: WaterSafetyCheckRequest,
     accessToken: string,
   ): Promise<Envelope<WaterSafetyCheck>>
+  listWaterParameterLogs(
+    cultivationId: string,
+    accessToken: string,
+  ): Promise<Page<WaterParameterLog>>
+  createWaterParameterLog(
+    cultivationId: string,
+    body: CreateWaterParameterLogRequest,
+    idempotencyKey: string,
+    accessToken: string,
+  ): Promise<Envelope<WaterParameterLog>>
 }

@@ -10,6 +10,7 @@ import type {
   CultivationSummary,
   CultivationTimeline,
   FarmTask,
+  FeedConversion,
   FeedingPlan,
   FeedingRecord,
   GrowthMeasurement,
@@ -78,4 +79,5 @@ export interface CultivationsRepository {
     idempotencyKey: string,
     accessToken: string,
   ): Promise<Envelope<HarvestCompletion>>
+  getFeedConversion(cultivationId: string, accessToken: string): Promise<Envelope<FeedConversion>>
 }

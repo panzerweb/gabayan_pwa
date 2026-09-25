@@ -8,6 +8,7 @@ import {
   cultivationSummarySchema,
   cultivationTimelineSchema,
   farmTaskSchema,
+  feedConversionSchema,
   feedingPlanSchema,
   feedingRecordSchema,
   growthMeasurementSchema,
@@ -191,5 +192,14 @@ export async function completeHarvestApi(
     accessToken,
     headers: { 'Idempotency-Key': idempotencyKey },
     schema: envelopeSchema(harvestCompletionSchema),
+  })
+}
+
+// Pro: the ratio the server derives from the records; a Free account is refused with 403.
+export async function getFeedConversionApi(cultivationId: string, accessToken: string) {
+  return apiRequest(ENDPOINTS.cultivations.feedConversion(cultivationId), {
+    method: 'GET',
+    accessToken,
+    schema: envelopeSchema(feedConversionSchema),
   })
 }

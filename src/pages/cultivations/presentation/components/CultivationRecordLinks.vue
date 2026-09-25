@@ -2,7 +2,8 @@
 import { ROUTE_NAMES } from '@router/route-names'
 
 // Entry points to the cultivation's growth, farm records, water safety check and harvest
-// screens.
+// screens, and to the Pro water log and feed conversion. A Pro link is shown to every plan and
+// says so; the tier guard explains the plans to a farmer below Pro.
 const props = defineProps<{ cultivationId: string }>()
 
 const links = [
@@ -16,6 +17,16 @@ const links = [
     name: ROUTE_NAMES.cultivationWaterSafety,
     label: 'Water safety check',
     detail: 'Compare readings with suggested ranges',
+  },
+  {
+    name: ROUTE_NAMES.cultivationWaterLog,
+    label: 'Water log · Pro',
+    detail: 'Saved readings, history and trend',
+  },
+  {
+    name: ROUTE_NAMES.cultivationFeedConversion,
+    label: 'Feed conversion · Pro',
+    detail: 'Feed used for each kg of growth',
   },
   { name: ROUTE_NAMES.cultivationHarvest, label: 'Harvest', detail: 'Readiness and completion' },
 ]

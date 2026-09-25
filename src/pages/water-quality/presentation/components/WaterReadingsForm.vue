@@ -14,13 +14,18 @@ import {
 
 // Seven labelled readings, each with its unit, an explanation and the suggested range when
 // the ranges are known. Any field may stay blank; the parent owns the values and the submit.
-const props = defineProps<{
-  form: WaterReadingsForm
-  fieldErrors: Record<string, string>
-  thresholds?: WaterThreshold[] | undefined
-  disabled?: boolean
-  checking?: boolean
-}>()
+// The default slot holds any further fields, shown above the submit button.
+const props = withDefaults(
+  defineProps<{
+    form: WaterReadingsForm
+    fieldErrors: Record<string, string>
+    thresholds?: WaterThreshold[] | undefined
+    disabled?: boolean
+    checking?: boolean
+    submitLabel?: string
+  }>(),
+  { thresholds: undefined, submitLabel: 'Check readings' },
+)
 
 const emit = defineEmits<{
   'update:reading': [parameter: WaterParameter, value: string]
@@ -54,7 +59,10 @@ function hintFor(parameter: WaterParameter) {
     <p v-if="fieldErrors.readings" class="form-error" role="alert">
       {{ fieldErrors.readings }}
     </p>
-    <BaseButton type="submit" :disabled="disabled" :loading="checking"> Check readings </BaseButton>
+    <slot />
+    <BaseButton type="submit" :disabled="disabled" :loading="checking">
+      {{ submitLabel }}
+    </BaseButton>
   </form>
 </template>
 
