@@ -33,6 +33,7 @@ const appRoutes = [
   ['/app/cultivations/:cultivationId/records', ROUTE_NAMES.cultivationRecords],
   ['/app/cultivations/:cultivationId/harvest', ROUTE_NAMES.cultivationHarvest],
   ['/app/cultivations/:cultivationId/water-safety', ROUTE_NAMES.cultivationWaterSafety],
+  ['/app/species/:speciesId/feed-guide', ROUTE_NAMES.feedGuide],
   ['/app/marketplace', ROUTE_NAMES.marketplace],
   ['/app/products/:productId', ROUTE_NAMES.productDetail],
   ['/app/cart', ROUTE_NAMES.cart],

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { registerCommerceContract } from './scenarios/commerce.scenarios.mjs'
 import { registerCultivationContract } from './scenarios/cultivations.scenarios.mjs'
+import { registerFeedsContract } from './scenarios/feeds.scenarios.mjs'
 import { registerNotificationContract } from './scenarios/notifications.scenarios.mjs'
 import { registerProfileContract } from './scenarios/profile.scenarios.mjs'
 import { registerReferenceContract } from './scenarios/reference.scenarios.mjs'
@@ -549,6 +550,7 @@ registerProfileContract(client)
 registerReferenceContract(client)
 registerSpeciesContract(client)
 registerSizingContract(client)
+registerFeedsContract(client)
 registerCultivationContract(client)
 registerTaskAndRecordContract(client)
 registerCommerceContract(client)

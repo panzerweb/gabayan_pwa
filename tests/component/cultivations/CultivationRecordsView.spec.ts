@@ -3,7 +3,9 @@ import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import CultivationRecordsView from '@pages/cultivations/presentation/views/CultivationRecordsView.vue'
 import { ROUTE_NAMES } from '@router/route-names'
 
+import { tilapiaFeedGuide } from '../../unit/feeds/fixtures'
 import {
+  batch001Detail,
   calmWaterCheck,
   feedingPlan,
   feedingRecord,
@@ -15,6 +17,13 @@ import { button } from './support'
 
 const repositories = vi.hoisted(() => ({
   cultivations: {} as Record<string, ReturnType<typeof vi.fn>>,
+  feeds: {} as Record<string, ReturnType<typeof vi.fn>>,
+}))
+
+vi.mock('@pages/feeds/data/feeds.repository', () => ({
+  get feedsRepository() {
+    return repositories.feeds
+  },
 }))
 
 vi.mock('@pages/cultivations/data/cultivations.repository', () => ({
@@ -30,6 +39,7 @@ beforeEach(() => {
     listWaterChecks: vi.fn().mockResolvedValue(page([calmWaterCheck])),
     getFeedingPlan: vi.fn().mockResolvedValue(envelope(feedingPlan)),
   }
+  repositories.feeds = { getFeedGuide: vi.fn().mockResolvedValue(envelope(tilapiaFeedGuide)) }
 })
 
 async function open(query: Record<string, string> = {}) {
@@ -97,6 +107,17 @@ describe('CultivationRecordsView', () => {
     expect(card).toContain('Morning feeding')
     expect(card).toContain('This estimate is not a prescription')
     expect(card).toContain('Rule demo-2026-09')
+  })
+
+  it('shows the feed for the cultivation’s current stage below the feed plan', async () => {
+    repositories.cultivations.getCultivation = vi.fn().mockResolvedValue(envelope(batch001Detail))
+    const { wrapper } = await open({ tab: 'plan' })
+
+    expect(repositories.feeds.getFeedGuide).toHaveBeenCalledWith('sp_tilapia', 'access_1')
+    expect(wrapper.get('h2').text()).toBe('Feed for the Growing stage')
+    expect(wrapper.text()).toContain('Tilapia grower pellets, floating')
+    expect(wrapper.find('a[aria-label="Buy now: Tilapia Grower Feed 20 kg"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Typical figures from commercial feed labels')
   })
 
   it('explains an empty feeding history', async () => {

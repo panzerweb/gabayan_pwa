@@ -8,6 +8,7 @@ export function formatQuantity(value: number, unit: string, maximumFractionDigit
   const label: Record<string, string> = {
     G: 'g',
     KG: 'kg',
+    MM: 'mm',
     M: 'm',
     M2: 'm²',
     M3: 'm³',
