@@ -21,6 +21,7 @@ export const QUERY_KEY_PREFIXES = {
   orders: ['orders'],
   notifications: ['notifications'],
   tiers: ['tiers'],
+  weatherAlerts: ['weather-alerts'],
 } as const satisfies Record<string, readonly string[]>
 
 export type QueryKeyPrefix = (typeof QUERY_KEY_PREFIXES)[keyof typeof QUERY_KEY_PREFIXES]
@@ -32,7 +33,8 @@ const k = QUERY_KEY_PREFIXES
 // The cart prefix covers the cart badge and the checkout quote, both kept under `cart`.
 // Creating or harvesting a cultivation changes the account's active culture-system count.
 // The feed conversion ratio is derived from the feeding, growth and mortality records, so
-// every write of one of those leaves it stale.
+// every write of one of those leaves it stale. Weather alerts are read for the farm's saved
+// location, and reading them may raise a notification, so a farm update refreshes both.
 export const INVALIDATIONS = {
   cultivationCreate: [k.home, k.cultivationList, k.cultivationDetail, k.tiers],
   taskComplete: [
@@ -66,6 +68,7 @@ export const INVALIDATIONS = {
   orderCreate: [k.orders, k.cart, k.home, k.notifications],
   harvestCreate: [k.cultivationDetail, k.cultivationList, k.home, k.harvestReadiness, k.tiers],
   upgradeRequest: [k.tiers],
+  farmUpdate: [k.weatherAlerts, k.notifications, k.home],
 } as const satisfies Record<string, readonly QueryKeyPrefix[]>
 
 export type InvalidatingMutation = keyof typeof INVALIDATIONS

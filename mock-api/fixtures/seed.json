@@ -4804,5 +4804,154 @@
       "reviewedAt": null,
       "reviewedBy": null
     }
-  ]
+  ],
+  "weatherAlertRules": [
+    {
+      "id": "war_high_temperature_2026_09",
+      "kind": "HIGH_TEMPERATURE",
+      "measure": "MAXIMUM_AIR_TEMPERATURE",
+      "advisoryFrom": 34,
+      "warningFrom": 36,
+      "minimumConsecutiveDays": 1,
+      "active": true,
+      "title": "Hot days ahead",
+      "summary": "hot days are forecast",
+      "explanation": "Hot days warm the pond. Warm water holds less oxygen while the fish breathe and digest faster, so they can run short of oxygen, most of all in the afternoon and before dawn.",
+      "actions": [
+        "Feed in the cooler morning and late afternoon, and give less if the fish eat slowly.",
+        "Keep the water level up so the pond stays deeper and cooler, and run aeration if you have it.",
+        "Check the fish at dawn; fish gasping at the surface need oxygen quickly."
+      ],
+      "basis": "Demo thresholds for the day's maximum air temperature in the forecast for the farm's municipality. Air temperature stands in for water temperature, which the forecast does not give.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-weather"
+    },
+    {
+      "id": "war_overcast_spell_2026_09",
+      "kind": "OVERCAST_SPELL",
+      "measure": "MEAN_CLOUD_COVER",
+      "advisoryFrom": 80,
+      "warningFrom": 90,
+      "minimumConsecutiveDays": 2,
+      "active": true,
+      "title": "Cloudy days ahead",
+      "summary": "several cloudy days in a row are forecast",
+      "explanation": "Cloudy days slow the algae that make oxygen in the pond during the day. If a thick bloom dies off, rotting algae can use up the oxygen overnight and the fish may struggle by dawn.",
+      "actions": [
+        "Feed less while it stays cloudy; uneaten feed uses up oxygen as it rots.",
+        "Check the fish at dawn for gasping at the surface, and run aeration at night if you have it.",
+        "Watch the water colour; a quick change from green to brown or clear can mean the algae are dying."
+      ],
+      "basis": "Demo thresholds for the day's mean cloud cover in the forecast for the farm's municipality, over at least two days in a row.",
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-weather"
+    }
+  ],
+  "weatherForecasts": [
+    {
+      "id": "wfc_san_pablo_city",
+      "municipality": "San Pablo City",
+      "province": "Laguna",
+      "fallback": false,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 45
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 32,
+          "meanCloudCoverPercent": 55
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 60
+        }
+      ]
+    },
+    {
+      "id": "wfc_dagupan_city",
+      "municipality": "Dagupan City",
+      "province": "Pangasinan",
+      "fallback": false,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 33.5,
+          "meanCloudCoverPercent": 30
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 34.6,
+          "meanCloudCoverPercent": 20
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 35.3,
+          "meanCloudCoverPercent": 15
+        }
+      ]
+    },
+    {
+      "id": "wfc_dumangas",
+      "municipality": "Dumangas",
+      "province": "Iloilo",
+      "fallback": false,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 29,
+          "meanCloudCoverPercent": 85
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 28,
+          "meanCloudCoverPercent": 92
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 28,
+          "meanCloudCoverPercent": 88
+        }
+      ]
+    },
+    {
+      "id": "wfc_jomalig",
+      "municipality": "Jomalig",
+      "province": "Quezon",
+      "fallback": false,
+      "unavailable": true,
+      "days": []
+    },
+    {
+      "id": "wfc_fallback",
+      "municipality": null,
+      "province": null,
+      "fallback": true,
+      "unavailable": false,
+      "days": [
+        {
+          "offset": 0,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 45
+        },
+        {
+          "offset": 1,
+          "maximumAirTemperatureC": 32,
+          "meanCloudCoverPercent": 55
+        },
+        {
+          "offset": 2,
+          "maximumAirTemperatureC": 31,
+          "meanCloudCoverPercent": 60
+        }
+      ]
+    }
+  ],
+  "weatherAlerts": []
 }

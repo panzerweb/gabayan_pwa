@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { useOnlineStatus } from '@core/composables/useOnlineStatus'
 import { apiFieldErrors, describeError } from '@core/errors'
 import { ApiError } from '@core/http'
+import { invalidateAfter } from '@core/query'
 import { zodFieldErrors } from '@core/utils/validation'
 import { useSessionStore } from '@stores/session.store'
 import { useToastStore } from '@stores/toast.store'
@@ -81,7 +82,10 @@ export function useFarmProfile(repository: ProfileRepository = profileRepository
     }
     try {
       await upsert.mutateAsync(toUpsertFarmRequest(parsed.data))
-      await queryClient.invalidateQueries({ queryKey: profileKeys.farm() })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: profileKeys.farm() }),
+        invalidateAfter(queryClient, 'farmUpdate'),
+      ])
     } catch (error) {
       fieldErrors.value = apiFieldErrors(error)
       formError.value = describeError(error, SAVE_FAILED)

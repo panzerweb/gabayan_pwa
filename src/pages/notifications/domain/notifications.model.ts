@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { sourceStatusSchema } from '@core/http'
 import { formatManilaDate, formatQuantity, manilaDateOf } from '@core/utils/format'
 import { quantitySchema, type StatusDisplay } from '@pages/cultivations/domain/cultivations.model'
+import { weatherAlertSchema } from '@pages/weather-alerts/domain/weather-alerts.model'
 
 export const notificationCategorySchema = z.enum(['CULTIVATION', 'ORDER', 'EDUCATION', 'SYSTEM'])
 
@@ -12,6 +13,7 @@ export const notificationTypeSchema = z.enum([
   'WATER_CHANGE_DUE',
   'GROWTH_SAMPLE_DUE',
   'HARVEST_APPROACHING',
+  'WEATHER_ALERT',
   'ORDER_UPDATE',
   'EDUCATIONAL_TIP',
   'SYSTEM',
@@ -48,6 +50,8 @@ export const notificationSchema = z.object({
   taskId: z.string().nullable(),
   // Absent on servers that predate reminders; null on every notification that is not one.
   reminder: reminderDetailSchema.nullable().optional(),
+  // Absent on servers that predate weather alerts; set only on a WEATHER_ALERT notification.
+  weatherAlert: weatherAlertSchema.nullable().optional(),
 })
 
 export const unreadCountSchema = z.object({ count: z.number().int().nonnegative() })

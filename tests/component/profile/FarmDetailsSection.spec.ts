@@ -133,4 +133,29 @@ describe('FarmDetailsSection', () => {
     expect(toast.messages.map((item) => item.message)).toEqual(['Farm profile updated.'])
     expect(wrapper.find('form').exists()).toBe(false)
   })
+
+  it('refreshes the weather alerts, notifications and Home once a new farm location is saved', async () => {
+    const moved = { ...farm, municipality: 'Dagupan City', province: 'Pangasinan' }
+    repository.current.upsertFarmProfile.mockResolvedValue(envelope(moved))
+    const { wrapper, queryClient } = await mountWithFarm()
+    const stale = [
+      ['weather-alerts', 'current'],
+      ['notifications', 'list'],
+      ['home', 'dashboard'],
+    ]
+    for (const queryKey of stale) queryClient.setQueryData(queryKey, { data: null })
+    queryClient.setQueryData(['orders', 'list'], { data: [] })
+    await button(wrapper, 'Edit').trigger('click')
+    await control(wrapper, 'City or municipality').setValue('Dagupan City')
+    await control(wrapper, 'Province').setValue('Pangasinan')
+    repository.current.getFarmProfile.mockResolvedValue(envelope(moved))
+
+    await wrapper.get('form').trigger('submit')
+    await flushPromises()
+
+    for (const queryKey of stale) {
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated, queryKey.join('/')).toBe(true)
+    }
+    expect(queryClient.getQueryState(['orders', 'list'])?.isInvalidated).toBe(false)
+  })
 })

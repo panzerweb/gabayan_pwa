@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url'
 
 import { addDays, dateInManila, daysBetween } from './dates.mjs'
 import { raiseDueReminders } from './reminders.mjs'
+import { raiseWeatherAlerts } from './weather-alerts.mjs'
 import {
   WATER_LOG_NOTES_LIMIT,
   evaluateWaterLog,
@@ -175,7 +176,7 @@ function cultivationSummary(cultivation) {
 }
 
 function publicNotification(notification) {
-  return omitKeys(notification, ['ownerUserId'])
+  return { reminder: null, weatherAlert: null, ...omitKeys(notification, ['ownerUserId']) }
 }
 
 function isCalendarDate(value) {
@@ -855,9 +856,10 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
     return settings
   }
 
-  // Raises the reminders due for the farmer before Home or the notifications answer
-  // (BLOCKERS D-22). A new feeding task moves `nextTaskAt`, a value the server derives, so
-  // the cultivation's version is left alone.
+  // Raises the reminders due for the farmer, and the weather alerts the forecast calls for
+  // on their farm, before Home or the notifications answer (BLOCKERS D-22, D-11). A new
+  // feeding task moves `nextTaskAt`, a value the server derives, so the cultivation's version
+  // is left alone. Answers the farm's WeatherAlerts.
   function raiseReminders(user, response) {
     const cultivationIds = raiseDueReminders(router.db, {
       user,
@@ -872,6 +874,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
         .assign({ nextTaskAt: nextOpenTaskAt(cultivationId) })
         .write()
     }
+    return raiseWeatherAlerts(router.db, { user, now: currentTime(response) })
   }
 
   app.disable('x-powered-by')
@@ -2978,6 +2981,12 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now
       })
       .write()
     return sendData(response, reopened)
+  })
+
+  app.get('/api/v1/weather-alerts', (request, response) => {
+    const user = requireUser(request, response)
+    if (!user) return
+    return sendData(response, raiseReminders(user, response))
   })
 
   app.get('/api/v1/notifications/unread-count', (request, response) => {

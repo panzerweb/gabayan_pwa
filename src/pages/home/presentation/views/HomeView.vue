@@ -4,6 +4,7 @@ import ErrorState from '@components/feedback/ErrorState.vue'
 import LoadingState from '@components/feedback/LoadingState.vue'
 import AppHeader from '@components/navigation/AppHeader.vue'
 import BaseCard from '@components/ui/BaseCard.vue'
+import WeatherAlertsCard from '@pages/weather-alerts/presentation/components/WeatherAlertsCard.vue'
 import { ROUTE_NAMES } from '@router/route-names'
 
 import EducationalTipCard from '../components/EducationalTipCard.vue'
@@ -41,8 +42,9 @@ const { dashboard, headline, unreadCount, loading, loadFailed, refetch } = useHo
             :overview="dashboard.farmOverview"
           />
           <HomeTaskList :tasks="dashboard.tasks" :summary="dashboard.taskSummary" />
-          <EducationalTipCard :tip="dashboard.tip" />
         </template>
+        <WeatherAlertsCard />
+        <EducationalTipCard v-if="dashboard.primaryCultivation" :tip="dashboard.tip" />
       </template>
     </main>
   </div>

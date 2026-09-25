@@ -122,4 +122,7 @@ export const ENDPOINTS = {
     read: (notificationId: Id) => `/notifications/${segment(notificationId)}/read` as const,
     readAll: '/notifications/read-all',
   },
+  weatherAlerts: {
+    root: '/weather-alerts',
+  },
 } as const
