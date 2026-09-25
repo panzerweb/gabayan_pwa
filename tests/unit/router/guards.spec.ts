@@ -163,7 +163,7 @@ describe('setup-step guard', () => {
 })
 
 describe('tier guard', () => {
-  // No route needs a plan yet, so the guard is given the daily tasks route carrying `meta.tier`.
+  // The daily tasks route given a `meta.tier`, so these cases hold for any plan a screen needs.
   function needing(tier: TierCode) {
     const location = locationOf(ROUTE_NAMES.cultivationTasks, { cultivationId: 'cul_001' })
     return { ...location, meta: { ...location.meta, tier } }
@@ -225,6 +225,21 @@ describe('tier guard', () => {
     vi.spyOn(tiersRepository, 'getAccountTier').mockRejectedValue(new TypeError('offline'))
 
     expect(await tierGuard(needing('ORGANIZATION'))).toBe(true)
+  })
+
+  it('sends a Free farmer opening the water log or feed conversion to the plans for Pro', async () => {
+    signIn({ hasCultivation: true })
+    onPlan(accountTier().plan)
+
+    for (const [name, path] of [
+      [ROUTE_NAMES.cultivationWaterLog, 'water-log'],
+      [ROUTE_NAMES.cultivationFeedConversion, 'feed-conversion'],
+    ] as const) {
+      expect(await tierGuard(locationOf(name, { cultivationId: 'cul_001' }))).toEqual({
+        name: ROUTE_NAMES.plans,
+        query: { required: 'PRO', redirect: `/app/cultivations/cul_001/${path}` },
+      })
+    }
   })
 
   it('leaves a signed-out visitor to the session guard', async () => {

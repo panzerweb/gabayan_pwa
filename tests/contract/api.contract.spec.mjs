@@ -6,6 +6,7 @@ import { registerCommerceContract } from './scenarios/commerce.scenarios.mjs'
 import { registerCultivationContract } from './scenarios/cultivations.scenarios.mjs'
 import { registerFeedsContract } from './scenarios/feeds.scenarios.mjs'
 import { registerNotificationContract } from './scenarios/notifications.scenarios.mjs'
+import { registerProLogsContract } from './scenarios/pro-logs.scenarios.mjs'
 import { registerProfileContract } from './scenarios/profile.scenarios.mjs'
 import { registerReferenceContract } from './scenarios/reference.scenarios.mjs'
 import { registerReminderContract } from './scenarios/reminders.scenarios.mjs'
@@ -560,6 +561,7 @@ registerTierContract(client)
 registerWaterQualityContract(client)
 registerToolsContract(client)
 registerReminderContract(client)
+registerProLogsContract(client)
 
 describe('endpoint catalog coverage', () => {
   it('reads every method-and-path row of the contract endpoint catalog', () => {

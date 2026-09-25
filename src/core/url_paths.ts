@@ -77,6 +77,10 @@ export const ENDPOINTS = {
       `/cultivations/${segment(cultivationId)}/feeding-records` as const,
     waterChecks: (cultivationId: Id) =>
       `/cultivations/${segment(cultivationId)}/water-checks` as const,
+    waterParameterLogs: (cultivationId: Id) =>
+      `/cultivations/${segment(cultivationId)}/water-parameter-logs` as const,
+    feedConversion: (cultivationId: Id) =>
+      `/cultivations/${segment(cultivationId)}/feed-conversion` as const,
     harvestReadiness: (cultivationId: Id) =>
       `/cultivations/${segment(cultivationId)}/harvest-readiness` as const,
     harvest: (cultivationId: Id) => `/cultivations/${segment(cultivationId)}/harvest` as const,

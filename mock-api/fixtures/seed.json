@@ -1779,6 +1779,263 @@
       "createdAt": "2026-09-21T22:30:00Z"
     }
   ],
+  "waterParameterLogs": [
+    {
+      "id": "wlog_tilapia_001",
+      "cultivationId": "cul_tilapia_001",
+      "loggedAt": "2026-09-09T23:00:00Z",
+      "readings": {
+        "salinityPpt": 0.5,
+        "ph": 7.4,
+        "ammoniaMgL": 0.2,
+        "nitriteMgL": 0.1,
+        "nitrateMgL": 12,
+        "dissolvedOxygenMgL": 5.8,
+        "temperatureC": 28.5
+      },
+      "results": [
+        {
+          "parameter": "SALINITY",
+          "name": "Salinity",
+          "unit": "PPT",
+          "value": 0.5,
+          "minimum": null,
+          "maximum": 15,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "PH",
+          "name": "pH",
+          "unit": "PH",
+          "value": 7.4,
+          "minimum": 6.5,
+          "maximum": 8.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "AMMONIA",
+          "name": "Ammonia",
+          "unit": "MG_PER_L",
+          "value": 0.2,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRITE",
+          "name": "Nitrite",
+          "unit": "MG_PER_L",
+          "value": 0.1,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRATE",
+          "name": "Nitrate",
+          "unit": "MG_PER_L",
+          "value": 12,
+          "minimum": null,
+          "maximum": 50,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "DISSOLVED_OXYGEN",
+          "name": "Dissolved oxygen",
+          "unit": "MG_PER_L",
+          "value": 5.8,
+          "minimum": 3,
+          "maximum": null,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "WATER_TEMPERATURE",
+          "name": "Water temperature",
+          "unit": "CELSIUS",
+          "value": 28.5,
+          "minimum": 25,
+          "maximum": 32,
+          "status": "WITHIN_RANGE"
+        }
+      ],
+      "notLogged": [],
+      "outOfRangeCount": 0,
+      "notes": "Morning reading with the freshwater test kit.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-09T23:00:00Z",
+      "isDemo": true,
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+    },
+    {
+      "id": "wlog_tilapia_002",
+      "cultivationId": "cul_tilapia_001",
+      "loggedAt": "2026-09-16T23:00:00Z",
+      "readings": {
+        "salinityPpt": null,
+        "ph": 7.8,
+        "ammoniaMgL": 0.8,
+        "nitriteMgL": 0.3,
+        "nitrateMgL": null,
+        "dissolvedOxygenMgL": 4.2,
+        "temperatureC": 29
+      },
+      "results": [
+        {
+          "parameter": "PH",
+          "name": "pH",
+          "unit": "PH",
+          "value": 7.8,
+          "minimum": 6.5,
+          "maximum": 8.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "AMMONIA",
+          "name": "Ammonia",
+          "unit": "MG_PER_L",
+          "value": 0.8,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "ABOVE_RANGE"
+        },
+        {
+          "parameter": "NITRITE",
+          "name": "Nitrite",
+          "unit": "MG_PER_L",
+          "value": 0.3,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "DISSOLVED_OXYGEN",
+          "name": "Dissolved oxygen",
+          "unit": "MG_PER_L",
+          "value": 4.2,
+          "minimum": 3,
+          "maximum": null,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "WATER_TEMPERATURE",
+          "name": "Water temperature",
+          "unit": "CELSIUS",
+          "value": 29,
+          "minimum": 25,
+          "maximum": 32,
+          "status": "WITHIN_RANGE"
+        }
+      ],
+      "notLogged": ["SALINITY", "NITRATE"],
+      "outOfRangeCount": 1,
+      "notes": "Water looked greener than last week.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-16T23:00:00Z",
+      "isDemo": true,
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+    },
+    {
+      "id": "wlog_tilapia_003",
+      "cultivationId": "cul_tilapia_001",
+      "loggedAt": "2026-09-21T22:00:00Z",
+      "readings": {
+        "salinityPpt": 0.5,
+        "ph": 7.6,
+        "ammoniaMgL": 0.4,
+        "nitriteMgL": 0.2,
+        "nitrateMgL": 18,
+        "dissolvedOxygenMgL": 2.6,
+        "temperatureC": 30.5
+      },
+      "results": [
+        {
+          "parameter": "SALINITY",
+          "name": "Salinity",
+          "unit": "PPT",
+          "value": 0.5,
+          "minimum": null,
+          "maximum": 15,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "PH",
+          "name": "pH",
+          "unit": "PH",
+          "value": 7.6,
+          "minimum": 6.5,
+          "maximum": 8.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "AMMONIA",
+          "name": "Ammonia",
+          "unit": "MG_PER_L",
+          "value": 0.4,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRITE",
+          "name": "Nitrite",
+          "unit": "MG_PER_L",
+          "value": 0.2,
+          "minimum": null,
+          "maximum": 0.5,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "NITRATE",
+          "name": "Nitrate",
+          "unit": "MG_PER_L",
+          "value": 18,
+          "minimum": null,
+          "maximum": 50,
+          "status": "WITHIN_RANGE"
+        },
+        {
+          "parameter": "DISSOLVED_OXYGEN",
+          "name": "Dissolved oxygen",
+          "unit": "MG_PER_L",
+          "value": 2.6,
+          "minimum": 3,
+          "maximum": null,
+          "status": "BELOW_RANGE"
+        },
+        {
+          "parameter": "WATER_TEMPERATURE",
+          "name": "Water temperature",
+          "unit": "CELSIUS",
+          "value": 30.5,
+          "minimum": 25,
+          "maximum": 32,
+          "status": "WITHIN_RANGE"
+        }
+      ],
+      "notLogged": [],
+      "outOfRangeCount": 1,
+      "notes": "Fish were gulping at the surface before sunrise.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-21T22:00:00Z",
+      "isDemo": true,
+      "sourceStatus": "DEMO",
+      "ruleVersion": "demo-2026-09-gabayan",
+      "disclaimer": "Gabayan's recommendations are demo estimates and may vary based on water quality, climate, fish health, feed quality, management practices, and local conditions."
+    }
+  ],
   "harvestRecords": [],
   "tasks": [
     {
@@ -1843,6 +2100,70 @@
     }
   ],
   "feedingRecords": [
+    {
+      "id": "feed_tilapia_week_1",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-08-28T10:00:00Z",
+      "amount": {
+        "value": 19,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-08-28T10:00:00Z"
+    },
+    {
+      "id": "feed_tilapia_week_2",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-09-05T10:00:00Z",
+      "amount": {
+        "value": 23,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-05T10:00:00Z"
+    },
+    {
+      "id": "feed_tilapia_week_3",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-09-13T10:00:00Z",
+      "amount": {
+        "value": 23.5,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-13T10:00:00Z"
+    },
+    {
+      "id": "feed_tilapia_week_4",
+      "cultivationId": "cul_tilapia_001",
+      "taskId": null,
+      "fedAt": "2026-09-20T10:00:00Z",
+      "amount": {
+        "value": 25,
+        "unit": "KG"
+      },
+      "notes": "The week's feed total, copied from the feeding notebook.",
+      "recordedBy": {
+        "id": "usr_juan",
+        "fullName": "Juan Dela Cruz"
+      },
+      "createdAt": "2026-09-20T10:00:00Z"
+    },
     {
       "id": "feed_tilapia_001",
       "cultivationId": "cul_tilapia_001",

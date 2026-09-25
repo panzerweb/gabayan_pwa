@@ -7,6 +7,7 @@ import {
   createWaterCheckApi,
   getCultivationApi,
   getCultivationTimelineApi,
+  getFeedConversionApi,
   getFeedingPlanApi,
   getHarvestReadinessApi,
   listCultivationsApi,
@@ -33,4 +34,5 @@ export const cultivationsRepository: CultivationsRepository = {
   createWaterCheck: createWaterCheckApi,
   getHarvestReadiness: getHarvestReadinessApi,
   completeHarvest: completeHarvestApi,
+  getFeedConversion: getFeedConversionApi,
 }

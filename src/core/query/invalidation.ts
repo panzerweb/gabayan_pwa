@@ -15,6 +15,8 @@ export const QUERY_KEY_PREFIXES = {
   feedingRecords: ['cultivations', 'feeding-records'],
   waterChecks: ['cultivations', 'water-checks'],
   harvestReadiness: ['cultivations', 'harvest-readiness'],
+  feedConversion: ['cultivations', 'feed-conversion'],
+  waterLogs: ['water-quality', 'logs'],
   cart: ['cart'],
   orders: ['orders'],
   notifications: ['notifications'],
@@ -29,13 +31,37 @@ const k = QUERY_KEY_PREFIXES
 // Task completion also refreshes the timeline, where the completed task is listed.
 // The cart prefix covers the cart badge and the checkout quote, both kept under `cart`.
 // Creating or harvesting a cultivation changes the account's active culture-system count.
+// The feed conversion ratio is derived from the feeding, growth and mortality records, so
+// every write of one of those leaves it stale.
 export const INVALIDATIONS = {
   cultivationCreate: [k.home, k.cultivationList, k.cultivationDetail, k.tiers],
-  taskComplete: [k.home, k.tasks, k.cultivationDetail, k.cultivationTimeline, k.notifications],
-  growthCreate: [k.cultivationDetail, k.growth, k.feedingPlan, k.harvestReadiness, k.home],
-  mortalityCreate: [k.cultivationDetail, k.mortality, k.feedingPlan, k.harvestReadiness, k.home],
-  feedingCreate: [k.tasks, k.feedingRecords, k.home],
+  taskComplete: [
+    k.home,
+    k.tasks,
+    k.cultivationDetail,
+    k.cultivationTimeline,
+    k.notifications,
+    k.feedConversion,
+  ],
+  growthCreate: [
+    k.cultivationDetail,
+    k.growth,
+    k.feedingPlan,
+    k.harvestReadiness,
+    k.home,
+    k.feedConversion,
+  ],
+  mortalityCreate: [
+    k.cultivationDetail,
+    k.mortality,
+    k.feedingPlan,
+    k.harvestReadiness,
+    k.home,
+    k.feedConversion,
+  ],
+  feedingCreate: [k.tasks, k.feedingRecords, k.home, k.feedConversion],
   waterCheckCreate: [k.tasks, k.waterChecks, k.home],
+  waterLogCreate: [k.waterLogs],
   cartChange: [k.cart],
   orderCreate: [k.orders, k.cart, k.home, k.notifications],
   harvestCreate: [k.cultivationDetail, k.cultivationList, k.home, k.harvestReadiness, k.tiers],

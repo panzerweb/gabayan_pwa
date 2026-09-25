@@ -197,3 +197,104 @@ export function parseReadingsForm(form: WaterReadingsForm): {
   }
   return { readings, fieldErrors }
 }
+
+// Contract §9 "Water-parameter logs" (Pro). Each saved reading keeps the status it was given
+// against the ranges when the log was saved; the client never re-evaluates it.
+export const WATER_LOG_NOTES_LIMIT = 500
+
+export const WATER_LOG_LIST_LIMIT = 50
+
+export const WATER_LOG_OFFLINE_MESSAGE =
+  'You’re offline. Reconnect to save this reading. Nothing is saved or queued.'
+
+export const waterLogReadingSchema = z.object({
+  parameter: waterParameterSchema,
+  name: z.string().min(1),
+  unit: waterParameterUnitSchema,
+  value: z.number(),
+  minimum: z.number().nullable(),
+  maximum: z.number().nullable(),
+  status: waterReadingStatusSchema,
+})
+
+export const loggedReadingsSchema = z.object({
+  salinityPpt: z.number().nullable(),
+  ph: z.number().nullable(),
+  ammoniaMgL: z.number().nullable(),
+  nitriteMgL: z.number().nullable(),
+  nitrateMgL: z.number().nullable(),
+  dissolvedOxygenMgL: z.number().nullable(),
+  temperatureC: z.number().nullable(),
+})
+
+export const waterParameterLogSchema = z.object({
+  id: z.string().min(1),
+  cultivationId: z.string().min(1),
+  loggedAt: z.string(),
+  readings: loggedReadingsSchema,
+  results: z.array(waterLogReadingSchema),
+  notLogged: z.array(waterParameterSchema),
+  outOfRangeCount: z.number().int().nonnegative(),
+  notes: z.string().nullable(),
+  recordedBy: z.object({ id: z.string(), fullName: z.string() }),
+  createdAt: z.string(),
+  isDemo: z.boolean(),
+  sourceStatus: sourceStatusSchema,
+  ruleVersion: z.string().min(1),
+  disclaimer: z.string().min(1),
+})
+
+export type WaterLogReading = z.infer<typeof waterLogReadingSchema>
+export type WaterParameterLog = z.infer<typeof waterParameterLogSchema>
+
+// `loggedAt` is left to the server, which stamps the reading with its own time.
+export interface CreateWaterParameterLogRequest {
+  readings: WaterReadings
+  notes?: string | null
+}
+
+// Validates the log form as the safety check does, plus the notes, and builds the request.
+export function parseWaterLogForm(
+  form: WaterReadingsForm,
+  notes: string,
+): { body: CreateWaterParameterLogRequest | null; fieldErrors: Record<string, string> } {
+  const { readings, fieldErrors } = parseReadingsForm(form)
+  if (fieldErrors.readings) fieldErrors.readings = 'Enter at least one reading to save.'
+  const trimmed = notes.trim()
+  if (trimmed.length > WATER_LOG_NOTES_LIMIT) {
+    fieldErrors.notes = `Keep the notes to ${WATER_LOG_NOTES_LIMIT} characters or fewer.`
+  }
+  if (Object.keys(fieldErrors).length) return { body: null, fieldErrors }
+  return { body: { readings, notes: trimmed || null }, fieldErrors }
+}
+
+export interface WaterTrendPoint {
+  logId: string
+  loggedAt: string
+  value: number
+  minimum: number | null
+  maximum: number | null
+  status: WaterReadingStatus
+}
+
+// One parameter's saved readings across the logs, oldest first, each with its saved status.
+// Logs that did not measure the parameter are left out.
+export function waterTrendPoints(
+  logs: readonly WaterParameterLog[],
+  parameter: WaterParameter,
+): WaterTrendPoint[] {
+  return logs
+    .flatMap((log) => {
+      const result = log.results.find((reading) => reading.parameter === parameter)
+      if (!result) return []
+      const { value, minimum, maximum, status } = result
+      return [{ logId: log.id, loggedAt: log.loggedAt, value, minimum, maximum, status }]
+    })
+    .sort((left, right) => Date.parse(left.loggedAt) - Date.parse(right.loggedAt))
+}
+
+// "All readings within range", "1 reading out of range", "2 readings out of range".
+export function outOfRangeSummary(count: number): string {
+  if (count === 0) return 'All readings within range'
+  return `${count} ${count === 1 ? 'reading' : 'readings'} out of range`
+}
