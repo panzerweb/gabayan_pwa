@@ -7,9 +7,10 @@ import StatusChip from '@components/ui/StatusChip.vue'
 import { formatManilaTime, formatQuantity } from '@core/utils/format'
 
 import { notificationCategoryDisplay, type Notification } from '../../domain/notifications.model'
+import NotificationReminderDetail from './NotificationReminderDetail.vue'
 
 // One notification. Unread ones say so in words as well as with the accent, and offer
-// either their action or "Mark as read".
+// either their action or "Mark as read". A reminder the server raised also shows its figures.
 const props = defineProps<{ notification: Notification }>()
 const emit = defineEmits<{
   open: [notification: Notification]
@@ -39,6 +40,11 @@ const unread = computed(() => !props.notification.readAt)
         formatQuantity(notification.recommendedAmount.value, notification.recommendedAmount.unit)
       }}
     </p>
+    <NotificationReminderDetail
+      v-if="notification.reminder"
+      :type="notification.type"
+      :reminder="notification.reminder"
+    />
     <BaseButton v-if="notification.action" variant="secondary" @click="emit('open', notification)">
       {{ notification.action.label }}
     </BaseButton>

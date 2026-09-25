@@ -58,6 +58,28 @@ describe('ReminderSettingsSection', () => {
     )
   })
 
+  it('says under each switch what it sends, describing the water change as partial', async () => {
+    const { wrapper } = await mountWithSettings()
+    const help = (label: string) => {
+      const describedBy = control(wrapper, label).attributes('aria-describedby')
+      if (!describedBy) throw new Error(`"${label}" has no description`)
+      return wrapper.get(`#${describedBy}`).text()
+    }
+
+    expect(help('Feeding reminders')).toBe(
+      'A reminder at each feeding time below, with the planned amount.',
+    )
+    expect(help('Water maintenance')).toBe(
+      'A reminder to change part of the water, by the share your species and pond type suggest. Fish cages get none.',
+    )
+    expect(help('Harvest reminders')).toBe(
+      'An alert when a recent sample reaches the target size. You still decide when to harvest.',
+    )
+    for (const label of ['Growth sampling', 'Order updates', 'Educational tips']) {
+      expect(help(label)).not.toBe('')
+    }
+  })
+
   it('switches the feeding times off with feeding reminders', async () => {
     const { wrapper } = await mountWithSettings()
 

@@ -8,6 +8,7 @@ import { registerFeedsContract } from './scenarios/feeds.scenarios.mjs'
 import { registerNotificationContract } from './scenarios/notifications.scenarios.mjs'
 import { registerProfileContract } from './scenarios/profile.scenarios.mjs'
 import { registerReferenceContract } from './scenarios/reference.scenarios.mjs'
+import { registerReminderContract } from './scenarios/reminders.scenarios.mjs'
 import { registerSizingContract } from './scenarios/sizing.scenarios.mjs'
 import { registerSpeciesContract } from './scenarios/species.scenarios.mjs'
 import { registerSystemAndAuthContract } from './scenarios/system-auth.scenarios.mjs'
@@ -558,6 +559,7 @@ registerNotificationContract(client)
 registerTierContract(client)
 registerWaterQualityContract(client)
 registerToolsContract(client)
+registerReminderContract(client)
 
 describe('endpoint catalog coverage', () => {
   it('reads every method-and-path row of the contract endpoint catalog', () => {

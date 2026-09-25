@@ -226,13 +226,41 @@ export function toAddressWrite(form: z.output<typeof addressFormSchema>): Addres
 
 // --- Reminder settings form
 
+// Each switch with a line saying what it sends (contract §6 and §12 Reminders).
 export const REMINDER_TOGGLES = [
-  { field: 'feedingReminders', label: 'Feeding reminders' },
-  { field: 'waterMaintenance', label: 'Water maintenance' },
-  { field: 'growthSampling', label: 'Growth sampling' },
-  { field: 'harvestReminders', label: 'Harvest reminders' },
-  { field: 'orderUpdates', label: 'Order updates' },
-  { field: 'educationalTips', label: 'Educational tips' },
+  {
+    field: 'feedingReminders',
+    label: 'Feeding reminders',
+    description: 'A reminder at each feeding time below, with the planned amount.',
+  },
+  {
+    field: 'waterMaintenance',
+    label: 'Water maintenance',
+    description:
+      'A reminder to change part of the water, by the share your species and pond type suggest. Fish cages get none.',
+  },
+  {
+    field: 'growthSampling',
+    label: 'Growth sampling',
+    description:
+      'Reminders to weigh a sample of fish, which keeps feeding and harvest estimates current.',
+  },
+  {
+    field: 'harvestReminders',
+    label: 'Harvest reminders',
+    description:
+      'An alert when a recent sample reaches the target size. You still decide when to harvest.',
+  },
+  {
+    field: 'orderUpdates',
+    label: 'Order updates',
+    description: 'News about orders you placed in the shop.',
+  },
+  {
+    field: 'educationalTips',
+    label: 'Educational tips',
+    description: 'Short farming tips from time to time.',
+  },
 ] as const
 
 export type ReminderToggle = (typeof REMINDER_TOGGLES)[number]['field']

@@ -3,6 +3,9 @@ import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+import { addDays, dateInManila, daysBetween } from './dates.mjs'
+import { raiseDueReminders } from './reminders.mjs'
+
 const require = createRequire(import.meta.url)
 const jsonServer = require('json-server')
 
@@ -168,27 +171,6 @@ function publicNotification(notification) {
   return omitKeys(notification, ['ownerUserId'])
 }
 
-function dateInManila(isoTimestamp) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Manila',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date(isoTimestamp))
-}
-
-function addDays(isoDate, days) {
-  const date = new Date(`${isoDate}T00:00:00Z`)
-  date.setUTCDate(date.getUTCDate() + days)
-  return date.toISOString().slice(0, 10)
-}
-
-function daysBetween(fromIsoDate, toIsoDate) {
-  return Math.round(
-    (Date.parse(`${toIsoDate}T00:00:00Z`) - Date.parse(`${fromIsoDate}T00:00:00Z`)) / 86400000,
-  )
-}
-
 function isCalendarDate(value) {
   return (
     typeof value === 'string' &&
@@ -332,13 +314,20 @@ function validateRegistration(body) {
   return { fields, fullName, email, mobileNumber, password }
 }
 
-export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = {}) {
+// `now` (or MOCK_API_NOW) pins the clock that decides "today" and which reminders are due, so
+// tests read the seed the same way on any day; unset, the system clock is used. A request may
+// pin it for itself with the test-only `X-Mock-Now` header (contract §15).
+export function createMockApi({ databasePath = defaultDatabasePath, delayMs, now } = {}) {
   // db.json is an untracked working copy of the seed; start from the seed when it is absent.
   if (!existsSync(databasePath)) copyFileSync(seedDatabasePath, databasePath)
 
   const app = jsonServer.create()
   const router = jsonServer.router(databasePath)
   const resolvedDelay = delayMs ?? Number(process.env.MOCK_API_DELAY_MS ?? 250)
+  const pinnedNow = now ?? process.env.MOCK_API_NOW ?? null
+  if (pinnedNow !== null && parseZonedTimestamp(pinnedNow) === null) {
+    throw new Error('MOCK_API_NOW must be an RFC 3339 time with a zone.')
+  }
   const accessTokens = new Map()
   const refreshTokens = new Map()
   let requestSequence = 0
@@ -810,6 +799,53 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     return Number((grams / 1000).toFixed(3))
   }
 
+  // The instant a handler treats as now: the pinned clock when there is one.
+  function currentTime(response) {
+    return response.locals.now ?? new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+  }
+
+  // Contract §6: settings exist from the first read, created with every reminder on.
+  function notificationSettingsFor(user) {
+    const existing = router.db.get('notificationSettings').find({ ownerUserId: user.id }).value()
+    if (existing) return existing
+    const settings = {
+      id: `notification_settings_${user.id}`,
+      ownerUserId: user.id,
+      feedingReminders: true,
+      waterMaintenance: true,
+      growthSampling: true,
+      harvestReminders: true,
+      orderUpdates: true,
+      educationalTips: true,
+      morningFeedingTime: '08:00',
+      afternoonFeedingTime: '16:30',
+      timezone: user.timezone,
+      updatedAt: new Date().toISOString(),
+      version: 1,
+    }
+    router.db.get('notificationSettings').push(settings).write()
+    return settings
+  }
+
+  // Raises the reminders due for the farmer before Home or the notifications answer
+  // (BLOCKERS D-22). A new feeding task moves `nextTaskAt`, a value the server derives, so
+  // the cultivation's version is left alone.
+  function raiseReminders(user, response) {
+    const cultivationIds = raiseDueReminders(router.db, {
+      user,
+      settings: notificationSettingsFor(user),
+      now: currentTime(response),
+      feedingPlan: feedingPlanFor,
+    })
+    for (const cultivationId of cultivationIds) {
+      router.db
+        .get('cultivations')
+        .find({ id: cultivationId })
+        .assign({ nextTaskAt: nextOpenTaskAt(cultivationId) })
+        .write()
+    }
+  }
+
   app.disable('x-powered-by')
   app.use((request, response, next) => {
     const origin = request.get('origin')
@@ -820,7 +856,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     }
     response.set(
       'access-control-allow-headers',
-      'Authorization, Content-Type, Idempotency-Key, If-Match, X-Request-Id',
+      'Authorization, Content-Type, Idempotency-Key, If-Match, X-Request-Id, X-Mock-Now',
     )
     response.set('access-control-allow-methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS')
     if (request.method === 'OPTIONS') return response.sendStatus(204)
@@ -833,6 +869,12 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
     const incomingId = request.get('x-request-id')
     response.locals.requestId = incomingId || `req_mock_${String(requestSequence).padStart(6, '0')}`
     response.set('x-request-id', response.locals.requestId)
+    const requestedNow = request.get('x-mock-now')
+    const clock = requestedNow === undefined ? pinnedNow : parseZonedTimestamp(requestedNow)
+    if (clock === null && requestedNow !== undefined) {
+      return sendError(response, 400, 'BAD_REQUEST', 'X-Mock-Now must be an RFC 3339 time.')
+    }
+    response.locals.now = clock ? parseZonedTimestamp(clock) : null
     if (resolvedDelay > 0) return setTimeout(next, resolvedDelay)
     next()
   })
@@ -1085,25 +1127,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/users/me/notification-settings', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
-    let settings = router.db.get('notificationSettings').find({ ownerUserId: user.id }).value()
-    if (!settings) {
-      settings = {
-        id: `notification_settings_${user.id}`,
-        ownerUserId: user.id,
-        feedingReminders: true,
-        waterMaintenance: true,
-        growthSampling: true,
-        harvestReminders: true,
-        orderUpdates: true,
-        educationalTips: true,
-        morningFeedingTime: '08:00',
-        afternoonFeedingTime: '16:30',
-        timezone: user.timezone,
-        updatedAt: new Date().toISOString(),
-        version: 1,
-      }
-      router.db.get('notificationSettings').push(settings).write()
-    }
+    const settings = notificationSettingsFor(user)
     return sendData(response, omitKeys(settings, ['id', 'ownerUserId']))
   })
 
@@ -1872,10 +1896,11 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/dashboard/home', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
-    const date = String(request.query.date ?? dateInManila(new Date().toISOString()))
+    const date = String(request.query.date ?? dateInManila(currentTime(response)))
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       return sendError(response, 400, 'BAD_REQUEST', 'Date must use YYYY-MM-DD.')
     }
+    raiseReminders(user, response)
     const cultivations = router.db.get('cultivations').filter({ ownerUserId: user.id }).value()
     const primaryCultivation =
       cultivations.find((item) => !['COMPLETED', 'CANCELLED'].includes(item.status)) ?? null
@@ -2827,6 +2852,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/notifications/unread-count', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
+    raiseReminders(user, response)
     const count = router.db
       .get('notifications')
       .filter((item) => item.ownerUserId === user.id && item.readAt === null)
@@ -2838,6 +2864,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
   app.get('/api/v1/notifications', (request, response) => {
     const user = requireUser(request, response)
     if (!user) return
+    raiseReminders(user, response)
     let notifications = router.db.get('notifications').filter({ ownerUserId: user.id }).value()
     if (request.query.category) {
       const categories = Array.isArray(request.query.category)
@@ -3412,6 +3439,7 @@ export function createMockApi({ databasePath = defaultDatabasePath, delayMs } = 
         cultivationId: null,
         orderId: order.id,
         taskId: null,
+        reminder: null,
       })
       .write()
     const result = publicOrder(order)

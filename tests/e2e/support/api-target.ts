@@ -51,6 +51,11 @@ export function appOrigin(
 export const JOURNEY_APP_PORT = '5174'
 export const JOURNEY_MOCK_API_PORT = '3101'
 
+// The clock the journeys' mock starts on: the seed day before its first feeding time, so no
+// reminder falls due that the seed does not already hold. A journey that needs another time
+// sends the mock's test-only X-Mock-Now header (contract §15).
+export const JOURNEY_MOCK_CLOCK = '2026-09-23T07:30:00+08:00'
+
 export interface JourneyServers {
   /** Origin the browser opens the app on. */
   appUrl: string

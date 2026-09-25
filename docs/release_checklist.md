@@ -7,9 +7,9 @@ Last verified: 2026-09-25
 - [x] ESLint passes across application, mock API, and tests.
 - [x] ESLint refuses `@tanstack/vue-query`, `@core/http` and `data/` imports in every `src/**/*.vue`, shared components and layouts included (`tests/unit/core/vue-import-boundary.spec.ts`).
 - [x] Vue/TypeScript strict type checking passes.
-- [x] Unit and component suite passes: 671 tests.
-- [x] Mock API contract suite passes: 84 tests, and its coverage check exercises all 75 method-and-path rows of contract §5.
-- [x] Mobile Playwright suite passes: 23 journeys in Chrome at the primary `390 x 844 px` viewport.
+- [x] Unit and component suite passes: 684 tests.
+- [x] Mock API contract suite passes: 89 tests, and its coverage check exercises all 75 method-and-path rows of contract §5.
+- [x] Mobile Playwright suite passes: 24 journeys in Chrome at the primary `390 x 844 px` viewport.
 - [x] Responsive reflow check passes at 320, 360, 390, 412, and 430 px without horizontal overflow.
 - [x] Production PWA build succeeds and emits the web manifest and service worker.
 - [x] Formatting check passes.
@@ -91,3 +91,5 @@ Every route loads its page as a lazy chunk (`src/router/routes/*.routes.ts`); th
 - [ ] `ProductDetail.installationGuide` and `WaterReadingResult.recommendedProducts` pass against FastAPI. Waits for aqua-lens-api Phase 34; until then a FastAPI contract run fails the tools scenarios (`tests/contract/scenarios/tools.scenarios.mjs`) and `tests/e2e/buy-now.spec.ts` cannot pass there. Other screens are unaffected: both fields are optional in the PWA's schemas, so a product without a guide and a result without products render as before.
 - [x] The Feed plan tab of a cultivation shows the feed for its current growth stage (feed type, protein, pellet size, feedings a day) with the demo disclaimer and a "Buy now" to each linked Feeds product, and links to the species' whole feed guide (`GET /species/{speciesId}/feed-guide`, all six species DEMO; `tests/component/feeds/`, `tests/contract/scenarios/feeds.scenarios.mjs`, `tests/e2e/feeds.spec.ts`).
 - [ ] `GET /species/{speciesId}/feed-guide` passes against FastAPI. Waits for aqua-lens-api Phase 36; until then a FastAPI contract run fails the feeds scenarios and `tests/e2e/feeds.spec.ts` cannot pass there. The Feed plan tab still shows today's plan: an API without the route answers 404, so the feed card says there is no guide for the fish yet.
+- [x] Reading Home or the notifications raises the reminders due for each stocked, open cultivation, once per cultivation, kind and slot: the day's feeding task with a `FEEDING_DUE` reminder at each feeding time, a `WATER_CHANGE_DUE` reminder for a partial change of the profile's percentage (30 %, demo) each interval, and a `HARVEST_APPROACHING` alert only once a current sample reaches the target band, with 120-150 days shown as a hint and the decision left to the grower; each follows its switch in reminder settings, which now say what each switch sends. The contract and journey suites pin the mock clock to `2026-09-23T07:30:00+08:00` (`MOCK_API_NOW`, `X-Mock-Now`; `tests/contract/scenarios/reminders.scenarios.mjs`, `tests/component/notifications/NotificationReminderDetail.spec.ts`, `tests/e2e/reminders.spec.ts`).
+- [ ] Reminders pass against FastAPI. Waits for aqua-lens-api Phase 38; until then a FastAPI contract run fails the reminder scenarios, and `tests/e2e/reminders.spec.ts` also needs a way to set FastAPI's clock (BLOCKERS D-67). Other screens are unaffected: `Notification.reminder` is optional in the PWA's schema.
